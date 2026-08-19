@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Caveat:wght@600;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #FFFDF5;
+  --foreground: #013E37;
+  --butter: #FFEFB3;
+  --pine: #013E37;
+  --font-outfit: 'Outfit', sans-serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --font-caveat: 'Caveat', cursive;
+}
+
+.dark {
+  --background: #002621;
+  --foreground: #FFEFB3;
+  --butter: #FFEFB3;
+  --pine: #013E37;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-outfit);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Islamic Geometric Pattern Background Overlay with Butter & Pine */
+.islamic-pattern {
+  background-color: #FFFDF5;
+  background-image: radial-gradient(#013E37 0.75px, transparent 0.75px), radial-gradient(#FFEFB3 0.75px, #FFFDF5 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  opacity: 0.95;
+}
+
+.dark .islamic-pattern {
+  background-color: #002621;
+  background-image: radial-gradient(#FFEFB3 0.75px, transparent 0.75px), radial-gradient(#045E54 0.75px, #002621 0.75px);
+  opacity: 0.95;
+}
+
+/* Luxury Butter-Pine Capsule Pills */
+.pill-butter {
+  background-color: #FFEFB3;
+  color: #013E37;
+  border: 1.5px solid #013E37;
+  font-weight: 700;
+}
+
+.pill-pine {
+  background-color: #013E37;
+  color: #FFEFB3;
+  border: 1.5px solid #FFEFB3;
+  font-weight: 700;
+}
+
+.night-sky-pattern {
+  background: radial-gradient(ellipse at bottom, #1E1B4B 0%, #0F172A 100%);
+}
+
+/* Glassmorphism */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(254, 243, 199, 0.6);
+}
+
+.glass-dark {
+  background: rgba(30, 27, 75, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+/* Realistic 3D Book Spine & Shadows */
+.book-container {
+  perspective: 1500px;
+}
+
+.book-spread {
+  transform-style: preserve-3d;
+  box-shadow: 0 30px 60px -15px rgba(30, 27, 75, 0.3), 0 0 0 1px rgba(245, 158, 11, 0.15);
+}
+
+.book-spine-gradient {
+  background: linear-gradient(90deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.02) 20%, transparent 50%, rgba(0,0,0,0.02) 80%, rgba(0,0,0,0.15) 100%);
+}
+
+/* Smooth custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FDFBF7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FDE68A;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #F59E0B;
+}
+
+/* Glow effects */
+.gold-glow {
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.4));
+}
+
+@keyframes floatAnimation {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+.animate-gentle-float {
+  animation: floatAnimation 5s ease-in-out infinite;
+}
+
+/* =========================================================
+   PDF & PRINT STYLES - CLEAN STORYBOOK EXPORT
+   ========================================================= */
+@media print {
+  /* Hide all website navigation, headers, footers, overlays, and controls */
+  header,
+  footer,
+  nav,
+  aside,
+  .no-print,
+  .print\\:hidden,
+  [data-print="hidden"] {
+    display: none !important;
+  }
+
+  /* Reset document layout for clean white paper printing */
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* A4 Portrait / Standard Paper */
+  @page {
+    size: A4 portrait;
+    margin: 12mm 15mm;
+  }
+
+  /* Main container visibility */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Storybook Print Page rules */
+  .pdf-story-page {
+    page-break-after: always;
+    break-after: page;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    min-height: 96vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px 0;
+    box-sizing: border-box;
+    background: #ffffff !important;
+  }
+
+  .pdf-story-page:last-child {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Ensure images print in high quality with exact colors */
+  img {
+    max-width: 100% !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Single-page Certificate print rules */
+  #tashakkurnoma-print-area, #tashakkurnoma-print-area * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #tashakkurnoma-print-area {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    z-index: 999999 !important;
+  }
+}
+
+
+
