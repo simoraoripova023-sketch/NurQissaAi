@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { 
   X, Sparkles, Check, Crown, Star, Gem, ShieldCheck, 
-  CreditCard, ArrowRight, Heart, Gift, Zap
+  CreditCard, ArrowRight, Heart, Gift, Zap, Send
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import confetti from 'canvas-confetti';
