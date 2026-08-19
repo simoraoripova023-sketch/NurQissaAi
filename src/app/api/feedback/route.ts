@@ -38,20 +38,26 @@ export async function POST(req: NextRequest) {
       console.warn('Supabase feedback insert notice:', dbErr);
     }
 
-    // 2. Save backup to data/feedbacks.json
-    fs.mkdirSync(path.join(process.cwd(), 'data'), { recursive: true });
-    let feedbacks = [];
-    if (fs.existsSync(FEEDBACKS_FILE)) {
-      try {
-        feedbacks = JSON.parse(fs.readFileSync(FEEDBACKS_FILE, 'utf-8'));
-      } catch {
-        feedbacks = [];
+    // 2. Safe local backup (only when filesystem is writable)
+    try {
+      if (fs && typeof fs.mkdirSync === 'function') {
+        fs.mkdirSync(path.join(process.cwd(), 'data'), { recursive: true });
+        let feedbacks = [];
+        if (fs.existsSync(FEEDBACKS_FILE)) {
+          try {
+            feedbacks = JSON.parse(fs.readFileSync(FEEDBACKS_FILE, 'utf-8'));
+          } catch {
+            feedbacks = [];
+          }
+        }
+        feedbacks.unshift(newFeedback);
+        fs.writeFileSync(FEEDBACKS_FILE, JSON.stringify(feedbacks, null, 2), 'utf-8');
       }
+    } catch {
+      // Serverless environments like Vercel have read-only filesystem, which is normal
     }
-    feedbacks.unshift(newFeedback);
-    fs.writeFileSync(FEEDBACKS_FILE, JSON.stringify(feedbacks, null, 2), 'utf-8');
 
-    // 2. Format notification for Telegram
+    // 3. Format notification for Telegram
     const emojiMap: Record<string, string> = {
       taklif: '💡 YANGI TAKLIF',
       shikoyat: '⚠️ YANGI SHIKOYAT / MUAMMO',
@@ -68,7 +74,7 @@ export async function POST(req: NextRequest) {
       `📝 <b>Matn:</b>\n<i>${newFeedback.message}</i>`
     );
 
-    // 3. Send EXCLUSIVELY to owner's personal chat ID
+    // 4. Send EXCLUSIVELY to owner's personal chat ID
     const ownerId = process.env.ADMIN_TELEGRAM_ID || '5636799086';
     const adminChats = [ownerId];
 
@@ -102,12 +108,22 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
+    const { supabase } = await import('@/lib/supabase');
+    const { data } = await supabase.from('feedbacks').select('*').order('created_at', { ascending: false }).limit(20);
+    if (data && data.length > 0) {
+      return NextResponse.json({ feedbacks: data });
+    }
+  } catch (dbErr) {
+    console.warn('Supabase fetch notice:', dbErr);
+  }
+
+  try {
     if (fs.existsSync(FEEDBACKS_FILE)) {
       const data = JSON.parse(fs.readFileSync(FEEDBACKS_FILE, 'utf-8'));
       return NextResponse.json({ feedbacks: data });
     }
     return NextResponse.json({ feedbacks: [] });
-  } catch (e: any) {
+  } catch {
     return NextResponse.json({ feedbacks: [] });
   }
 }
