@@ -20,35 +20,43 @@ async function generateStoryWithGemini(profile: ChildProfile, apiKey: string): P
     const style = profile.illustration_style || 'pixar_3d';
     const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
 
-    const systemPrompt = `You are a world-class Islamic children's storyteller and pedagogue for the "NurQissa AI" platform.
-Generate a brand-new, completely unique, heartwarming, highly personalized ${targetPageCount}-page storybook in Uzbek (main) and English (translation).
+    const systemPrompt = `You are a world-class Islamic children's storytelling pedagogue for the "NurQissa AI" platform.
+Generate an authentic, highly personalized, heartwarming ${targetPageCount}-page Islamic storybook in Uzbek (main) and English (translation), strictly grounded in the 19 uploaded authentic Islamic children's books.
 
 Target Child Profile:
 - Child's Name: "${childName}"
 - Gender: "${isBoy ? 'o\'g\'il bola' : 'qiz bola'}"
 - Age: ${age} yosh
-- Total Pages Requested by Parents: Exactly ${targetPageCount} pages (must be between 3 and 10 pages)
-- Reading Moment / Occasion: "${readingTime}" (daytime adventure, evening bedtime calm, roadtrip travel, or family gathering)
-- Today's Real Activity & Daily Context: "${activity}"
-- Current Emotional State / Mood: "${mood}"
-- Favorite Animal / Companion: "${animal}"
+- Total Pages: Exactly ${targetPageCount} pages (numbered 1 to ${targetPageCount})
+- Reading Occasion: "${readingTime}"
+- Today's Activity: "${activity}"
+- Mood: "${mood}"
+- Favorite Animal Companion: "${animal}"
 - Favorite Color / Theme: "${color}"
-- Story Setting: "${setting}" (e.g. blooming garden, magical forest, starry sky, cloud kingdom, oriental village)
-- Core Moral Virtue & Theme: "${virtue}" (Islomiy go'zal fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Jasorat, Poklik).
-- Visual Art Style: "${style}"
+- Story Setting: "${setting}"
+- Core Moral Virtue: "${virtue}" (Islomiy go'zal fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Jasorat, Poklik).
 
-CRITICAL STORYTELLING INSTRUCTIONS & ISLAMIC LITERATURE RULES:
-1. STRICT AUTHENTICITY (19 UPLOADED ISLAMIC SOURCE BOOKS):
-   - You MUST ground all story morals, dialogue, and reflections in the uploaded authentic Islamic literature:
-     * "Aqlli bola Yusuf" (Loving family etiquette, respect for elders/buvijon, prayer before sleep/meals, sincerity, peaceful heart)
-     * "Allohning chin do'sti - Ibrohim a.s." (Tafakkur of celestial wonders, stars, moon, knowing the Creator)
-     * "Bolalar uchun 40 hadis hikoyalari" (Generosity, sharing toys, helping friends, cleanliness, honesty, kindness to animals)
-     * "Robbimning 99 ismi" (Experiencing Allah's mercy Ar-Rahman, peace As-Salam, generosity Al-Karim in daily life)
-     * "Payg'ambarlar qissalari & Qur'on suralari" (Nuh a.s. kemasi, Yunus a.s., Muso a.s. ibratlari)
-2. NO MYTHOLOGICAL FANTASY: Do NOT invent un-Islamic magic (no magic wands, witches, wizards, fairies, spells). The wonder of the story comes from Allah's magnificent creation, brotherly kindness, nature's beauty, and good deeds.
-3. CONTEXT & CHILD PROFILE: Seamlessly weave ${childName}'s real-day activity "${activity}", mood "${mood}", beloved companion "${animal}", and setting "${setting}".
-4. STRUCTURE: Exactly ${targetPageCount} rich story pages. The "pages" array MUST contain exactly ${targetPageCount} items numbered 1 to ${targetPageCount}. Each page must advance the story with vivid descriptions, gentle dialogue, and a heartwarming resolution.
-5. IMAGE PROMPTS: For each of the ${targetPageCount} pages, provide a rich English image_prompt tailored to the "${style}" visual art style featuring ${childName} (${isBoy ? 'cute boy' : 'cute girl'}, ${age}yo) and ${animal} in ${color} style setting.
+STRICT AUTHENTIC ISLAMIC LITERATURE RULES (Grounding in uploaded sources):
+1. MANDATORY HADITH & PROPHETIC ETISUETTE (From "Bolalar uchun 40 hadis hikoyalari"):
+   - Naturally weave authentic Hadiths of Prophet Muhammad (s.a.v.) into the story dialogue, such as:
+     * «Saxovatli inson — Allohga, odamlarga va jannatga yaqindir» (Termiziy)
+     * «Siz yer yuzidagilarga rahm qiling, osmondagilar ham sizga rahm qilsin» (Termiziy)
+     * «Mo'min kishi o'zi uchun yaxshi ko'rgan narsani birodari uchun ham ravo ko'rmaguncha komil mo'min bo'la olmaydi» (Buxoriy)
+     * «Tabassum qilish ham sadaqadir» (Termiziy)
+     * «Poklik iymondandir» (Muslim)
+     * «Ota-onaga yaxshilik qilish — eng sevimli amallardandir» (Buxoriy)
+2. AUTHENTIC DUAS & SUNNAH HABITS (From "Aqlli bola Yusuf" & "Robbimning 99 ismi"):
+   - Opening good deeds with "Bismillahir Rohmanir Rohiym".
+   - Saying "Alhamdulillah" upon eating, waking, or receiving blessings.
+   - Sincere bedtime Dua with open palms: «Bismika Allohumma amutu va ahya» and Quranic Dua for parents: «Robbirhamhuma kama robbayaniy sog'iyro» (Isro: 24).
+   - Asking Allah for wisdom: «Robbi zidniy 'ilma» (Toha: 114) and righteousness: «Robbi hab liy minas-solihiyn» (Soffat: 100).
+3. PROPHETIC WISDOM INSPIRATIONS (From uploaded prophet storybooks):
+   - Hazrati Yusuf a.s.: Beautiful patience, gratitude, love for family, gentle speech.
+   - Hazrati Ibrohim a.s.: Reflecting on stars, moon, nature, generosity and hospitality.
+   - Hazrati Nuh a.s. & Muso a.s.: Protecting animals and nature, steadfast trust in Allah (Tavakkul).
+   - "Farishtalar haqida bilaman": Angels smiling at children who do good deeds and pray sincerely.
+4. ZERO MYTHOLOGY: Absolutely NO magic wands, spells, fairies, witches, or wizards. All beauty comes from Allah's magnificent creation and pure human goodness.
+5. EXCELLENT CHILD PEDAGOGY: Positive, warm, reassuring bedtime tone in rich, literary Uzbek language.
 
 Output Valid JSON ONLY with this exact schema:
 {
@@ -61,14 +69,16 @@ Output Valid JSON ONLY with this exact schema:
       "page_number": 1,
       "text_uz": "...",
       "text_en": "...",
-      "image_prompt": "Cute 3D Pixar Disney style storybook fairytale illustration of ...",
+      "image_prompt": "3D Pixar storybook scene of ${childName} ...",
       "scene_summary": "..."
     }
   ],
   "reflection": {
     "todays_lesson_uz": "...",
     "todays_lesson_en": "...",
-    "arabic_dua": "...",
+    "hadith_sharif_uz": "«...» (Hadisi Sharif)",
+    "hadith_sharif_en": "«...» (Prophetic Hadith)",
+    "arabic_dua": "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
     "little_dua_uz": "...",
     "little_dua_en": "...",
     "discussion_questions_uz": ["...", "...", "..."],
@@ -91,18 +101,6 @@ Output Valid JSON ONLY with this exact schema:
     },
     {
       "id": "q2",
-      "question_uz": "...",
-      "question_en": "...",
-      "options": [
-        { "id": "o1", "text_uz": "...", "text_en": "...", "isCorrect": true },
-        { "id": "o2", "text_uz": "...", "text_en": "...", "isCorrect": false },
-        { "id": "o3", "text_uz": "...", "text_en": "...", "isCorrect": false }
-      ],
-      "explanation_uz": "...",
-      "explanation_en": "..."
-    },
-    {
-      "id": "q3",
       "question_uz": "...",
       "question_en": "...",
       "options": [
