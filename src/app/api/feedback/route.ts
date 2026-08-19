@@ -24,7 +24,21 @@ export async function POST(req: NextRequest) {
       created_at: new Date().toISOString()
     };
 
-    // 1. Save to data/feedbacks.json
+    // 1. Save to Supabase (if table exists)
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      await supabase.from('feedbacks').insert([{
+        type: newFeedback.type,
+        name: newFeedback.name,
+        contact: newFeedback.contact,
+        message: newFeedback.message,
+        created_at: newFeedback.created_at
+      }]);
+    } catch (dbErr) {
+      console.warn('Supabase feedback insert notice:', dbErr);
+    }
+
+    // 2. Save backup to data/feedbacks.json
     fs.mkdirSync(path.join(process.cwd(), 'data'), { recursive: true });
     let feedbacks = [];
     if (fs.existsSync(FEEDBACKS_FILE)) {
