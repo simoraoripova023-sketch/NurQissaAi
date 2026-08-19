@@ -317,34 +317,23 @@ export async function POST(req: NextRequest) {
       generatedStory = await generateStoryWithGemini(profile, (geminiApiKey || '').trim());
     }
 
-    // 3. Generate custom 3D AI illustrations for Cover and all pages
+    // 3. Assign pristine authentic 3D Islamic storybook illustrations for Cover and all pages
     if (generatedStory && generatedStory.pages && generatedStory.pages.length >= 4) {
-      const coverPrompt = `3D Disney Pixar storybook cover illustration matching Fotima and Yusuf book art: ${characterPersona} together with beloved companion ${animal} in breathtaking glowing ${color} setting, soft warm golden sunlight, crescent moon, lush flowers, title banner, high quality 3D render, masterpiece`;
-      
-      const fallbackCoverUrl = getStorySceneImage(profile.gender, 1);
-      // ALWAYS generate the 3D animated cover transformed from the child's persona
-      const coverImageUrl = await generateDallEImage(coverPrompt, fallbackCoverUrl, `${storyId}-cover`);
+      const coverImageUrl = (profile.child_photo_url && profile.child_photo_url.startsWith('/stories/'))
+        ? profile.child_photo_url
+        : getStorySceneImage(profile.gender, 1);
 
-      const enhancedPages = await Promise.all(generatedStory.pages.map(async (p, idx) => {
-        const pagePrompt = p.image_prompt 
-          ? `${p.image_prompt}, featuring ${characterPersona} and ${animal}, matching Fotima & Yusuf book artwork`
-          : `3D Pixar children's storybook scene of ${characterPersona} with ${animal} in ${color} setting, ${p.scene_summary || 'adventure'}, matching Fotima and Yusuf book art`;
-        
-        // 100% clean authentic literature scene as infallible fallback
-        const authenticSceneFallback = getStorySceneImage(profile.gender, idx + 1);
-        
-        // Generate via OpenAI gpt-image-1-mini with consistent character persona
-        const pageImageUrl = await generateDallEImage(pagePrompt, authenticSceneFallback, `${storyId}-p${idx + 1}`);
-        
+      const enhancedPages = generatedStory.pages.map((p, idx) => {
+        const authenticScene = getStorySceneImage(profile.gender, idx + 1);
         return {
           page_number: idx + 1,
           text_uz: p.text_uz || '',
           text_en: p.text_en || '',
-          image_prompt: pagePrompt,
-          image_url: pageImageUrl,
+          image_prompt: p.image_prompt || `Authentic storybook scene for page ${idx + 1}`,
+          image_url: authenticScene,
           scene_summary: p.scene_summary || `${childName} sarguzashti - ${idx + 1}-sahifa`,
         };
-      }));
+      });
 
       const dynamicStory: StoryBook = {
         id: storyId,
@@ -387,80 +376,82 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Fallback: Dynamic programmatic generator (Crafted uniquely for child's name, animal, color, setting)
-    const coverPrompt = `Fairytale cover for ${childName} with ${animal} in magical ${color} world, 3d pixar bedtime story`;
-    const coverImageUrl = profile.child_photo_url || createAiImageUrl(coverPrompt, baseSeed);
+    const coverImageUrl = (profile.child_photo_url && profile.child_photo_url.startsWith('/stories/'))
+      ? profile.child_photo_url
+      : getStorySceneImage(profile.gender, 1);
 
-    const fallbackPages = [
+    const rawFallbackPages = [
       {
         page_number: 1,
         text_uz: `Oqshom shafag'i olamga oltin nurlarini sochar edi. ${childName} o'zining sevimli ${animal}i bilan birga xonadonida o'tirib, osmondagi yulduzlarni tomosha qilardi. Uning qalbida go'zal ertak eshitish ishtiyoqi yonardi.`,
         text_en: `As the golden evening arrived, ${childName} sat peacefully with their beloved ${animal}, gazing at the first twinkling stars.`,
-        image_prompt: `Cute 3D Pixar fairytale illustration of ${childName} (${isBoy ? 'boy' : 'girl'}, age ${profile.age || 6}) sitting by a cozy window with ${animal}, warm evening light`,
-        image_url: createAiImageUrl(`${childName} by window with ${animal}`, baseSeed + 1),
+        image_prompt: `Authentic story scene for page 1`,
+        image_url: getStorySceneImage(profile.gender, 1),
         scene_summary: `${childName}ning oqshomgi xotirjamligi`
       },
       {
         page_number: 2,
         text_uz: `Shu payt xonaga mehribon buvijonisi va ota-onasi kirib keldilar. Ular ${childName}ning yoniga o'tirib, mehr bilan peshonasidan o'pdilar: \"Ko'zlarimizning nuri, bilasanmi, chinakam baxt — har bir ne'mat uchun Allohga shukr qilish va yaxshilik ulashishdadir\", dedilar.`,
         text_en: `Loving family joined ${childName}, sharing gentle words of wisdom: "True happiness comes from gratitude and sharing goodness."`,
-        image_prompt: `Smiling loving grandmother and parents gently hugging ${childName} in warm cozy living room, golden fairytale art`,
-        image_url: createAiImageUrl(`loving family hugging ${childName} in cozy room`, baseSeed + 2),
+        image_prompt: `Authentic story scene for page 2`,
+        image_url: getStorySceneImage(profile.gender, 2),
         scene_summary: `Oila mehri va dono o'git`
       },
       {
         page_number: 3,
         text_uz: `${childName} o'zining sevimli ${animal}ini quchoqlab, samimiy jilmaydi. U bugun o'rgangan go'zal fazilatga amal qilishga qaror qildi: \"Bismillahir Rohmanir Rohiym!\" deb, eng sevimli narsasini oilasi va yaqinlari bilan baham ko'rdi.`,
         text_en: `With a joyful smile, ${childName} whispered "Bismillah" and happily shared what they loved most with family.`,
-        image_prompt: `${childName} sharing a special gift with joyful family, glowing warm light, 3D Pixar style`,
-        image_url: createAiImageUrl(`${childName} sharing with family`, baseSeed + 3),
+        image_prompt: `Authentic story scene for page 3`,
+        image_url: getStorySceneImage(profile.gender, 3),
         scene_summary: `Bismillah bilan ezgulik ulashish`
       },
       {
         page_number: 4,
         text_uz: `Birdan butun xona go'yo nurga to'ldi! ${childName}ning yaxshi amali tufayli ${animal} ham quvonchdan sakrab ketdi. Har bir yaxshi amal qalbga xotirjamlik va baraka olib kelishini ${childName} dildan his qildi.`,
         text_en: `The room sparkled with warmth. Doing good brought instant peace and light to everyone's heart.`,
-        image_prompt: `Magical golden sparkles filling room around happy ${childName} and playful ${animal}`,
-        image_url: createAiImageUrl(`magic sparkles around ${childName} and ${animal}`, baseSeed + 4),
+        image_prompt: `Authentic story scene for page 4`,
+        image_url: getStorySceneImage(profile.gender, 4),
         scene_summary: `Ezgulikning nurli barakasi`
       },
       {
         page_number: 5,
         text_uz: `Kechki dasturxonda butun oila jam bo'ldi. ${childName} odob bilan taom yeb, \"Alhamdulillah, bizga bergan barcha shirin ne'matlaringga shukur, Yo Robbim!\" dedi. Ota-onasi uning odobidan faxrlandilar.`,
         text_en: `At dinnertime, ${childName} politely said 'Alhamdulillah', filling parents with immense pride and joy.`,
-        image_prompt: `Family gathered happily around beautiful dinner table with glowing lanterns, 3D storybook art`,
-        image_url: createAiImageUrl(`family dinner table with ${childName}`, baseSeed + 5),
+        image_prompt: `Authentic story scene for page 5`,
+        image_url: getStorySceneImage(profile.gender, 5),
         scene_summary: `Shukronalik dasturxoni`
       },
       {
         page_number: 6,
         text_uz: `Oqshom tushib, osmon hilol oy va son-sanoqsiz yulduzlar bilan bezandi. ${childName} xonasini ozoda qilib, yotishga tayyorlandi. Uning qalbi cheksiz oromga to'lgan edi.`,
         text_en: `Outside the window, a bright crescent moon smiled as ${childName} prepared for cozy bedtime.`,
-        image_prompt: `Peaceful night scene of cozy bedroom, starry night and smiling crescent moon outside window`,
-        image_url: createAiImageUrl(`cozy bedroom night scene with ${childName}`, baseSeed + 6),
+        image_prompt: `Authentic story scene for page 6`,
+        image_url: getStorySceneImage(profile.gender, 6),
         scene_summary: `Orombaxsh oqshom sukunati`
       },
       {
         page_number: 7,
         text_uz: `Yotishdan oldin ${childName} jajji kaftlarini ochib, ixlos bilan duo qildi: \"Ey mehribon Allohim! Ota-onamni, oilamni asragin. Menga go'zal xulq va sabr bergin. Omin!\". Buvijonisi unga shirin fotiha berdi.`,
         text_en: `Raising hands in sincere prayer, ${childName} asked Allah to bless parents, family, and keep their heart pure.`,
-        image_prompt: `Cute ${childName} sitting in bed making bedtime dua with soft glowing moonlight, 3d fairytale art`,
-        image_url: createAiImageUrl(`${childName} making bedtime dua`, baseSeed + 7),
+        image_prompt: `Authentic story scene for page 7`,
+        image_url: getStorySceneImage(profile.gender, 7),
         scene_summary: `${childName}ning samimiy oqshom duosi`
       },
       {
         page_number: 8,
         text_uz: `${childName} yostig'iga bosh qo'yib, jilmaygancha shirin uyquga ketdi. U shirin tushlar ko'rib, farishtalar panohida orom oldi. Xayrli tun, aziz ${childName}!`,
         text_en: `Resting upon soft pillows, ${childName} drifted into the sweetest peaceful sleep. Good night, little champion!`,
-        image_prompt: `${childName} sleeping peacefully in cozy bed hugging ${animal}, gentle moonlight, fairytale masterpiece`,
-        image_url: createAiImageUrl(`${childName} sleeping peacefully with ${animal}`, baseSeed + 8),
+        image_prompt: `Authentic story scene for page 8`,
+        image_url: getStorySceneImage(profile.gender, 8),
         scene_summary: `Shirin tushlar va xotirjam uyqu`
       }
     ];
 
     const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
-    const selectedFallbackPages = fallbackPages.slice(0, targetPageCount).map((p, idx) => ({
+    const selectedFallbackPages = rawFallbackPages.slice(0, targetPageCount).map((p, idx) => ({
       ...p,
       page_number: idx + 1,
+      image_url: getStorySceneImage(profile.gender, idx + 1)
     }));
 
     const fallbackStory: StoryBook = {

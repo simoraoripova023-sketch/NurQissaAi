@@ -17,14 +17,14 @@ export const GIRL_SCENE_ARTWORK = [
 
 // Boy Storybook Scene Artwork (Clean High-Definition Fairytale Illustrations)
 export const BOY_SCENE_ARTWORK = [
-  "/stories/yusuf_scene_1.png", // 1. Coming home thoughtfully with dad/school
-  "/stories/yusuf_scene_3.png", // 2. Warm cozy home, grandmother reciting Quran
-  "/stories/yusuf_scene_5.png", // 3. Grandmother kissing forehead, moral lesson
-  "/stories/yusuf_scene_7.png", // 4. Hearing peaceful Adhan, crescent moon
-  "/stories/yusuf_scene_0.png", // 5. Luminous heart, practicing noble virtue
-  "/stories/yusuf_scene_3.png", // 6. Family dinner, sharing bread with Bismillah
-  "/stories/yusuf_scene_5.png", // 7. Sincere bedtime prayer with open palms
-  "/stories/yusuf_scene_7.png", // 8. Peaceful sleep with Alhamdulillah
+  "/stories/yusuf/page_1.jpeg", // 1. Coming home thoughtfully, garden & family
+  "/stories/yusuf/page_2.jpeg", // 2. Warm cozy home, grandmother reciting story
+  "/stories/yusuf/page_3.jpeg", // 3. Learning Quran, glowing lanterns
+  "/stories/yusuf/page_4.jpeg", // 4. Family wisdom, love for parents
+  "/stories/yusuf/page_5.jpeg", // 5. Practicing good deeds, kindness
+  "/stories/yusuf/page_6.jpeg", // 6. Family dinner, gratitude with Bismillah
+  "/stories/yusuf/page_7.jpeg", // 7. Sincere bedtime prayer with open palms
+  "/stories/yusuf/page_8.jpeg", // 8. Peaceful sleep under stars with Alhamdulillah
 ];
 
 export function getStorySceneImage(gender: string, pageNumber: number): string {
