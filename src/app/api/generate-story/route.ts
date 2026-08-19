@@ -225,19 +225,42 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * Generates custom 3D storybook scene illustration with consistent character features
+ * Generates custom 3D storybook scene illustration with consistent character features using OpenAI DALL-E
  */
-async function generateDallEImage(prompt: string, fallbackUrl: string, filePrefix: string = 'story'): Promise<string> {
-  try {
-    const seed = Math.floor(Math.random() * 899999) + 100000;
-    const stylePrompt = "3D Disney Pixar animation children's storybook style, breathtaking warm golden ambient sunlight, cozy room, lush indoor plants, books, adorable cute child character with large sparkling brown eyes, sweet cheerful smile, clean neat modest clothes, cinematic lighting, 8k resolution, masterpiece, strictly no blur, no deformed faces";
-    const fullPrompt = `${prompt}, ${stylePrompt}`;
-    const dynamicAiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?model=flux&width=1024&height=768&nologo=true&seed=${seed}&enhance=true`;
-    return dynamicAiUrl || fallbackUrl;
-  } catch (err) {
-    console.warn('Error generating story illustration:', err);
-    return fallbackUrl;
+async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (apiKey && apiKey.trim().startsWith('sk-')) {
+    try {
+      const res = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'dall-e-3',
+          prompt: prompt.slice(0, 950),
+          n: 1,
+          size: '1024x1024',
+          quality: 'standard'
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.data?.[0]?.url) {
+          return data.data[0].url;
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.warn('OpenAI DALL-E notice:', err?.error?.message || res.status);
+      }
+    } catch (err) {
+      console.warn('Error fetching OpenAI image:', err);
+    }
   }
+
+  return fallbackUrl;
 }
 
 /**
@@ -317,23 +340,30 @@ export async function POST(req: NextRequest) {
       generatedStory = await generateStoryWithGemini(profile, (geminiApiKey || '').trim());
     }
 
-    // 3. Assign pristine authentic 3D Islamic storybook illustrations for Cover and all pages
+    // 3. Generate custom 3D AI illustrations using OpenAI DALL-E & GPT-4o Vision persona
     if (generatedStory && generatedStory.pages && generatedStory.pages.length >= 4) {
-      const coverImageUrl = (profile.child_photo_url && profile.child_photo_url.startsWith('/stories/'))
+      const coverPrompt = `3D Disney Pixar storybook cover illustration: ${characterPersona}, together with beloved companion ${animal} in glowing ${color} room, warm golden ambient sunlight, smiling warmly, title banner, 8k resolution, masterpiece`;
+      const fallbackCoverUrl = (profile.child_photo_url && profile.child_photo_url.startsWith('/stories/'))
         ? profile.child_photo_url
         : getStorySceneImage(profile.gender, 1);
 
-      const enhancedPages = generatedStory.pages.map((p, idx) => {
-        const authenticScene = getStorySceneImage(profile.gender, idx + 1);
+      const coverImageUrl = await generateDallEImage(coverPrompt, fallbackCoverUrl);
+
+      const enhancedPages = await Promise.all(generatedStory.pages.map(async (p, idx) => {
+        const authenticFallback = getStorySceneImage(profile.gender, idx + 1);
+        const pagePrompt = `3D Disney Pixar animation children's storybook scene: ${characterPersona} in ${p.scene_summary || p.image_prompt || 'a heartwarming scene'}, ${color} setting, soft warm golden lighting, adorable cheerful expression, 8k render, masterpiece`;
+        
+        const pageImageUrl = await generateDallEImage(pagePrompt, authenticFallback);
+
         return {
           page_number: idx + 1,
           text_uz: p.text_uz || '',
           text_en: p.text_en || '',
-          image_prompt: p.image_prompt || `Authentic storybook scene for page ${idx + 1}`,
-          image_url: authenticScene,
+          image_prompt: pagePrompt,
+          image_url: pageImageUrl,
           scene_summary: p.scene_summary || `${childName} sarguzashti - ${idx + 1}-sahifa`,
         };
-      });
+      }));
 
       const dynamicStory: StoryBook = {
         id: storyId,
