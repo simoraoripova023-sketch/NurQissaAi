@@ -225,56 +225,19 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * Generates official OpenAI GPT-Image-1 Image and saves it to disk as a clean high-res PNG file
+ * Generates custom 3D storybook scene illustration with consistent character features
  */
 async function generateDallEImage(prompt: string, fallbackUrl: string, filePrefix: string = 'story'): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey || !apiKey.trim().startsWith('sk-')) return fallbackUrl;
-
   try {
-    const res = await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey.trim()}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'gpt-image-1-mini',
-        prompt: prompt.slice(0, 1000),
-        n: 1,
-        size: '1024x1024',
-      })
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data?.data?.[0]?.url) {
-        return data.data[0].url;
-      }
-      if (data?.data?.[0]?.b64_json) {
-        try {
-          const genDir = path.join(process.cwd(), 'public', 'generated');
-          if (!fs.existsSync(genDir)) {
-            fs.mkdirSync(genDir, { recursive: true });
-          }
-          const fileName = `${filePrefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}.png`;
-          const filePath = path.join(genDir, fileName);
-          const buffer = Buffer.from(data.data[0].b64_json, 'base64');
-          await fs.promises.writeFile(filePath, buffer);
-          return `/generated/${fileName}`;
-        } catch (saveErr) {
-          console.warn('Error saving image to disk, falling back to base64:', saveErr);
-          return `data:image/png;base64,${data.data[0].b64_json}`;
-        }
-      }
-    } else {
-      const err = await res.json().catch(() => ({}));
-      console.warn('OpenAI image error in story route:', err);
-    }
+    const seed = Math.floor(Math.random() * 899999) + 100000;
+    const stylePrompt = "3D Disney Pixar animation children's storybook style, breathtaking warm golden ambient sunlight, cozy room, lush indoor plants, books, adorable cute child character with large sparkling brown eyes, sweet cheerful smile, clean neat modest clothes, cinematic lighting, 8k resolution, masterpiece, strictly no blur, no deformed faces";
+    const fullPrompt = `${prompt}, ${stylePrompt}`;
+    const dynamicAiUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?model=flux&width=1024&height=768&nologo=true&seed=${seed}&enhance=true`;
+    return dynamicAiUrl || fallbackUrl;
   } catch (err) {
-    console.warn('Error fetching OpenAI image:', err);
+    console.warn('Error generating story illustration:', err);
+    return fallbackUrl;
   }
-  return fallbackUrl;
 }
 
 /**

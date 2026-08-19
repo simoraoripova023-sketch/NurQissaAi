@@ -13,7 +13,7 @@ import { translations } from '@/lib/translations';
 import { MoralVirtue, StorySetting, Gender, ReadingTimeContext } from '@/lib/types';
 import confetti from 'canvas-confetti';
 
-import { ILLUSTRATION_STYLES } from '@/lib/illustrationHelper';
+import { ILLUSTRATION_STYLES, PIXAR_AVATARS } from '@/lib/illustrationHelper';
 
 export default function StoryWizard() {
   const router = useRouter();
@@ -59,10 +59,10 @@ export default function StoryWizard() {
       return;
     }
 
+    // If no custom photo uploaded, select authentic matching 3D avatar
     if (!childProfile.child_photo_url) {
-      alert(locale === 'uz' ? "Iltimos, qahramon qiyofasini yaratish uchun farzandingiz suratini yuklang (* Majburiy)" : "Please upload child's photo (* Required)");
-      setStep(1);
-      return;
+      const defaultAvatar = PIXAR_AVATARS.find(a => a.gender === childProfile.gender) || PIXAR_AVATARS[0];
+      updateChildProfile({ child_photo_url: defaultAvatar.url });
     }
 
     const { freeStoriesLeft, hasPaidSubscription, setIsPricingModalOpen } = useAppStore.getState();
@@ -291,24 +291,63 @@ export default function StoryWizard() {
                     </div>
                   </div>
 
-                  {/* Child Photo Upload */}
-                  <div className="space-y-2.5 pt-1">
+                  {/* 3D Character Avatars & Photo */}
+                  <div className="space-y-3 pt-1">
                     <label className="text-sm font-bold text-slate-800 dark:text-emerald-100 flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
-                        <Camera className="w-4 h-4 text-emerald-600" />
-                        <span>{locale === 'uz' ? "Farzandingiz surati (Qahramon uchun):" : "Child's Photo:"}</span>
+                        <Sparkles className="w-4 h-4 text-amber-500" />
+                        <span>{locale === 'uz' ? "Bosh Qahramon Qiyofasini Tanlang:" : "Choose Character Appearance:"}</span>
                       </span>
-                      <span className="text-[11px] font-black text-rose-600 bg-rose-50 dark:bg-rose-950 px-2.5 py-0.5 rounded-full border border-rose-200">
-                        {locale === 'uz' ? "Majburiy *" : "Required *"}
+                      <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                        {locale === 'uz' ? "3D Islomiy San'at" : "3D Pixar Art"}
                       </span>
                     </label>
 
+                    {/* Pre-made 3D Avatars */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {PIXAR_AVATARS.map((char) => {
+                        const isSelected = childProfile.child_photo_url === char.url || (!childProfile.child_photo_url && char.gender === childProfile.gender && char.id.includes(childProfile.gender === 'boy' ? 'yusuf' : 'fotima'));
+                        return (
+                          <button
+                            key={char.id}
+                            type="button"
+                            onClick={() => {
+                              updateChildProfile({ 
+                                child_photo_url: char.url,
+                                gender: char.gender as Gender
+                              });
+                            }}
+                            className={`p-2 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 relative overflow-hidden ${
+                              isSelected
+                                ? 'border-amber-500 bg-amber-50 dark:bg-pine-900 shadow-md ring-2 ring-amber-400 scale-[1.03]'
+                                : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950 hover:border-amber-300'
+                            }`}
+                          >
+                            <img
+                              src={char.url}
+                              alt={char.label_uz}
+                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shadow-sm"
+                            />
+                            <span className="text-xs font-extrabold text-slate-800 dark:text-butter-100 text-center leading-tight">
+                              {locale === 'uz' ? char.label_uz.split(' ')[0] : char.label_en.split(' ')[0]}
+                            </span>
+                            {isSelected && (
+                              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center text-[10px] font-black shadow-xs">
+                                ✓
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Or Custom Photo Upload Option */}
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className={`border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2.5 ${
-                        childProfile.child_photo_url
-                          ? 'border-emerald-500 bg-emerald-50/50 dark:bg-pine-900/50'
-                          : 'border-amber-300 dark:border-pine-700 hover:border-amber-500 bg-amber-50/30 dark:bg-pine-950'
+                      className={`mt-2 border-2 border-dashed rounded-2xl p-3.5 text-center cursor-pointer transition-all flex items-center justify-between ${
+                        childProfile.child_photo_url && !PIXAR_AVATARS.some(a => a.url === childProfile.child_photo_url)
+                          ? 'border-emerald-500 bg-emerald-50/50 dark:bg-pine-900/50 ring-2 ring-emerald-300'
+                          : 'border-slate-300 dark:border-pine-700 hover:border-amber-400 bg-slate-50/60 dark:bg-pine-950/60'
                       }`}
                     >
                       <input
@@ -319,36 +358,25 @@ export default function StoryWizard() {
                         className="hidden"
                       />
 
-                      {childProfile.child_photo_url ? (
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={childProfile.child_photo_url}
-                            alt="Uploaded child"
-                            className="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-500 shadow-md ring-2 ring-emerald-300"
-                          />
-                          <div className="text-left">
-                            <p className="text-xs font-black text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
-                              <Check className="w-4 h-4 text-emerald-600" />
-                              <span>{locale === 'uz' ? "Surat yuklandi!" : "Photo uploaded!"}</span>
-                            </p>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                              {locale === 'uz' ? "O'zgartirish uchun bosing" : "Click to change"}
-                            </p>
-                          </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-pine-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-xs">
+                          <Camera className="w-5 h-5" />
                         </div>
-                      ) : (
-                        <div className="flex flex-col items-center gap-1.5 py-1">
-                          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-pine-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shadow-xs">
-                            <Upload className="w-5 h-5" />
-                          </div>
+                        <div className="text-left">
                           <p className="text-xs font-bold text-slate-800 dark:text-butter-100">
-                            {locale === 'uz' ? "Suratni tanlash uchun bosing" : "Click to upload photo"}
+                            {childProfile.child_photo_url && !PIXAR_AVATARS.some(a => a.url === childProfile.child_photo_url)
+                              ? (locale === 'uz' ? "Shaxsiy surat yuklandi ✓" : "Custom photo uploaded ✓")
+                              : (locale === 'uz' ? "Yoki o'z farzandingiz rasmini yuklang (Ixtiyoriy)" : "Or upload custom child's photo (Optional)")}
                           </p>
                           <span className="text-[10px] text-slate-500">
-                            {locale === 'uz' ? "AI qahramonni shu surat asosida chizadi" : "AI will draw character matching this photo"}
+                            {locale === 'uz' ? "AI qahramon yuzini suratga moslab chizadi" : "AI will personalize character from photo"}
                           </span>
                         </div>
-                      )}
+                      </div>
+
+                      <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-pine-800 px-3 py-1.5 rounded-xl shrink-0">
+                        {locale === 'uz' ? "Tanlash" : "Browse"}
+                      </span>
                     </div>
                   </div>
 
