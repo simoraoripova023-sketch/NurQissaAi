@@ -116,7 +116,7 @@ const initialChildProfile: ChildProfile = {
   favorite_color: 'Zumrad yashil 🟢',
   story_setting: 'blessed_garden',
   illustration_style: 'pixar_3d',
-  child_photo_url: '',
+  child_photo_url: '/stories/yusuf_scene_0.png',
   character_appearance_description: '',
   page_count: 6,
 };
@@ -373,13 +373,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     set(() => {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('nurqissa_user');
+        import('@/lib/supabase').then(({ supabase }) => {
+          supabase.auth.signOut().catch(() => {});
+        }).catch(() => {});
       }
       return { currentUser: null };
     }),
 
   // Paid System & Story Credit Limits (Freemium: 2 Free Stories)
-  freeStoriesLeft: typeof window !== 'undefined' ? parseInt(localStorage.getItem('nurqissa_free_stories') || '2', 10) : 2,
-  hasPaidSubscription: typeof window !== 'undefined' ? localStorage.getItem('nurqissa_paid_sub') === 'true' : false,
+  freeStoriesLeft: 2,
+  hasPaidSubscription: false,
   isPricingModalOpen: false,
   setIsPricingModalOpen: (isPricingModalOpen) => set({ isPricingModalOpen }),
 

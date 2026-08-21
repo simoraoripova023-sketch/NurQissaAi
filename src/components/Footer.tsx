@@ -64,7 +64,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/story/ali-va-saxovat-yulduzi" className="hover:text-amber-300 transition-colors">
+                <Link href="/story/aqilli-bola-yusuf" className="hover:text-amber-300 transition-colors">
                   {locale === 'uz' ? "Namunaviy ertak" : "Sample Story"}
                 </Link>
               </li>

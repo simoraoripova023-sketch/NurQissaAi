@@ -61,7 +61,8 @@ export async function POST(req: NextRequest) {
     const emojiMap: Record<string, string> = {
       taklif: '💡 YANGI TAKLIF',
       shikoyat: '⚠️ YANGI SHIKOYAT / MUAMMO',
-      savol: '❓ YANGI SAVOL / MUROJAAT'
+      savol: '❓ YANGI SAVOL / MUROJAAT',
+      buyurtma: '📚 YANGI KITOB BUYURTMASI (QATTIQ MUQOVA)'
     };
 
     const typeTitle = emojiMap[type] || '📩 YANGI MUROJAAT';

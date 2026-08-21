@@ -16,7 +16,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const { 
     locale, setLocale, nurCoins, theme, toggleTheme, 
-    setIsAuthModalOpen, currentUser 
+    setIsAuthModalOpen, currentUser,
+    freeStoriesLeft, hasPaidSubscription, setIsPricingModalOpen
   } = useAppStore();
   const t = translations[locale];
 
@@ -67,11 +68,11 @@ export default function Navbar() {
             <div className="flex items-center gap-1.5 sm:gap-3">
               {/* Story Credit / Subscription Pill */}
               <button
-                onClick={() => useAppStore.getState().setIsPricingModalOpen(true)}
+                onClick={() => setIsPricingModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-gradient-to-r from-amber-400/20 to-orange-400/20 hover:from-amber-400/30 hover:to-orange-400/30 border-2 border-amber-500/70 text-amber-900 dark:text-amber-200 text-[11px] sm:text-xs font-black shadow-sm hover:scale-105 transition-all"
                 title={locale === 'uz' ? "Qissa balansi va tariflar" : "Story balance & plans"}
               >
-                {useAppStore.getState().hasPaidSubscription ? (
+                {hasPaidSubscription ? (
                   <>
                     <span className="text-xs sm:text-sm">👑</span>
                     <span>VIP</span>
@@ -79,7 +80,7 @@ export default function Navbar() {
                 ) : (
                   <>
                     <span className="text-xs sm:text-sm">📖</span>
-                    <span>{useAppStore.getState().freeStoriesLeft} {locale === 'uz' ? 'ta' : 'left'}</span>
+                    <span>{freeStoriesLeft} {locale === 'uz' ? 'ta' : 'left'}</span>
                   </>
                 )}
               </button>

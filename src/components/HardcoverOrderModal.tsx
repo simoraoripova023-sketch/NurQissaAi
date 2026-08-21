@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Book, CheckCircle, Printer, Sparkles, MapPin, Phone, User, Package } from 'lucide-react';
+import { X, Book, CheckCircle, Printer, Sparkles, MapPin, Phone, User, Package, Loader2 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
 import { cleanUzbekPhoneDigits, formatUzbekPhoneDisplay } from '@/lib/phoneHelper';
@@ -16,18 +16,43 @@ export default function HardcoverOrderModal() {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('+998 ');
   const [recipientName, setRecipientName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   if (!isOrderModalOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    confetti({
-      particleCount: 120,
-      spread: 80,
-      origin: { y: 0.6 },
-    });
+    setIsSubmitting(true);
+
+    try {
+      const storyTitle = activeStory ? (locale === 'uz' ? activeStory.title_uz : activeStory.title_en) : 'Shaxsiy ertak';
+      const finishText = coverFinish === 'glossy' ? 'Yaltiroq (Glossy)' : 'Xira nafis (Matte)';
+      const fullPhone = `+998 ${formatUzbekPhoneDisplay(phone)}`;
+
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'buyurtma',
+          name: recipientName.trim(),
+          contact: fullPhone,
+          message: `Kitob: "${storyTitle}"\nMuqova turi: ${finishText}\nYetkazish manzili: ${address.trim()}\nErtak ID: ${activeStory?.id || 'N/A'}`
+        })
+      });
+
+      setIsSubmitted(true);
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 },
+      });
+    } catch (err) {
+      console.error('Order submit error:', err);
+      setIsSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -199,10 +224,20 @@ export default function HardcoverOrderModal() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-emerald-600 text-white font-bold text-sm shadow-lg shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-emerald-600 text-white font-bold text-sm shadow-lg shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
                 >
-                  <Package className="w-4 h-4 text-amber-200" />
-                  <span>{t.confirmOrder}</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                      <span>{locale === 'uz' ? "Buyurtma yuborilmoqda..." : "Submitting order..."}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Package className="w-4 h-4 text-amber-200" />
+                      <span>{t.confirmOrder}</span>
+                    </>
+                  )}
                 </button>
               </div>
 

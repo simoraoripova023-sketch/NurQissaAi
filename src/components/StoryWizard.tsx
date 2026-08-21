@@ -277,7 +277,14 @@ export default function StoryWizard() {
                         <button
                           key={g}
                           type="button"
-                          onClick={() => updateChildProfile({ gender: g })}
+                          onClick={() => {
+                            const isCustomPhoto = childProfile.child_photo_url && !PIXAR_AVATARS.some(a => a.url === childProfile.child_photo_url);
+                            const matchingAvatar = PIXAR_AVATARS.find(a => a.gender === g) || PIXAR_AVATARS[0];
+                            updateChildProfile({ 
+                              gender: g,
+                              child_photo_url: isCustomPhoto ? childProfile.child_photo_url : matchingAvatar.url
+                            });
+                          }}
                           className={`p-3.5 rounded-2xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                             childProfile.gender === g
                               ? 'border-amber-500 bg-amber-50 dark:bg-pine-900 text-amber-950 dark:text-amber-200 shadow-sm'
@@ -591,8 +598,8 @@ export default function StoryWizard() {
                       return;
                     }
                     if (!childProfile.child_photo_url) {
-                      alert(locale === 'uz' ? "Iltimos, farzandingiz suratini yuklang (* Majburiy)" : "Please upload child's photo (* Required)");
-                      return;
+                      const defaultAvatar = PIXAR_AVATARS.find(a => a.gender === childProfile.gender) || PIXAR_AVATARS[0];
+                      updateChildProfile({ child_photo_url: defaultAvatar.url });
                     }
                     setStep(2);
                   }}

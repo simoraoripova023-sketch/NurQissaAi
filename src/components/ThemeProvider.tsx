@@ -23,22 +23,87 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       document.documentElement.classList.add('dark');
     }
 
-    // Sync fresh sample stories to localStorage so latest stories load seamlessly
+    // Sync fresh sample stories & user states to Zustand store
     try {
       const stored = localStorage.getItem('nurqissa_stories');
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
           const customStories = parsed.filter(
-            (s: any) => s && s.id !== 'aqilli-bola-yusuf' && s.id !== 'fotima-va-sirli-hadya'
+            (s: any) => s && s.id !== 'aqilli-bola-yusuf' && s.id !== 'haj-qilishni-organamiz'
           );
           const merged = [...SAMPLE_STORIES, ...customStories];
           localStorage.setItem('nurqissa_stories', JSON.stringify(merged));
+          useAppStore.setState({ stories: merged });
         }
       }
+
+      const userStr = localStorage.getItem('nurqissa_user');
+      if (userStr) {
+        try {
+          useAppStore.setState({ currentUser: JSON.parse(userStr) });
+        } catch {}
+      }
+
+      const freeStories = localStorage.getItem('nurqissa_free_stories');
+      if (freeStories !== null) {
+        useAppStore.setState({ freeStoriesLeft: parseInt(freeStories, 10) });
+      }
+
+      const paidSub = localStorage.getItem('nurqissa_paid_sub');
+      if (paidSub !== null) {
+        useAppStore.setState({ hasPaidSubscription: paidSub === 'true' });
+      }
+
+      const coins = localStorage.getItem('nurqissa_coins');
+      if (coins !== null) {
+        useAppStore.setState({ nurCoins: parseInt(coins, 10) });
+      }
+
+      const streak = localStorage.getItem('nurqissa_daily_streak');
+      if (streak !== null) {
+        useAppStore.setState({ dailyStreak: parseInt(streak, 10) });
+      }
     } catch (e) {
-      console.error('Story sync error:', e);
+      console.error('State sync error:', e);
     }
+
+    // Real Supabase Auth State Sync (e.g. Google Sign-In)
+    import('@/lib/supabase').then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          const user = session.user;
+          const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
+          useAppStore.setState({
+            currentUser: {
+              name: fullName,
+              phone: user.phone || user.email || '',
+              childName: 'Alijon',
+              isLoggedIn: true,
+            },
+            isAuthModalOpen: false,
+          });
+        }
+      });
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          const user = session.user;
+          const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
+          useAppStore.setState({
+            currentUser: {
+              name: fullName,
+              phone: user.phone || user.email || '',
+              childName: 'Alijon',
+              isLoggedIn: true,
+            },
+            isAuthModalOpen: false,
+          });
+        }
+      });
+    }).catch((err) => {
+      console.warn('Supabase auth listener notice:', err);
+    });
   }, []);
 
   return <>{children}</>;
