@@ -7,7 +7,7 @@ import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
 
 export default function PricingSection() {
-  const { locale, setIsOrderModalOpen } = useAppStore();
+  const { locale, setIsOrderModalOpen, setIsPricingModalOpen } = useAppStore();
   const t = translations[locale];
 
   const plans = [
@@ -35,7 +35,7 @@ export default function PricingSection() {
       description: locale === 'uz' ? "Har oqshom yangi ertak eshituvchi oilalar uchun" : "For families reading bedtime stories every night",
       popular: true,
       buttonText: locale === 'uz' ? "Pro obunani faollashtirish" : "Get Pro Access",
-      buttonLink: "/create",
+      isPricingModal: true,
       features: [
         locale === 'uz' ? "Cheksiz ertaklar yaratish" : "Unlimited AI bedtime stories",
         locale === 'uz' ? "Ovozli ertakchi (Audio TTS)" : "Full Audio Narration (TTS)",
@@ -141,6 +141,14 @@ export default function PricingSection() {
                     className="w-full py-3.5 px-6 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
                   >
                     <Printer className="w-4 h-4" />
+                    <span>{plan.buttonText}</span>
+                  </button>
+                ) : (plan as any).isPricingModal ? (
+                  <button
+                    onClick={() => setIsPricingModalOpen(true)}
+                    className="w-full py-3.5 px-6 rounded-2xl font-black text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-slate-950 hover:brightness-110 shadow-lg shadow-amber-500/25 transition-all"
+                  >
+                    <Crown className="w-4 h-4" />
                     <span>{plan.buttonText}</span>
                   </button>
                 ) : (

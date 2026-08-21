@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, Camera, Upload, User, Heart, Star, Compass, 
   ArrowRight, ArrowLeft, Check, Palette, Smile, Sun, Moon, 
-  ShieldCheck, Loader2, BookOpen, Wand2, RefreshCw, Sparkle
+  ShieldCheck, Loader2, BookOpen, Wand2, RefreshCw, Sparkle, Crown, Lock
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
@@ -17,7 +17,16 @@ import { ILLUSTRATION_STYLES, PIXAR_AVATARS } from '@/lib/illustrationHelper';
 
 export default function StoryWizard() {
   const router = useRouter();
-  const { locale, childProfile, updateChildProfile, addStoryToLibrary, setActiveStory } = useAppStore();
+  const { 
+    locale, 
+    childProfile, 
+    updateChildProfile, 
+    addStoryToLibrary, 
+    setActiveStory,
+    freeStoriesLeft,
+    hasPaidSubscription,
+    setIsPricingModalOpen 
+  } = useAppStore();
   const t = translations[locale];
 
   const [step, setStep] = useState(1);
@@ -211,6 +220,33 @@ export default function StoryWizard() {
           </div>
         ) : (
           <div>
+            {/* Credit Limit Banner if 0 stories left and not VIP */}
+            {!hasPaidSubscription && freeStoriesLeft <= 0 && (
+              <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-left">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shrink-0 shadow-md">
+                    <Crown className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-amber-900 dark:text-amber-300">
+                      {locale === 'uz' ? "Bepul 2 ta sinov qissasi balansingiz tugadi ⚠️" : "2 Free trial stories credit reached ⚠️"}
+                    </p>
+                    <p className="text-[11px] text-slate-600 dark:text-butter-300/80">
+                      {locale === 'uz' ? "Yangi ertaklar yaratish uchun qulay tarifni tanlang" : "Choose a story pack to craft new customized stories"}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPricingModalOpen(true)}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black shadow-md transition-all shrink-0 flex items-center justify-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>{locale === 'uz' ? "Tarifni Tanlash 👑" : "Choose Plan 👑"}</span>
+                </button>
+              </div>
+            )}
+
             <AnimatePresence mode="wait">
               {/* ========================================================= */}
               {/* STEP 1: Child Name, Age, Gender, Photo & Art Style */}
@@ -607,6 +643,15 @@ export default function StoryWizard() {
                 >
                   <span>{locale === 'uz' ? "Keyingi qadam" : "Next Step"}</span>
                   <ArrowRight className="w-4 h-4" />
+                </button>
+              ) : !hasPaidSubscription && freeStoriesLeft <= 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setIsPricingModalOpen(true)}
+                  className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-xl shadow-amber-500/30 hover:scale-[1.02] active:scale-95 transition-all"
+                >
+                  <Crown className="w-4 h-4 text-amber-200" />
+                  <span>{locale === 'uz' ? "Tarifni Tanlash & Qissa Yaratish 👑" : "Unlock Plan & Create Story 👑"}</span>
                 </button>
               ) : (
                 <button
