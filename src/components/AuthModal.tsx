@@ -298,7 +298,6 @@ export default function AuthModal() {
           redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             prompt: 'select_account',
-            access_type: 'offline',
           },
         },
       });
