@@ -72,9 +72,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     const hasValidSupabase =
       typeof process !== 'undefined' &&
       process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder') &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('byfftryvhlwgadouglgs') &&
-      process.env.NEXT_PUBLIC_ENABLE_SUPABASE_AUTH === 'true';
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
 
     if (hasValidSupabase) {
       import('@/lib/supabase').then(({ supabase }) => {
@@ -82,13 +80,15 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
           if (session?.user) {
             const user = session.user;
             const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
+            const authUser = {
+              name: fullName,
+              phone: user.email || user.phone || '',
+              childName: 'Alijon',
+              isLoggedIn: true,
+            };
+            localStorage.setItem('nurqissa_user', JSON.stringify(authUser));
             useAppStore.setState({
-              currentUser: {
-                name: fullName,
-                phone: user.phone || user.email || '',
-                childName: 'Alijon',
-                isLoggedIn: true,
-              },
+              currentUser: authUser,
               isAuthModalOpen: false,
             });
           }
@@ -98,13 +98,15 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
           if (session?.user) {
             const user = session.user;
             const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
+            const authUser = {
+              name: fullName,
+              phone: user.email || user.phone || '',
+              childName: 'Alijon',
+              isLoggedIn: true,
+            };
+            localStorage.setItem('nurqissa_user', JSON.stringify(authUser));
             useAppStore.setState({
-              currentUser: {
-                name: fullName,
-                phone: user.phone || user.email || '',
-                childName: 'Alijon',
-                isLoggedIn: true,
-              },
+              currentUser: authUser,
               isAuthModalOpen: false,
             });
           }

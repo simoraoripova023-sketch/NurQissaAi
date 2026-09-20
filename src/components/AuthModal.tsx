@@ -16,8 +16,8 @@ export default function AuthModal() {
   const { locale, isAuthModalOpen, setIsAuthModalOpen, loginUser, logoutUser, currentUser, nurCoins } = useAppStore();
   const t = translations[locale];
 
-  // Auth flow states: 'form' (main phone/options), 'otp' (SMS code), 'google' (Google account)
-  const [authStep, setAuthStep] = useState<'form' | 'otp' | 'google'>('form');
+  // Auth flow states: 'form' (main phone/options), 'otp' (SMS code), 'google' (Google account), 'github' (GitHub account)
+  const [authStep, setAuthStep] = useState<'form' | 'otp' | 'google' | 'github'>('form');
   const [authMode, setAuthMode] = useState<'signup' | 'login'>('signup');
   const [parentName, setParentName] = useState('');
   const [phoneDigits, setPhoneDigits] = useState('');
@@ -28,6 +28,11 @@ export default function AuthModal() {
   const [googleEmail, setGoogleEmail] = useState('');
   const [googleName, setGoogleName] = useState('');
   const [googleChildName, setGoogleChildName] = useState('');
+
+  // GitHub specific states
+  const [githubUsername, setGithubUsername] = useState('');
+  const [githubEmail, setGithubEmail] = useState('');
+  const [githubChildName, setGithubChildName] = useState('');
   
   // OTP states
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '']);
@@ -39,6 +44,7 @@ export default function AuthModal() {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isGithubLoading, setIsGithubLoading] = useState(false);
   const [isSendingSms, setIsSendingSms] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
@@ -287,8 +293,7 @@ export default function AuthModal() {
     const hasValidSupabase =
       typeof process !== 'undefined' &&
       process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder') &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('byfftryvhlwgadouglgs');
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
 
     if (hasValidSupabase) {
       setIsGoogleLoading(true);
@@ -404,6 +409,77 @@ export default function AuthModal() {
       spread: 75,
       origin: { y: 0.6 },
       colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335'],
+    });
+  };
+
+  // Handle GitHub OAuth or GitHub Account flow
+  const handleGithubLogin = async () => {
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    const hasValidSupabase =
+      typeof process !== 'undefined' &&
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+
+    if (hasValidSupabase) {
+      setIsGithubLoading(true);
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'github',
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback`,
+          },
+        });
+        if (error) throw error;
+        return;
+      } catch (err: any) {
+        setIsGithubLoading(false);
+        setErrorMsg(err?.message || (locale === 'uz' ? "GitHub tizimiga ulanishda xatolik" : "GitHub login failed"));
+        setGithubUsername(parentName || '');
+        setGithubChildName(childName || '');
+        setAuthStep('github');
+        return;
+      }
+    }
+
+    // Direct GitHub Flow
+    setGithubUsername(parentName || '');
+    setGithubChildName(childName || '');
+    setAuthStep('github');
+  };
+
+  // Confirm GitHub Account credentials
+  const handleGithubSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    const username = githubUsername.trim();
+    if (!username) {
+      setErrorMsg(locale === 'uz' ? "Iltimos, GitHub foydalanuvchi nomingizni kiriting" : "Please enter your GitHub username");
+      return;
+    }
+
+    let email = githubEmail.trim().toLowerCase();
+    if (!email) {
+      email = `${username.toLowerCase().replace(/[^a-z0-9_-]/g, '')}@github.com`;
+    }
+
+    const finalName = username;
+    const finalChild = githubChildName.trim() || (locale === 'uz' ? "Alijon" : "Ali");
+
+    loginUser({
+      name: finalName,
+      phone: email,
+      childName: finalChild,
+    });
+
+    confetti({
+      particleCount: 70,
+      spread: 75,
+      origin: { y: 0.6 },
+      colors: ['#24292e', '#4078c0', '#6e5494', '#bd2c00'],
     });
   };
 
@@ -743,6 +819,116 @@ export default function AuthModal() {
               </button>
             </form>
           </div>
+        ) : authStep === 'github' ? (
+          /* GitHub Account Sign-In Screen */
+          <div className="space-y-4">
+            <button
+              type="button"
+              onClick={() => {
+                setAuthStep('form');
+                setErrorMsg('');
+                setSuccessMsg('');
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-pine-800 dark:text-butter-300 hover:underline cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>{locale === 'uz' ? "Boshqa usulga qaytish" : "Go back"}</span>
+            </button>
+
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-slate-900 border-2 border-slate-700 mx-auto flex items-center justify-center shadow-md p-2 text-white">
+                <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-butter-200 text-pine-900 text-[11px] font-black border border-pine-800">
+                <Sparkles className="w-3 h-3 text-pine-800" />
+                <span>{locale === 'uz' ? "+50 Nur Tangasi Sovg'a! 🌟" : "+50 Nur Coins Bonus! 🌟"}</span>
+              </div>
+
+              <h2 className="text-xl font-black text-pine-900 dark:text-butter-200 font-display">
+                {locale === 'uz' ? "GitHub Hisobingiz Bilan Kirish" : "Sign In with GitHub"}
+              </h2>
+
+              <p className="text-xs text-pine-700/80 dark:text-butter-300/80 font-medium max-w-xs mx-auto">
+                {locale === 'uz'
+                  ? "Ertaklarni saqlash va davom etish uchun GitHub profilingizni ulang"
+                  : "Connect your GitHub account to access your stories & rewards"}
+              </p>
+            </div>
+
+            {/* Error Message */}
+            {errorMsg && (
+              <div className="p-3 rounded-2xl bg-rose-100 border border-rose-300 text-rose-900 text-xs font-bold flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleGithubSubmit} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-bold text-pine-900 dark:text-butter-200 mb-1">
+                  {locale === 'uz' ? "GitHub Foydalanuvchi Nomi (Username)" : "GitHub Username"}
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-pine-700 dark:text-butter-300 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    value={githubUsername}
+                    onChange={(e) => { setGithubUsername(e.target.value); setErrorMsg(''); }}
+                    placeholder="masalan: octocat yoki ismingiz"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-pine-900 border-2 border-pine-800/40 dark:border-butter-300/40 text-pine-900 dark:text-butter-200 text-xs font-medium focus:outline-none focus:border-pine-800 dark:focus:border-butter-200"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-pine-900 dark:text-butter-200 mb-1">
+                  {locale === 'uz' ? "Email manzilingiz (ixtiyoriy)" : "Email Address (Optional)"}
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-pine-700 dark:text-butter-300 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    value={githubEmail}
+                    onChange={(e) => setGithubEmail(e.target.value)}
+                    placeholder="github-emailingiz@example.com"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-pine-900 border-2 border-pine-800/40 dark:border-butter-300/40 text-pine-900 dark:text-butter-200 text-xs font-medium focus:outline-none focus:border-pine-800 dark:focus:border-butter-200"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-pine-900 dark:text-butter-200 mb-1">
+                  {locale === 'uz' ? "Farzandingiz ismi" : "Child Name"}
+                </label>
+                <div className="relative">
+                  <Heart className="w-4 h-4 text-pine-700 dark:text-butter-300 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={githubChildName}
+                    onChange={(e) => setGithubChildName(e.target.value)}
+                    placeholder={locale === 'uz' ? "Masalan: Ali yoki Madina" : "e.g. Ali or Emma"}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-pine-900 border-2 border-pine-800/40 dark:border-butter-300/40 text-pine-900 dark:text-butter-200 text-xs font-medium focus:outline-none focus:border-pine-800 dark:focus:border-butter-200"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm border-2 border-slate-700 shadow-lg hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2 mt-4 cursor-pointer"
+              >
+                <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+                <span>{locale === 'uz' ? "GitHub Hisobim Bilan Kirish" : "Sign In with My GitHub Account"}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+          </div>
         ) : (
           /* STEP 1: Registration / Login Form */
           <>
@@ -766,13 +952,14 @@ export default function AuthModal() {
               </p>
             </div>
 
-            {/* 1-Click Google OAuth Button (Completely Safe, Local & Smooth) */}
-            <div className="space-y-3 mb-4">
+            {/* Social OAuth Buttons: Google & GitHub */}
+            <div className="space-y-2.5 mb-4">
+              {/* Google Button */}
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                disabled={isGoogleLoading}
-                className="w-full py-3 px-4 rounded-2xl border-2 border-slate-300 dark:border-pine-700 bg-white dark:bg-pine-900 hover:bg-slate-50 dark:hover:bg-pine-800 text-slate-800 dark:text-butter-100 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all disabled:opacity-50 cursor-pointer"
+                disabled={isGoogleLoading || isGithubLoading}
+                className="w-full py-2.5 px-4 rounded-2xl border-2 border-slate-300 dark:border-pine-700 bg-white dark:bg-pine-900 hover:bg-slate-50 dark:hover:bg-pine-800 text-slate-800 dark:text-butter-100 font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-sm hover:shadow transition-all disabled:opacity-50 cursor-pointer"
               >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -782,13 +969,30 @@ export default function AuthModal() {
                 </svg>
                 <span>
                   {isGoogleLoading
-                    ? (locale === 'uz' ? "Google orqali kiritilmoqda..." : "Connecting to Google...")
-                    : (locale === 'uz' ? "Google orqali 1 soniyada davom etish" : "Continue with Google in 1 click")}
+                    ? (locale === 'uz' ? "Google'ga ulanmoqda..." : "Connecting to Google...")
+                    : (locale === 'uz' ? "Google orqali davom etish" : "Continue with Google")}
+                </span>
+              </button>
+
+              {/* GitHub Button */}
+              <button
+                type="button"
+                onClick={handleGithubLogin}
+                disabled={isGoogleLoading || isGithubLoading}
+                className="w-full py-2.5 px-4 rounded-2xl border-2 border-slate-800 dark:border-slate-700 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2.5 shadow-sm hover:shadow transition-all disabled:opacity-50 cursor-pointer"
+              >
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                </svg>
+                <span>
+                  {isGithubLoading
+                    ? (locale === 'uz' ? "GitHub'ga ulanmoqda..." : "Connecting to GitHub...")
+                    : (locale === 'uz' ? "GitHub orqali davom etish" : "Continue with GitHub")}
                 </span>
               </button>
 
               {/* Divider */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 pt-1">
                 <div className="flex-1 h-[1px] bg-slate-200 dark:bg-pine-800" />
                 <span className="text-[10px] font-bold text-slate-400 dark:text-butter-300/60 uppercase tracking-wider">
                   {locale === 'uz' ? "yoki telefon raqam orqali" : "or with phone number"}
