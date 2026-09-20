@@ -1,9 +1,10 @@
 node_modules
 .next
 .git
-data/sources
+data
+scripts
+*.pdf
+*.mp4
 *.mp3
 *.wav
-*.jpg
-*.png
-!public/**
+*.tsbuildinfo
