@@ -38,10 +38,12 @@ pages = [
     (8, "Kechasi Yusuf osmondagi porloq yulduzlarga qarab yotarkan, shirin orom oldi. Uning qalbida iymon, mehr va Parvardigorining yaratgan mo'jizalariga cheksiz muhabbat uyg'ongan edi.")
 ]
 
-os.makedirs('public/stories/yusuf', exist_ok=True)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+out_dir = os.path.join(BASE_DIR, 'public', 'stories', 'yusuf')
+os.makedirs(out_dir, exist_ok=True)
 
 for page_num, text in pages:
-    output_path = f"public/stories/yusuf/audio_{page_num}.mp3"
+    output_path = os.path.join(out_dir, f"audio_{page_num}.mp3")
     print(f"Generating audio for Page {page_num}...")
     
     payload = {

@@ -13,7 +13,8 @@ BASE_URL = f"https://api.telegram.org/bot{TOKEN}"
 ADMIN_CHAT_ID = 5636799086  # Owner's confidential Chat ID
 WEB_APP_URL = "https://nur-qissa-ai.vercel.app"
 
-FEEDBACKS_FILE = os.path.join(os.getcwd(), 'data', 'feedbacks.json')
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+FEEDBACKS_FILE = os.path.join(BASE_DIR, 'data', 'feedbacks.json')
 user_states = {}
 
 def notify_owner(notification_text):
@@ -28,7 +29,7 @@ def notify_owner(notification_text):
         print(f"Admin bildirishnoma xatosi: {e}", flush=True)
 
 def save_feedback(user_name, contact, message, fb_type="taklif"):
-    os.makedirs('data', exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, 'data'), exist_ok=True)
     feedbacks = []
     if os.path.exists(FEEDBACKS_FILE):
         try:

@@ -1,9 +1,14 @@
 import subprocess
 import os
 
-ffmpeg_bin = r"C:\Users\Shohruh\Desktop\NURQissaAI\ffmpeg.exe"
-src_audio = r"C:\Users\Shohruh\Downloads\Telegram Desktop\Nurqissa.m4a"
-dest_dir = r"C:\Users\Shohruh\Desktop\NURQissaAI\public\stories\yusuf"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+ffmpeg_bin = os.environ.get("FFMPEG_BIN", "ffmpeg")
+src_audio = os.path.join(BASE_DIR, "data", "Nurqissa.m4a")
+dest_dir = os.path.join(BASE_DIR, "public", "stories", "yusuf")
+
+if not os.path.exists(src_audio):
+    print(f"Manba audio fayl topilmadi: {src_audio}")
+    exit(1)
 
 os.makedirs(dest_dir, exist_ok=True)
 

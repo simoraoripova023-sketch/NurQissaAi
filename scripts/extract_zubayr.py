@@ -1,8 +1,9 @@
 import os
 import pymupdf
 
-pdf_path = os.path.join(r"c:\Users\Shohruh\Desktop\NURQissaAI\data\sources\qissalar", "Odam payg'ambar qissasi - nuur tarjimonlar guruhi (1).pdf")
-out_dir = r"c:\Users\Shohruh\Desktop\NURQissaAI\public\stories\zubayr"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+pdf_path = os.path.join(BASE_DIR, "data", "sources", "qissalar", "Odam payg'ambar qissasi - nuur tarjimonlar guruhi (1).pdf")
+out_dir = os.path.join(BASE_DIR, "public", "stories", "zubayr")
 os.makedirs(out_dir, exist_ok=True)
 
 if not os.path.exists(pdf_path):

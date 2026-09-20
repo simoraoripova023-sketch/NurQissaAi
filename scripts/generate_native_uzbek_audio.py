@@ -14,11 +14,13 @@ pages = [
 ]
 
 async def generate_all():
-    os.makedirs("public/stories/yusuf", exist_ok=True)
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    out_dir = os.path.join(BASE_DIR, 'public', 'stories', 'yusuf')
+    os.makedirs(out_dir, exist_ok=True)
     voice = "uz-UZ-SardorNeural" # Sof o'zbekcha suxandon ovozi
     
     for page_num, text in pages:
-        output_file = f"public/stories/yusuf/audio_{page_num}.mp3"
+        output_file = os.path.join(out_dir, f"audio_{page_num}.mp3")
         print(f"Generating authentic Uzbek audio for Page {page_num}...")
         communicate = edge_tts.Communicate(text, voice, rate="-3%", pitch="+0Hz")
         await communicate.save(output_file)

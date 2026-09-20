@@ -3,8 +3,9 @@ import json
 import glob
 import fitz # PyMuPDF
 
-SOURCES_DIR = r"c:\Users\Shohruh\Desktop\NURQissaAI\data\sources\qissalar"
-OUTPUT_FILE = r"c:\Users\Shohruh\Desktop\NURQissaAI\data\islamic_knowledge_base.json"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+SOURCES_DIR = os.path.join(BASE_DIR, "data", "sources", "qissalar")
+OUTPUT_FILE = os.path.join(BASE_DIR, "data", "islamic_knowledge_base.json")
 
 def analyze_pdfs_fitz():
     pdf_files = glob.glob(os.path.join(SOURCES_DIR, "*.pdf"))

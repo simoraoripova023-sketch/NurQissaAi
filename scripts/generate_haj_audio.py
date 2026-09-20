@@ -27,9 +27,11 @@ try:
         (7, "Va nihoyat, yettinchi bosqich — Ka'baga Xayrlashuv tavofini qilib, muqaddas Haj ibodatini bekam-ko'st yakunlashdir! Xonada Iyd bayrami yangradi. Nilufar opa har bir jajji bolajonning boshiga zarhal toj kiydirib, diplom va shirin xurmolarni hadya qildi. Bolajonlar shodlik bilan: Alhamdulillah, Haj qilishni o'rgandik! deb quvondilar.")
     ]
 
-    os.makedirs('public/stories/haj', exist_ok=True)
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    out_dir = os.path.join(BASE_DIR, 'public', 'stories', 'haj')
+    os.makedirs(out_dir, exist_ok=True)
     for page_num, text in pages:
-        output_path = f"public/stories/haj/audio_{page_num}.mp3"
+        output_path = os.path.join(out_dir, f"audio_{page_num}.mp3")
         payload = {
             "text": text,
             "model_id": "eleven_multilingual_v2",

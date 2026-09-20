@@ -1,8 +1,9 @@
 import os
 import fitz # PyMuPDF
 
-SOURCES_DIR = r"c:\Users\Shohruh\Desktop\NURQissaAI\data\sources\qissalar"
-PUBLIC_STORIES_DIR = r"c:\Users\Shohruh\Desktop\NURQissaAI\public\stories"
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+SOURCES_DIR = os.path.join(BASE_DIR, "data", "sources", "qissalar")
+PUBLIC_STORIES_DIR = os.path.join(BASE_DIR, "public", "stories")
 
 os.makedirs(PUBLIC_STORIES_DIR, exist_ok=True)
 
