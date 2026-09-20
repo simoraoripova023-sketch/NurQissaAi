@@ -288,93 +288,30 @@ export default function AuthModal() {
   const handleGoogleLogin = async () => {
     setErrorMsg('');
     setSuccessMsg('');
+    setIsGoogleLoading(true);
 
-    // 1. Check if real Supabase OAuth is configured
-    const hasValidSupabase =
-      typeof process !== 'undefined' &&
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
-
-    if (hasValidSupabase) {
-      setIsGoogleLoading(true);
-      try {
-        const { supabase } = await import('@/lib/supabase');
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/auth/callback`,
-            queryParams: {
-              prompt: 'select_account',
-              access_type: 'offline',
-            },
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: 'select_account',
+            access_type: 'offline',
           },
-        });
-        if (error) throw error;
-        return;
-      } catch (err: any) {
-        setIsGoogleLoading(false);
-        setErrorMsg(err?.message || (locale === 'uz' ? "Supabase Google tizimiga ulanishda xatolik" : "Supabase Google login failed"));
-        setGoogleName(parentName || '');
-        setGoogleChildName(childName || '');
-        setAuthStep('google');
-        return;
-      }
+        },
+      });
+      if (error) throw error;
+      return;
+    } catch (err: any) {
+      setIsGoogleLoading(false);
+      setErrorMsg(err?.message || (locale === 'uz' ? "Google tizimiga ulanishda xatolik" : "Google login failed"));
+      setGoogleName(parentName || '');
+      setGoogleChildName(childName || '');
+      setAuthStep('google');
+      return;
     }
-
-    // 2. Check if Google Client ID is configured for Google Identity Services
-    const googleClientId = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID : undefined;
-    if (googleClientId && typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
-      setIsGoogleLoading(true);
-      try {
-        const client = (window as any).google.accounts.oauth2.initTokenClient({
-          client_id: googleClientId,
-          scope: 'email profile openid',
-          callback: async (tokenResponse: any) => {
-            if (tokenResponse?.access_token) {
-              const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-              });
-              const userInfo = await res.json();
-              if (userInfo?.email) {
-                loginUser({
-                  name: userInfo.name || userInfo.email.split('@')[0],
-                  phone: userInfo.email,
-                  childName: childName || (locale === 'uz' ? "Alijon" : "Ali"),
-                });
-                confetti({
-                  particleCount: 65,
-                  spread: 75,
-                  origin: { y: 0.6 },
-                  colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335'],
-                });
-                setIsGoogleLoading(false);
-                return;
-              }
-            }
-            setIsGoogleLoading(false);
-          },
-          error_callback: () => {
-            setIsGoogleLoading(false);
-            setGoogleName(parentName || '');
-            setGoogleChildName(childName || '');
-            setAuthStep('google');
-          }
-        });
-        client.requestAccessToken();
-        return;
-      } catch {
-        setIsGoogleLoading(false);
-        setGoogleName(parentName || '');
-        setGoogleChildName(childName || '');
-        setAuthStep('google');
-        return;
-      }
-    }
-
-    // 3. Open dedicated Google Account Sign-In screen for real user credentials
-    setGoogleName(parentName || '');
-    setGoogleChildName(childName || '');
-    setAuthStep('google');
   };
 
   // Confirm Google Account credentials

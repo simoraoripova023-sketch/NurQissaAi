@@ -69,52 +69,50 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     }
 
     // Real Supabase Auth State Sync (e.g. Google Sign-In)
-    const hasValidSupabase =
-      typeof process !== 'undefined' &&
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder');
+    import('@/lib/supabase').then(({ supabase }) => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          const user = session.user;
+          const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
+          const authUser = {
+            name: fullName,
+            phone: user.email || user.phone || '',
+            childName: 'Alijon',
+            isLoggedIn: true,
+          };
+          localStorage.setItem('nurqissa_user', JSON.stringify(authUser));
+          useAppStore.setState({
+            currentUser: authUser,
+            isAuthModalOpen: false,
+          });
+        }
+      }).catch(() => {});
 
-    if (hasValidSupabase) {
-      import('@/lib/supabase').then(({ supabase }) => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          if (session?.user) {
-            const user = session.user;
-            const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
-            const authUser = {
-              name: fullName,
-              phone: user.email || user.phone || '',
-              childName: 'Alijon',
-              isLoggedIn: true,
-            };
-            localStorage.setItem('nurqissa_user', JSON.stringify(authUser));
-            useAppStore.setState({
-              currentUser: authUser,
-              isAuthModalOpen: false,
-            });
-          }
-        }).catch(() => {});
-
-        supabase.auth.onAuthStateChange((_event, session) => {
-          if (session?.user) {
-            const user = session.user;
-            const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
-            const authUser = {
-              name: fullName,
-              phone: user.email || user.phone || '',
-              childName: 'Alijon',
-              isLoggedIn: true,
-            };
-            localStorage.setItem('nurqissa_user', JSON.stringify(authUser));
-            useAppStore.setState({
-              currentUser: authUser,
-              isAuthModalOpen: false,
-            });
-          }
-        });
-      }).catch((err) => {
-        console.warn('Supabase auth listener notice:', err);
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          const user = session.user;
+          const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
+          const authUser = {
+            name: fullName,
+            phone: user.email || user.phone || '',
+            childName: 'Alijon',
+            isLoggedIn: true,
+          };
+          localStorage.setItem('nurqissa_user', JSON.stringify(authUser));
+          useAppStore.setState({
+            currentUser: authUser,
+            isAuthModalOpen: false,
+          });
+        } else if (_event === 'SIGNED_OUT') {
+          localStorage.removeItem('nurqissa_user');
+          useAppStore.setState({
+            currentUser: null,
+          });
+        }
       });
-    }
+    }).catch((err) => {
+      console.warn('Supabase auth listener notice:', err);
+    });
   }, []);
 
   return <>{children}</>;
