@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+data/sources
+*.mp3
+*.wav
+*.jpg
+*.png
+!public/**
