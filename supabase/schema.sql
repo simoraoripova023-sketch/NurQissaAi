@@ -1,5 +1,5 @@
 -- NURQissa AI Supabase Database Schema
--- Run this SQL in Supabase SQL Editor: https://supabase.com/dashboard/project/byfftryvhlwgadouglgs/sql
+-- Run this SQL in Supabase SQL Editor in your Supabase Dashboard
 
 -- 1. Feedbacks (Taklif va Shikoyatlar)
 CREATE TABLE IF NOT EXISTS feedbacks (
