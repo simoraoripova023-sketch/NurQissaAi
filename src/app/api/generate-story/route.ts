@@ -34,7 +34,27 @@ const STYLE_PROMPTS: Record<string, string> = {
   ghibli_anime: "Studio Ghibli nature-filled anime aesthetic, lush vibrant blooming garden background, gentle morning sunlight, whimsical peaceful fairytale atmosphere"
 };
 
-const NEGATIVE_ENHANCERS = "strictly no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus";
+const NEGATIVE_ENHANCERS = "strictly no hats, no wizard hats, no witch hats, no giant caps, no costumes, no floating head, no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus";
+
+function translateAnimalToEnglish(animalStr: string): string {
+  const lower = (animalStr || '').toLowerCase();
+  if (lower.includes('quyon')) return 'a cute little white fluffy bunny rabbit';
+  if (lower.includes('kabutar') || lower.includes('kaptar')) return 'a gentle friendly white dove bird';
+  if (lower.includes('mushuk')) return 'an adorable sweet fluffy little kitten';
+  if (lower.includes('bo\'taloq') || lower.includes('tuya')) return 'a cute gentle baby camel';
+  if (lower.includes('qo\'zi') || lower.includes('qozi')) return 'a sweet little white fluffy baby lamb';
+  if (lower.includes('bulbul') || lower.includes('qush')) return 'a cheerful little colorful songbird';
+  return 'a lovely cute companion animal';
+}
+
+function translateColorToEnglish(colorStr: string): string {
+  const lower = (colorStr || '').toLowerCase();
+  if (lower.includes('yashil') || lower.includes('zumrad')) return 'warm emerald green and golden light';
+  if (lower.includes('ko\'k') || lower.includes('moviy')) return 'peaceful pastel blue and warm golden sunlight';
+  if (lower.includes('pushti')) return 'gentle pastel rose pink and soft warm tones';
+  if (lower.includes('oltin') || lower.includes('sariq')) return 'radiant amber gold and cozy cream';
+  return 'warm glowing golden bedtime lighting';
+}
 
 /**
  * Generates custom 3D storybook scene illustration with consistent character features using OpenAI DALL-E 3
@@ -414,64 +434,71 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Fallback: High-Quality Programmatic Islamic Tale with 100% newly generated AI scene images
-    const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
-    const fallbackCoverPrompt = `${characterPersona}, resting with companion ${animal} in cozy glowing warm bedtime room, 8k resolution, masterpiece`;
-    const coverImageUrl = createAiImageUrl(fallbackCoverPrompt, baseSeed, chosenStyle);
+    const animalEn = translateAnimalToEnglish(animal);
+    const colorEn = translateColorToEnglish(color);
 
     const rawFallbackPages = [
       {
         page_number: 1,
         text_uz: `Oqshom shafag'i olamga oltin nurlarini sochar edi. ${childName} o'zining sevimli ${animal}i bilan birga xonadonida o'tirib, osmondagi yulduzlarni tomosha qilardi. Uning qalbida go'zal ibratli ertak tinglash ishtiyoqi yonardi.`,
         text_en: `As the golden evening arrived, ${childName} sat peacefully with their beloved ${animal}, gazing at the first twinkling stars.`,
-        scene_summary: `${childName}ning oqshomgi xotirjamligi va tafakkuri`
+        scene_summary: `${childName}ning oqshomgi xotirjamligi va tafakkuri`,
+        scene_prompt: `${characterPersona}, sitting cozily beside ${animalEn} looking at twilight stars through the window, warm golden sunset rays, peaceful cozy room with soft patterned rug, soft ambient glow`
       },
       {
         page_number: 2,
         text_uz: `Shu payt xonaga mehribon buvijonisi va ota-onasi kirib keldilar. Ular ${childName}ning yoniga o'tirib, mehr bilan peshonasidan o'pdilar: "Ko'zlarimizning nuri, bilasanmi, chinakam baxt — har bir ne'mat uchun Allohga shukr qilish va yaxshilik ulashishdadir", dedilar.`,
         text_en: `Loving family joined ${childName}, sharing gentle words of wisdom: "True happiness comes from gratitude and sharing goodness."`,
-        scene_summary: `Oila mehri va nuryuzli buvijonisining o'giti`
+        scene_summary: `Oila mehri va nuryuzli buvijonisining o'giti`,
+        scene_prompt: `${characterPersona}, sitting affectionately beside loving smiling grandmother and parents, grandmother gently touching child's shoulder, smiling warmly, warm tea cups on low table, cozy living room`
       },
       {
         page_number: 3,
         text_uz: `${childName} o'zining sevimli ${animal}ini quchoqlab, samimiy jilmaydi. U bugun o'rgangan go'zal fazilatga amal qilishga qaror qildi: "Bismillahir Rohmanir Rohiym!" deb, eng sevimli narsasini oilasi va yaqinlari bilan baham ko'rdi.`,
         text_en: `With a joyful smile, ${childName} whispered "Bismillah" and happily shared what they loved most with family.`,
-        scene_summary: `Bismillah bilan ezgulik va saxovat ko'rsatish`
+        scene_summary: `Bismillah bilan ezgulik va saxovat ko'rsatish`,
+        scene_prompt: `${characterPersona}, happily sharing sweet fruits and treats with family members, cheerful joyful smile, holding hands out politely, bright warm inviting Islamic arch decor room`
       },
       {
         page_number: 4,
         text_uz: `Birdan butun xona go'yo nurga to'ldi! ${childName}ning yaxshi amali tufayli ${animal} ham quvonchdan sakrab ketdi. Har bir yaxshi amal qalbga xotirjamlik va baraka olib kelishini ${childName} dildan his qildi.`,
         text_en: `The room sparkled with warmth. Doing good brought instant peace and light to everyone's heart.`,
-        scene_summary: `Ezgulikning nurli barakasi va qalb sakinatlari`
+        scene_summary: `Ezgulikning nurli barakasi va qalb sakinatlari`,
+        scene_prompt: `${characterPersona}, standing happily with open joyful arms in a bright room illuminated with soft glowing golden magical sparkles, cute ${animalEn} jumping playfully in excitement, pure happiness and radiant warm light`
       },
       {
         page_number: 5,
         text_uz: `Kechki dasturxonda butun oila jam bo'ldi. ${childName} odob bilan taom yeb, "Alhamdulillah, bizga bergan barcha shirin ne'matlaringga shukur, Yo Robbim!" dedi. Ota-onasi uning odobidan cheksiz faxrlandilar.`,
         text_en: `At dinnertime, ${childName} politely said 'Alhamdulillah', filling parents with immense pride and joy.`,
-        scene_summary: `Shukronalik dasturxoni va go'zal odob`
+        scene_summary: `Shukronalik dasturxoni va go'zal odob`,
+        scene_prompt: `${characterPersona}, sitting politely with parents at dinner table filled with fresh bread and tea, holding hands in gratitude prayer, smiling proudly, warm cozy dining room lanterns`
       },
       {
         page_number: 6,
         text_uz: `Oqshom tushib, osmon hilol oy va son-sanoqsiz yulduzlar bilan bezandi. ${childName} xonasini ozoda qilib, yotishga tayyorlandi. Uning qalbi cheksiz oromga to'lgan edi.`,
         text_en: `Outside the window, a bright crescent moon smiled as ${childName} prepared for cozy bedtime.`,
-        scene_summary: `Orombaxsh oqshom sukunati va xona ozodaligi`
+        scene_summary: `Orombaxsh oqshom sukunati va xona ozodaligi`,
+        scene_prompt: `${characterPersona}, tidying up storybooks in a neat clean bedroom, glowing crescent moon and stars outside large window, serene calming bedtime ambient lighting`
       },
       {
         page_number: 7,
         text_uz: `Yotishdan oldin ${childName} jajji kaftlarini ochib, ixlos bilan duo qildi: "Ey mehribon Allohim! Ota-onamni, oilamni asragin. Menga go'zal xulq va sabr bergin. Omin!". Buvijonisi unga shirin fotiha berdi.`,
         text_en: `Raising hands in sincere prayer, ${childName} asked Allah to bless parents, family, and keep their heart pure.`,
-        scene_summary: `${childName}ning samimiy oqshomgi duosi`
+        scene_summary: `${childName}ning samimiy oqshomgi duosi`,
+        scene_prompt: `${characterPersona}, kneeling on a soft prayer carpet with cupped open hands making heartfelt bedtime Dua prayer, soft divine golden moonlight, calm tranquil spiritual atmosphere`
       },
       {
         page_number: 8,
         text_uz: `${childName} yostig'iga bosh qo'yib, jilmaygancha shirin uyquga ketdi. U shirin tushlar ko'rib, farishtalar panohida orom oldi. Xayrli tun, aziz ${childName}!`,
         text_en: `Resting upon soft pillows, ${childName} drifted into the sweetest peaceful sleep. Good night, little champion!`,
-        scene_summary: `Shirin tushlar va farishtalar panohidagi uyqu`
+        scene_summary: `Shirin tushlar va farishtalar panohidagi uyqu`,
+        scene_prompt: `${characterPersona}, sleeping soundly under a cozy soft blanket with a gentle innocent smile, ${animalEn} curled up peacefully beside bed, gentle soothing star night lamp, fairytale bedtime serenity`
       }
     ];
 
     const selectedPages = rawFallbackPages.slice(0, targetPageCount).map((p, idx) => {
       const pageSeed = baseSeed + idx + 1;
-      const prompt = `${characterPersona} in ${p.scene_summary}, ${color} atmosphere, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
+      const prompt = `${p.scene_prompt}, ${colorEn}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
       return {
         ...p,
         page_number: idx + 1,
