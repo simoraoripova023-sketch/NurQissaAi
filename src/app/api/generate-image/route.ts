@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getOpenAiApiKey } from '@/lib/serverKeys';
+
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 const NEGATIVE_ENHANCERS = "strictly no hats, no wizard hats, no witch hats, no giant caps, no costumes, no floating head, no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus, 8k render, masterpiece";
 
@@ -31,8 +35,9 @@ export async function POST(req: NextRequest) {
       ? `${prompt}, ${styleDescriptor}, ${NEGATIVE_ENHANCERS}`
       : `${characterAnchor} in ${prompt}, ${styleDescriptor}, ${NEGATIVE_ENHANCERS}`;
 
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (apiKey && apiKey.trim().startsWith('sk-')) {
+    const apiKey = getOpenAiApiKey();
+
+    if (apiKey) {
       const modelsToTry = ['gpt-image-1-mini', 'gpt-image-1', 'gpt-image-1.5'];
       
       for (const model of modelsToTry) {
@@ -40,7 +45,7 @@ export async function POST(req: NextRequest) {
           const response = await fetch('https://api.openai.com/v1/images/generations', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${apiKey.trim()}`,
+              'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({

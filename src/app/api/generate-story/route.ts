@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChildProfile, StoryBook } from '@/lib/types';
+import { getOpenAiApiKey, getGeminiApiKey } from '@/lib/serverKeys';
+
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 /**
  * Builds an immutable Master Character Visual Anchor to guarantee 100% character consistency across all pages.
@@ -60,15 +64,16 @@ function translateColorToEnglish(colorStr: string): string {
  * Generates custom 3D storybook scene illustration with consistent character features using OpenAI
  */
 async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (apiKey && apiKey.trim().startsWith('sk-')) {
+  const apiKey = getOpenAiApiKey();
+
+  if (apiKey) {
     const modelsToTry = ['gpt-image-1-mini', 'gpt-image-1', 'gpt-image-1.5'];
     for (const model of modelsToTry) {
       try {
         const res = await fetch('https://api.openai.com/v1/images/generations', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${apiKey.trim()}`,
+            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -114,7 +119,8 @@ function createAiImageUrl(prompt: string, storyId: string, pageNum: number, styl
  * Analyzes uploaded child photo to extract consistent 3D character persona features
  */
 async function analyzeChildPhoto(photoDataUrl?: string, gender: string = 'boy', name: string = 'Yusuf'): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = getOpenAiApiKey();
+
   const isBoy = gender === 'boy';
   const defaultPersona = isBoy
     ? `adorable cheerful 6-year-old Uzbek boy named ${name} with neat dark hair, sparkling warm brown eyes, sweet innocent smile, wearing a neat modest soft-colored outfit`
@@ -128,7 +134,7 @@ async function analyzeChildPhoto(photoDataUrl?: string, gender: string = 'boy', 
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey.trim()}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -226,7 +232,7 @@ Output Valid JSON ONLY with this exact schema:
     "todays_lesson_en": "...",
     "hadith_sharif_uz": "«...» (Hadisi Sharif)",
     "hadith_sharif_en": "«...» (Prophetic Hadith)",
-    "arabic_dua": "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
+    "arabic_dua": "رَبِّ هَبْ لِي مِنَ الصَّALИحِينَ",
     "little_dua_uz": "...",
     "little_dua_en": "...",
     "discussion_questions_uz": ["...", "...", "..."],
@@ -263,13 +269,14 @@ Output Valid JSON ONLY with this exact schema:
 }`;
 
     // 1. Try OpenAI GPT-4o-mini
-    const openAiKey = process.env.OPENAI_API_KEY;
-    if (openAiKey && openAiKey.trim().startsWith('sk-')) {
+    const openAiKey = getOpenAiApiKey();
+
+    if (openAiKey) {
       try {
         const oaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${openAiKey.trim()}`,
+            'Authorization': `Bearer ${openAiKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -296,6 +303,7 @@ Output Valid JSON ONLY with this exact schema:
     }
 
     // 2. Try Google Gemini models
+    const geminiKey = getGeminiApiKey();
     const modelsToTry = [
       'gemini-2.5-flash',
       'gemini-2.0-flash',
@@ -306,7 +314,7 @@ Output Valid JSON ONLY with this exact schema:
     let resultText = '';
     for (const model of modelsToTry) {
       try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
         const response = await fetch(geminiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -354,7 +362,7 @@ export async function POST(req: NextRequest) {
     const animal = profile.favorite_animal || (isBoy ? 'oq kabutar' : 'mitti quyoncha');
     const color = profile.favorite_color || 'zumrad yashil va oltin rang';
     const chosenStyle = profile.illustration_style || 'pixar_3d';
-    const geminiApiKey = process.env.GEMINI_API_KEY || '';
+    const geminiApiKey = getGeminiApiKey();
     const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
 
     // 1. Build locked Master Character Anchor (from vision photo analysis or precise traits)
@@ -374,9 +382,7 @@ export async function POST(req: NextRequest) {
       
       // Generate Cover Art: OpenAI gpt-image-1-mini or stream endpoint
       const fallbackAiCoverUrl = createAiImageUrl(coverPrompt, storyId, 0, chosenStyle);
-      const coverImageUrl = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.startsWith('sk-')
-        ? await generateDallEImage(coverPrompt, fallbackAiCoverUrl)
-        : fallbackAiCoverUrl;
+      const coverImageUrl = await generateDallEImage(coverPrompt, fallbackAiCoverUrl);
 
       // Generate 100% new, unique AI illustrations for every single page
       const enhancedPages = generatedStory.pages.map((p, idx) => {
@@ -503,9 +509,7 @@ export async function POST(req: NextRequest) {
 
     const fallbackCoverPrompt = `${characterPersona}, together with companion ${animalEn} in cozy warm glowing ${colorEn} room, gentle ambient sunlight, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
     const fallbackCoverUrl = createAiImageUrl(fallbackCoverPrompt, storyId, 0, chosenStyle);
-    const coverImageUrl = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.startsWith('sk-')
-      ? await generateDallEImage(fallbackCoverPrompt, fallbackCoverUrl)
-      : fallbackCoverUrl;
+    const coverImageUrl = await generateDallEImage(fallbackCoverPrompt, fallbackCoverUrl);
 
     const selectedPages = rawFallbackPages.slice(0, targetPageCount).map((p, idx) => {
       const prompt = `${p.scene_prompt}, ${colorEn}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;

@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getOpenAiApiKey } from '@/lib/serverKeys';
+
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 // In-memory cache for generated images during runtime
 const imageCache = new Map<string, { buffer: Buffer; contentType: string }>();
@@ -21,7 +25,7 @@ export async function GET(req: NextRequest) {
     const storyId = searchParams.get('storyId') || '';
     const page = searchParams.get('page') || '1';
 
-    const cacheKey = `${storyId}_p${page}_${rawPrompt.slice(0, 50)}`;
+    const cacheKey = `${storyId}_p${page}_${rawPrompt.slice(0, 60)}`;
     if (imageCache.has(cacheKey)) {
       const cached = imageCache.get(cacheKey)!;
       return new NextResponse(new Uint8Array(cached.buffer), {
@@ -35,8 +39,9 @@ export async function GET(req: NextRequest) {
     const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.pixar_3d;
     const fullPrompt = `${rawPrompt}, ${stylePrompt}, ${NEGATIVE_ENHANCERS}`;
 
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (apiKey && apiKey.trim().startsWith('sk-')) {
+    const apiKey = getOpenAiApiKey();
+
+    if (apiKey) {
       const modelsToTry = ['gpt-image-1-mini', 'gpt-image-1', 'gpt-image-1.5'];
       
       for (const model of modelsToTry) {
@@ -44,7 +49,7 @@ export async function GET(req: NextRequest) {
           const res = await fetch('https://api.openai.com/v1/images/generations', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${apiKey.trim()}`,
+              'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -69,6 +74,23 @@ export async function GET(req: NextRequest) {
                 },
               });
             }
+
+            if (data?.data?.[0]?.url) {
+              const imgRes = await fetch(data.data[0].url);
+              if (imgRes.ok) {
+                const imgBuf = Buffer.from(await imgRes.arrayBuffer());
+                imageCache.set(cacheKey, { buffer: imgBuf, contentType: 'image/png' });
+                return new NextResponse(new Uint8Array(imgBuf), {
+                  headers: {
+                    'Content-Type': 'image/png',
+                    'Cache-Control': 'public, max-age=86400, immutable',
+                  },
+                });
+              }
+            }
+          } else {
+            const err = await res.json().catch(() => ({}));
+            console.warn(`OpenAI image notice (${model}):`, err?.error?.message || res.status);
           }
         } catch (err) {
           console.warn(`Error generating image with ${model}:`, err);
@@ -76,7 +98,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Fallback: Generate a stylish SVG illustration if AI generation is temporarily unavailable
+    // Fallback: Return a warm glowing bedtime scene placeholder
     const title = decodeURIComponent(rawPrompt).slice(0, 45);
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768">
