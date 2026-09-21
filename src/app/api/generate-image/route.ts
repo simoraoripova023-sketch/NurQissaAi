@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAiApiKey } from '@/lib/serverKeys';
 
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const runtime = 'edge';
 
 const NEGATIVE_ENHANCERS = "strictly no hats, no wizard hats, no witch hats, no giant caps, no costumes, no floating head, no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus, 8k render, masterpiece";
 

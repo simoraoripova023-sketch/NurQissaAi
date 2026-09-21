@@ -86,6 +86,19 @@ export default function BookReader({ story }: BookReaderProps) {
   const prologue = locale === 'uz' ? story.prologue_uz : story.prologue_en;
   const totalPages = story.pages.length;
 
+  // Auto-generate high-definition AI illustration if page is currently viewing placeholder
+  useEffect(() => {
+    if (currentPageIndex >= 1 && currentPageIndex <= totalPages) {
+      const page = story.pages[currentPageIndex - 1];
+      const currentImg = customPageImages[currentPageIndex] || page?.image_url;
+      if (!currentImg || currentImg.startsWith('/api/story-image') || currentImg.includes('.svg')) {
+        if (!isGeneratingImage && !customPageImages[currentPageIndex]) {
+          handleGenerateAiImage(currentPageIndex);
+        }
+      }
+    }
+  }, [currentPageIndex]);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
