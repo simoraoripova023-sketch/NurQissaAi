@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Play, Pause, Volume2, Sparkles, Loader2 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
 interface AudioNarrationBarProps {
@@ -14,22 +14,33 @@ interface AudioNarrationBarProps {
 export default function AudioNarrationBar({ currentText, audioUrl, currentPage, totalPages }: AudioNarrationBarProps) {
   const { locale, isPlayingAudio, setIsPlayingAudio } = useAppStore();
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // Initialize audio element and synth
+  // Initialize SpeechSynthesis and load available voices
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if ('speechSynthesis' in window) {
-        synthRef.current = window.speechSynthesis;
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      synthRef.current = window.speechSynthesis;
+
+      const updateVoices = () => {
+        if (synthRef.current) {
+          const voices = synthRef.current.getVoices();
+          if (voices.length > 0) {
+            setAvailableVoices(voices);
+          }
+        }
+      };
+
+      updateVoices();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = updateVoices;
       }
     }
   }, []);
 
-  // Sync audio source when audioUrl changes
+  // Sync audio element source when audioUrl or currentPage changes
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -37,55 +48,107 @@ export default function AudioNarrationBar({ currentText, audioUrl, currentPage, 
         audioRef.current.src = audioUrl;
         audioRef.current.load();
         if (isPlayingAudio) {
-          audioRef.current.play().catch(() => setIsPlayingAudio(false));
+          audioRef.current.play().catch(() => {
+            speakText(currentText);
+          });
         }
+      } else if (isPlayingAudio) {
+        speakText(currentText);
       }
-    } else if (synthRef.current && isPlayingAudio && !audioUrl) {
+    } else if (isPlayingAudio && !audioUrl) {
       speakText(currentText);
     }
   }, [audioUrl, currentPage]);
 
   const speakText = (text: string) => {
-    if (!synthRef.current) return;
-    synthRef.current.cancel();
-    if (!text.trim()) return;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume(); // Unblock Chrome speech pause lock
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = playbackRate;
-    const voices = synthRef.current.getVoices();
-    const langPrefix = locale === 'uz' ? 'tr' : 'en';
-    const selectedVoice = voices.find(v => v.lang.startsWith(langPrefix)) || voices[0];
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
+      if (!text || !text.trim()) return;
+
+      const cleanText = text.replace(/[*_#«»"]/g, ' ').trim();
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = playbackRate;
+
+      const voices = availableVoices.length > 0 
+        ? availableVoices 
+        : (window.speechSynthesis.getVoices() || []);
+
+      if (locale === 'uz') {
+        utterance.lang = 'uz-UZ';
+        // Match Uzbek, Turkish or gentle female/male voice
+        const uzVoice = voices.find(v => v.lang.startsWith('uz') || v.lang.startsWith('tr')) 
+          || voices.find(v => v.name.toLowerCase().includes('uzbek') || v.name.toLowerCase().includes('turkish'))
+          || voices[0];
+        if (uzVoice) utterance.voice = uzVoice;
+      } else {
+        utterance.lang = 'en-US';
+        const enVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
+        if (enVoice) utterance.voice = enVoice;
+      }
+
+      utterance.onstart = () => {
+        setIsLoadingAudio(false);
+        setIsPlayingAudio(true);
+      };
+
+      utterance.onend = () => {
+        setIsPlayingAudio(false);
+      };
+
+      utterance.onerror = (e) => {
+        console.warn("TTS notice:", e);
+        setIsPlayingAudio(false);
+        setIsLoadingAudio(false);
+      };
+
+      window.speechSynthesis.speak(utterance);
+      setIsPlayingAudio(true);
+    } catch (err) {
+      console.error("speakText error:", err);
+      setIsPlayingAudio(false);
+      setIsLoadingAudio(false);
     }
-    utterance.onend = () => setIsPlayingAudio(false);
-    utterance.onerror = () => setIsPlayingAudio(false);
-    utteranceRef.current = utterance;
-    synthRef.current.speak(utterance);
-    setIsPlayingAudio(true);
   };
 
   const handlePlayPause = () => {
-    if (audioUrl && audioRef.current) {
-      if (isPlayingAudio) {
+    if (isPlayingAudio) {
+      // Pause active audio or synthesis
+      if (audioRef.current) {
         audioRef.current.pause();
-        setIsPlayingAudio(false);
-      } else {
-        audioRef.current.playbackRate = playbackRate;
-        audioRef.current.play().then(() => {
-          setIsPlayingAudio(true);
-        }).catch((err) => {
-          console.error("Audio playback error:", err);
-          setIsPlayingAudio(false);
-        });
+      }
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      setIsPlayingAudio(false);
+      setIsLoadingAudio(false);
+      return;
+    }
+
+    // If pre-recorded Studio MP3 is available
+    if (audioUrl && audioRef.current) {
+      setIsLoadingAudio(true);
+      audioRef.current.playbackRate = playbackRate;
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsLoadingAudio(false);
+            setIsPlayingAudio(true);
+          })
+          .catch((err) => {
+            console.warn("Studio audio failed, falling back to TTS:", err);
+            setIsLoadingAudio(false);
+            speakText(currentText);
+          });
       }
     } else {
-      if (isPlayingAudio) {
-        if (synthRef.current) synthRef.current.cancel();
-        setIsPlayingAudio(false);
-      } else {
-        speakText(currentText);
-      }
+      // Use Live AI Speech Synthesis (TTS)
+      speakText(currentText);
     }
   };
 
@@ -95,16 +158,22 @@ export default function AudioNarrationBar({ currentText, audioUrl, currentPage, 
     if (audioRef.current) {
       audioRef.current.playbackRate = nextRate;
     }
+    if (isPlayingAudio) {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window && !audioUrl) {
+        window.speechSynthesis.cancel();
+        speakText(currentText);
+      }
+    }
   };
 
-  // Clean up
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
       }
-      if (synthRef.current) {
-        synthRef.current.cancel();
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
       }
       setIsPlayingAudio(false);
     };
@@ -117,14 +186,12 @@ export default function AudioNarrationBar({ currentText, audioUrl, currentPage, 
         ref={audioRef}
         src={audioUrl}
         preload="auto"
-        onTimeUpdate={() => {
-          if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
-            setDuration(audioRef.current.duration || 0);
+        onEnded={() => setIsPlayingAudio(false)}
+        onError={() => {
+          if (isPlayingAudio) {
+            speakText(currentText);
           }
         }}
-        onEnded={() => setIsPlayingAudio(false)}
-        onError={() => setIsPlayingAudio(false)}
       />
 
       {/* Left info & animated waveform */}
@@ -138,7 +205,7 @@ export default function AudioNarrationBar({ currentText, audioUrl, currentPage, 
             <span>
               {audioUrl 
                 ? (locale === 'uz' ? "🎙️ Jonli Dublyaj & AI Ovoz" : "🎙️ Studio Voice Narration")
-                : (locale === 'uz' ? "Ovozli Ertakchi (TTS)" : "Bedtime Voice Narration")}
+                : (locale === 'uz' ? "Ovozli Ertakchi (AI TTS)" : "Bedtime AI Voice")}
             </span>
           </div>
           <p className="text-[11px] text-slate-300">
@@ -168,8 +235,9 @@ export default function AudioNarrationBar({ currentText, audioUrl, currentPage, 
       <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
         {/* Speed toggle */}
         <button
+          type="button"
           onClick={cycleSpeed}
-          className="px-2.5 py-1 rounded-lg bg-indigo-900/80 hover:bg-indigo-800 text-[11px] font-bold text-amber-300 border border-indigo-700 transition-colors"
+          className="px-2.5 py-1 rounded-lg bg-indigo-900/80 hover:bg-indigo-800 text-[11px] font-bold text-amber-300 border border-indigo-700 transition-colors cursor-pointer"
           title="Tezlik / Speed"
         >
           {playbackRate}x
@@ -177,11 +245,15 @@ export default function AudioNarrationBar({ currentText, audioUrl, currentPage, 
 
         {/* Play / Pause button */}
         <button
+          type="button"
           onClick={handlePlayPause}
-          className="w-11 h-11 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all shrink-0"
+          disabled={isLoadingAudio}
+          className="w-11 h-11 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer disabled:opacity-50"
           aria-label={isPlayingAudio ? "Pause" : "Play"}
         >
-          {isPlayingAudio ? (
+          {isLoadingAudio ? (
+            <Loader2 className="w-5 h-5 animate-spin text-slate-950" />
+          ) : isPlayingAudio ? (
             <Pause className="w-5 h-5 fill-slate-950" />
           ) : (
             <Play className="w-5 h-5 fill-slate-950 ml-0.5" />

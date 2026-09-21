@@ -68,12 +68,7 @@ export default function StoryWizard() {
       return;
     }
 
-    // If no custom photo uploaded, select authentic matching 3D avatar
-    if (!childProfile.child_photo_url) {
-      const defaultAvatar = PIXAR_AVATARS.find(a => a.gender === childProfile.gender) || PIXAR_AVATARS[0];
-      updateChildProfile({ child_photo_url: defaultAvatar.url });
-    }
-
+    // Check pricing and subscription
     const { freeStoriesLeft, hasPaidSubscription, setIsPricingModalOpen } = useAppStore.getState();
     if (!hasPaidSubscription && freeStoriesLeft <= 0) {
       setIsPricingModalOpen(true);
@@ -384,42 +379,69 @@ export default function StoryWizard() {
                       })}
                     </div>
 
-                    {/* Or Custom Photo Upload Option */}
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`mt-2 border-2 border-dashed rounded-2xl p-3.5 text-center cursor-pointer transition-all flex items-center justify-between ${
-                        childProfile.child_photo_url && !PIXAR_AVATARS.some(a => a.url === childProfile.child_photo_url)
-                          ? 'border-emerald-500 bg-emerald-50/50 dark:bg-pine-900/50 ring-2 ring-emerald-300'
-                          : 'border-slate-300 dark:border-pine-700 hover:border-amber-400 bg-slate-50/60 dark:bg-pine-950/60'
-                      }`}
-                    >
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handlePhotoUpload}
-                        accept="image/*"
-                        className="hidden"
-                      />
+                    {/* Custom Photo Upload Card */}
+                    <div className="space-y-2">
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all flex items-center justify-between ${
+                          childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
+                            ? 'border-emerald-500 bg-emerald-50/70 dark:bg-pine-900/70 ring-2 ring-emerald-300'
+                            : 'border-slate-300 dark:border-pine-700 hover:border-amber-400 bg-slate-50/60 dark:bg-pine-950/60'
+                        }`}
+                      >
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handlePhotoUpload}
+                          accept="image/*"
+                          className="hidden"
+                        />
 
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-pine-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-xs">
-                          <Camera className="w-5 h-5" />
+                        <div className="flex items-center gap-3.5">
+                          {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image') ? (
+                            <img
+                              src={childProfile.child_photo_url}
+                              alt="Child Upload Preview"
+                              className="w-12 h-12 rounded-xl object-cover border-2 border-emerald-500 shadow-sm shrink-0"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-pine-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-xs text-xl">
+                              📷
+                            </div>
+                          )}
+                          <div className="text-left">
+                            <p className="text-xs font-bold text-slate-800 dark:text-butter-100">
+                              {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
+                                ? (locale === 'uz' ? "Farzandingiz surati yuklandi ✓" : "Child's photo uploaded ✓")
+                                : (locale === 'uz' ? "Farzandingiz suratini yuklang (Ixtiyoriy)" : "Upload child's photo (Optional)")}
+                            </p>
+                            <span className="text-[11px] text-slate-500 dark:text-butter-300/70">
+                              {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
+                                ? (locale === 'uz' ? "AI qahramonni ushbu yuz asosida chizadi" : "AI will personalize 3D avatar from this face")
+                                : (locale === 'uz' ? "Suratsiz ham AI matn asosida yangi 3D qahramon yaratadi" : "Without photo, AI creates unique 3D hero")}
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-left">
-                          <p className="text-xs font-bold text-slate-800 dark:text-butter-100">
-                            {childProfile.child_photo_url && !PIXAR_AVATARS.some(a => a.url === childProfile.child_photo_url)
-                              ? (locale === 'uz' ? "Shaxsiy surat yuklandi ✓" : "Custom photo uploaded ✓")
-                              : (locale === 'uz' ? "Yoki o'z farzandingiz rasmini yuklang (Ixtiyoriy)" : "Or upload custom child's photo (Optional)")}
-                          </p>
-                          <span className="text-[10px] text-slate-500">
-                            {locale === 'uz' ? "AI qahramon yuzini suratga moslab chizadi" : "AI will personalize character from photo"}
-                          </span>
+
+                        <div className="flex items-center gap-2">
+                          {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image') ? (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                updateChildProfile({ child_photo_url: '', character_appearance_description: '' });
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold transition-all"
+                            >
+                              ✕ {locale === 'uz' ? "O'chirish" : "Remove"}
+                            </button>
+                          ) : (
+                            <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-pine-800 px-3 py-1.5 rounded-xl shrink-0">
+                              {locale === 'uz' ? "Yuklash" : "Browse"}
+                            </span>
+                          )}
                         </div>
                       </div>
-
-                      <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-pine-800 px-3 py-1.5 rounded-xl shrink-0">
-                        {locale === 'uz' ? "Tanlash" : "Browse"}
-                      </span>
                     </div>
                   </div>
 

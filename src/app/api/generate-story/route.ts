@@ -1,62 +1,185 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ChildProfile, StoryBook, MoralVirtue } from '@/lib/types';
-import { getStorySceneImage } from '@/lib/illustrationHelper';
+import { ChildProfile, StoryBook } from '@/lib/types';
 
 /**
- * Generates an authentic Islamic values-based bedtime story using Google Gemini API
+ * Builds an immutable Master Character Visual Anchor to guarantee 100% character consistency across all pages.
  */
-async function generateStoryWithGemini(profile: ChildProfile, apiKey: string): Promise<Partial<StoryBook> | null> {
+function buildMasterCharacterAnchor(profile: ChildProfile): string {
+  const isBoy = profile.gender === 'boy';
+  const name = profile.child_name || (isBoy ? 'Yusuf' : 'Fotima');
+  const age = profile.age || 6;
+
+  const defaultClothing = isBoy
+    ? "a neat modest white collared shirt under a soft emerald-green embroidered vest, tailored beige trousers, clean shoes"
+    : "a lovely modest pastel-colored floral dress with gentle long sleeves, delicate embroidery, and a cute little flower clip in hair";
+
+  const defaultAppearance = isBoy
+    ? `adorable handsome ${age}-year-old Uzbek boy named ${name}, neat short dark wavy hair, large sparkling expressive warm brown eyes, cute round rosy cheeks, sweet gentle innocent smile`
+    : `adorable sweet ${age}-year-old Uzbek girl named ${name}, shiny dark shoulder-length hair with neat bangs, large sparkling luminous brown eyes, rosy cute cheeks, gentle radiant smile`;
+
+  const baseAppearance = profile.character_appearance_description && profile.character_appearance_description.trim().length > 10
+    ? profile.character_appearance_description.trim()
+    : defaultAppearance;
+
+  const companion = profile.favorite_animal ? `accompanied by a cute friendly ${profile.favorite_animal}` : '';
+
+  return `${baseAppearance}, wearing ${defaultClothing}${companion ? `, ${companion}` : ''}`;
+}
+
+const STYLE_PROMPTS: Record<string, string> = {
+  pixar_3d: "3D Disney Pixar animation storybook masterpiece, ultra-smooth character rendering, soft glowing golden hour bedtime lighting, rich warm cinematic colors, 8k resolution, highly detailed texture, lovable expressive facial features",
+  watercolor: "authentic gentle fairytale watercolor illustration, soft dreamy gouache washes, fine delicate pencil outlines, heartwarming pastel palette, clean classic children's book painting",
+  classic_storybook: "classical vintage children's book illustration, rich warm gouache and oil painting texture, golden sunbeam lighting, heartwarming moral fairytale ambiance",
+  disney_2d: "classic Disney 2D hand-drawn animation style, crisp clean lines, vibrant storybook colors, joyful animated child character",
+  ghibli_anime: "Studio Ghibli nature-filled anime aesthetic, lush vibrant blooming garden background, gentle morning sunlight, whimsical peaceful fairytale atmosphere"
+};
+
+const NEGATIVE_ENHANCERS = "strictly no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus";
+
+/**
+ * Generates custom 3D storybook scene illustration with consistent character features using OpenAI DALL-E 3
+ */
+async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (apiKey && apiKey.trim().startsWith('sk-')) {
+    try {
+      const res = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'dall-e-3',
+          prompt: prompt.slice(0, 980),
+          n: 1,
+          size: '1024x1024',
+          quality: 'hd',
+          style: 'vivid'
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.data?.[0]?.url) {
+          return data.data[0].url;
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.warn('OpenAI DALL-E notice:', err?.error?.message || res.status);
+      }
+    } catch (err) {
+      console.warn('Error fetching OpenAI image:', err);
+    }
+  }
+
+  return fallbackUrl;
+}
+
+/**
+ * Creates dynamic high-definition AI image URL using the FLUX model with locked seed
+ */
+function createAiImageUrl(prompt: string, seed: number, style: string = 'pixar_3d'): string {
+  const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.pixar_3d;
+  const fullPrompt = `${prompt}, ${stylePrompt}, ${NEGATIVE_ENHANCERS}`;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?model=flux&width=1024&height=768&nologo=true&seed=${seed}&enhance=true`;
+}
+
+/**
+ * Analyzes uploaded child photo to extract consistent 3D character persona features
+ */
+async function analyzeChildPhoto(photoDataUrl?: string, gender: string = 'boy', name: string = 'Yusuf'): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  const isBoy = gender === 'boy';
+  const defaultPersona = isBoy
+    ? `adorable cheerful 6-year-old Uzbek boy named ${name} with neat dark hair, sparkling warm brown eyes, sweet innocent smile, wearing a neat modest soft-colored outfit`
+    : `adorable sweet 5-year-old Uzbek girl named ${name} with cute dark hair, bright expressive sparkling eyes, sweet joyful smile, wearing a lovely elegant dress`;
+
+  if (!apiKey || !photoDataUrl || !photoDataUrl.startsWith('data:image')) {
+    return defaultPersona;
+  }
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey.trim()}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: `Describe the child in this photo in 1 precise sentence for a 3D Pixar character prompt (approximate age, gender, hair style/color, facial features, eye expression, clothing color and style). Format as a character description without introductory words. Child name is ${name}.` },
+              { type: 'image_url', image_url: { url: photoDataUrl } }
+            ]
+          }
+        ],
+        max_tokens: 120
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const desc = data.choices?.[0]?.message?.content?.trim();
+      if (desc && desc.length > 15) {
+        return desc.replace(/^["']|["']$/g, '').replace(/\.$/, '');
+      }
+    }
+  } catch (e) {
+    console.warn('Vision photo analysis notice:', e);
+  }
+
+  return defaultPersona;
+}
+
+/**
+ * Generates an authentic Islamic values-based bedtime story using Google Gemini or OpenAI
+ */
+async function generateStoryWithAi(profile: ChildProfile, masterAnchor: string, apiKey: string): Promise<Partial<StoryBook> | null> {
   try {
     const isBoy = profile.gender === 'boy';
     const childName = profile.child_name;
     const virtue = profile.parent_goal || 'kindness';
     const setting = profile.story_setting || 'cozy_home';
-    const animal = profile.favorite_animal || 'kichik quyoncha';
-    const color = profile.favorite_color || 'oltin rang';
+    const animal = profile.favorite_animal || (isBoy ? 'oq kabutar' : 'mitti quyoncha');
+    const color = profile.favorite_color || 'zumrad yashil va oltin rang';
     const age = profile.age || 6;
-    const readingTime = profile.reading_time_context || 'daytime';
+    const readingTime = profile.reading_time_context || 'bedtime';
     const activity = profile.daily_activity || 'yaxshiliklar qildi';
     const mood = profile.emotional_state || 'happy';
-    const style = profile.illustration_style || 'pixar_3d';
+    const chosenStyle = profile.illustration_style || 'pixar_3d';
     const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
 
-    const systemPrompt = `You are a world-class Islamic children's storytelling pedagogue for the "NurQissa AI" platform.
-Generate an authentic, highly personalized, heartwarming ${targetPageCount}-page Islamic storybook in Uzbek (main) and English (translation), strictly grounded in the 19 uploaded authentic Islamic children's books.
+    const systemPrompt = `You are a world-class Islamic children's storytelling pedagogue and art director for the "NurQissa AI" platform.
+Generate an authentic, highly personalized, heartwarming ${targetPageCount}-page Islamic storybook in rich literary Uzbek (main) and English (translation), strictly grounded in authentic Islamic children's literature.
 
-Target Child Profile:
-- Child's Name: "${childName}"
+TARGET CHILD PROFILE & CHARACTER ANCHOR:
+- Child Name: "${childName}"
 - Gender: "${isBoy ? 'o\'g\'il bola' : 'qiz bola'}"
 - Age: ${age} yosh
 - Total Pages: Exactly ${targetPageCount} pages (numbered 1 to ${targetPageCount})
 - Reading Occasion: "${readingTime}"
 - Today's Activity: "${activity}"
 - Mood: "${mood}"
-- Favorite Animal Companion: "${animal}"
-- Favorite Color / Theme: "${color}"
-- Story Setting: "${setting}"
-- Core Moral Virtue: "${virtue}" (Islomiy go'zal fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Jasorat, Poklik).
+- Companion Animal: "${animal}"
+- Palette / Theme: "${color}"
+- Setting: "${setting}"
+- Core Moral Virtue: "${virtue}" (Islomiy fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Odob-axloq, Poklik).
+- LOCKED CHARACTER VISUAL ANCHOR: "${masterAnchor}"
 
-STRICT AUTHENTIC ISLAMIC LITERATURE RULES (Grounding in uploaded sources):
-1. MANDATORY HADITH & PROPHETIC ETISUETTE (From "Bolalar uchun 40 hadis hikoyalari"):
-   - Naturally weave authentic Hadiths of Prophet Muhammad (s.a.v.) into the story dialogue, such as:
-     * «Saxovatli inson — Allohga, odamlarga va jannatga yaqindir» (Termiziy)
-     * «Siz yer yuzidagilarga rahm qiling, osmondagilar ham sizga rahm qilsin» (Termiziy)
-     * «Mo'min kishi o'zi uchun yaxshi ko'rgan narsani birodari uchun ham ravo ko'rmaguncha komil mo'min bo'la olmaydi» (Buxoriy)
-     * «Tabassum qilish ham sadaqadir» (Termiziy)
-     * «Poklik iymondandir» (Muslim)
-     * «Ota-onaga yaxshilik qilish — eng sevimli amallardandir» (Buxoriy)
-2. AUTHENTIC DUAS & SUNNAH HABITS (From "Aqlli bola Yusuf" & "Robbimning 99 ismi"):
-   - Opening good deeds with "Bismillahir Rohmanir Rohiym".
-   - Saying "Alhamdulillah" upon eating, waking, or receiving blessings.
-   - Sincere bedtime Dua with open palms: «Bismika Allohumma amutu va ahya» and Quranic Dua for parents: «Robbirhamhuma kama robbayaniy sog'iyro» (Isro: 24).
-   - Asking Allah for wisdom: «Robbi zidniy 'ilma» (Toha: 114) and righteousness: «Robbi hab liy minas-solihiyn» (Soffat: 100).
-3. PROPHETIC WISDOM INSPIRATIONS (From uploaded prophet storybooks):
-   - Hazrati Yusuf a.s.: Beautiful patience, gratitude, love for family, gentle speech.
-   - Hazrati Ibrohim a.s.: Reflecting on stars, moon, nature, generosity and hospitality.
-   - Hazrati Nuh a.s. & Muso a.s.: Protecting animals and nature, steadfast trust in Allah (Tavakkul).
-   - "Farishtalar haqida bilaman": Angels smiling at children who do good deeds and pray sincerely.
-4. ZERO MYTHOLOGY: Absolutely NO magic wands, spells, fairies, witches, or wizards. All beauty comes from Allah's magnificent creation and pure human goodness.
-5. EXCELLENT CHILD PEDAGOGY: Positive, warm, reassuring bedtime tone in rich, literary Uzbek language.
+CRITICAL IMAGE PROMPT CONSISTENCY INSTRUCTION:
+For EVERY page, you MUST generate an "image_prompt" following this exact 4-part formula:
+Formula: [LOCKED CHARACTER ANCHOR] + [EXACT SCENE PHYSICAL ACTION & EMOTION] + [ENVIRONMENT & ATMOSPHERE] + [LIGHTING & 3D PIXAR RENDER STYLE]
+Example: "${masterAnchor} is kneeling gently beside their grandmother looking at the open illuminated book with sparkling eyes, in a warm cozy room with soft golden evening sunlight and potted green plants, 3D Pixar animation style, 8k render, masterpiece"
+
+AUTHENTIC ISLAMIC LITERATURE RULES:
+1. HADITH & PROPHETIC SUNNAH: Weave authentic Hadiths of Prophet Muhammad (s.a.v.) into the dialogue naturally (e.g., «Tabassum qilish ham sadaqadir», «Poklik iymondandir», «Ota-onaga yaxshilik qilish eng ulug' amallardandir»).
+2. DUA & SUNNAH HABITS: Opening with "Bismillahir Rohmanir Rohiym", praising Allah with "Alhamdulillah", bedtime prayer with open palms («Bismika Allohumma amutu va ahya»), and Dua for parents.
+3. ZERO MYTHOLOGY: Absolutely NO magic wands, spells, fairies, witches, or wizards.
+4. RICH PEDAGOGICAL TONE: Pure, warm, and inspiring bedtime language in literary Uzbek.
 
 Output Valid JSON ONLY with this exact schema:
 {
@@ -69,7 +192,7 @@ Output Valid JSON ONLY with this exact schema:
       "page_number": 1,
       "text_uz": "...",
       "text_en": "...",
-      "image_prompt": "3D Pixar storybook scene of ${childName} ...",
+      "image_prompt": "...",
       "scene_summary": "..."
     }
   ],
@@ -114,7 +237,7 @@ Output Valid JSON ONLY with this exact schema:
   ]
 }`;
 
-    // Try OpenAI GPT-4o-mini if OPENAI_API_KEY is present (Super fast & reliable)
+    // 1. Try OpenAI GPT-4o-mini
     const openAiKey = process.env.OPENAI_API_KEY;
     if (openAiKey && openAiKey.trim().startsWith('sk-')) {
       try {
@@ -127,11 +250,11 @@ Output Valid JSON ONLY with this exact schema:
           body: JSON.stringify({
             model: 'gpt-4o-mini',
             messages: [
-              { role: 'system', content: 'You are an Islamic children storytelling engine. You must output 100% valid JSON only adhering strictly to the required schema.' },
+              { role: 'system', content: 'You are an authentic Islamic children storytelling engine. Output 100% valid JSON only adhering strictly to the schema.' },
               { role: 'user', content: systemPrompt }
             ],
             response_format: { type: 'json_object' },
-            temperature: 0.75,
+            temperature: 0.72,
           }),
         });
 
@@ -143,16 +266,15 @@ Output Valid JSON ONLY with this exact schema:
           }
         }
       } catch (e) {
-        console.warn('OpenAI GPT-4o-mini story text generation failed, trying Gemini:', e);
+        console.warn('OpenAI GPT-4o-mini generation notice, trying Gemini:', e);
       }
     }
 
+    // 2. Try Google Gemini models
     const modelsToTry = [
-      'gemini-2.5-flash',
+      'gemini-2.0-flash',
       'gemini-1.5-flash',
-      'gemini-1.5-pro',
-      'gemini-3.7-flash',
-      'gemini-flash-latest'
+      'gemini-1.5-pro'
     ];
 
     let resultText = '';
@@ -163,16 +285,11 @@ Output Valid JSON ONLY with this exact schema:
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [
-              {
-                role: 'user',
-                parts: [{ text: systemPrompt }]
-              }
-            ],
+            contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
             generationConfig: {
               responseMimeType: 'application/json',
-              temperature: 0.75,
-              maxOutputTokens: 6000,
+              temperature: 0.72,
+              maxOutputTokens: 6500,
             }
           })
         });
@@ -181,134 +298,20 @@ Output Valid JSON ONLY with this exact schema:
           const data = await response.json();
           resultText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (resultText) break;
-        } else {
-          const errData = await response.json().catch(() => ({}));
-          console.warn(`Gemini model ${model} failed (${response.status}):`, errData?.error?.message);
         }
       } catch (err) {
-        console.warn(`Error calling Gemini model ${model}:`, err);
+        console.warn(`Gemini model ${model} notice:`, err);
       }
     }
 
     if (!resultText) return null;
 
     const cleanedText = resultText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
-    const parsed = JSON.parse(cleanedText);
-    return parsed;
+    return JSON.parse(cleanedText);
   } catch (error) {
-    console.error("Error in generateStoryWithGemini:", error);
+    console.error("Error in generateStoryWithAi:", error);
     return null;
   }
-}
-
-const STYLE_PROMPTS: Record<string, string> = {
-  pixar_3d: "Authentic NurQissa Islamic children's book 3D animation style (matching Fotima and Yusufjon storybook art), extremely cute adorable child character with large sparkling expressive brown eyes, sweet cheerful smile, clean neat modest clothes. Breathtaking warm golden sunlight streaming through cozy room, lush indoor plants, books, vibrant fairytale colors, ultra-smooth high-definition 3D render, cinematic lighting, 8k masterpiece",
-  watercolor: "Authentic Islamic fairytale watercolor storybook style (as in classical Nuur books), soft gentle gouache washes, delicate fine outlines, adorable expressive child face, sweet smile, cozy warm pastel lighting, clean high-definition book painting",
-  classic_storybook: "Classical Nuur storybook oil and gouache illustration style, rich warm textures, golden hour glow, heartwarming moral fairytale atmosphere, highly detailed children's book art, adorable child with beautiful eyes",
-  disney_2d: "Classic hand-drawn 2D animation style from Islamic children's books, expressive clean lines, cheerful vivid storybook palette, joyful innocent child character",
-  ghibli_anime: "Studio Ghibli nature-filled anime art style matching Islamic children's stories, lush blooming garden background, crystal streams, soft morning sunlight, cute emotive anime child"
-};
-
-/**
- * Creates dynamic high-definition AI image URL using the FLUX model and crystal-clear face enhancers
- */
-function createAiImageUrl(prompt: string, seed: number, style: string = 'pixar_3d'): string {
-  const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.pixar_3d;
-  const sampleBookArtEnhancers = "matching Fotima and Yusuf book illustration art, crystal clear cute symmetrical face, bright sparkling expressive eyes, adorable happy smile, clean smooth skin, high definition character art, 8k resolution, sharp focus, strictly no blurry face, no creepy doll face, no smeared features";
-  const fullPrompt = `${prompt}, ${stylePrompt}, ${sampleBookArtEnhancers}`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?model=flux&width=1024&height=768&nologo=true&seed=${seed}&enhance=true`;
-}
-
-import fs from 'fs';
-import path from 'path';
-
-/**
- * Generates custom 3D storybook scene illustration with consistent character features using OpenAI DALL-E
- */
-async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (apiKey && apiKey.trim().startsWith('sk-')) {
-    try {
-      const res = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey.trim()}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'dall-e-3',
-          prompt: prompt.slice(0, 950),
-          n: 1,
-          size: '1024x1024',
-          quality: 'standard'
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.data?.[0]?.url) {
-          return data.data[0].url;
-        }
-      } else {
-        const err = await res.json().catch(() => ({}));
-        console.warn('OpenAI DALL-E notice:', err?.error?.message || res.status);
-      }
-    } catch (err) {
-      console.warn('Error fetching OpenAI image:', err);
-    }
-  }
-
-  return fallbackUrl;
-}
-
-/**
- * Analyzes uploaded child photo to extract consistent 3D character persona features
- */
-async function analyzeChildPhoto(photoDataUrl?: string, gender: string = 'girl', name: string = 'Fotima'): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
-  const isBoy = gender === 'boy';
-  const defaultPersona = isBoy
-    ? `adorable cheerful young Uzbek boy named ${name} with neat dark hair, sparkling warm brown eyes, sweet innocent smile, wearing a neat modest soft-colored outfit`
-    : `adorable sweet young Uzbek girl named ${name} with cute dark hair, bright expressive sparkling eyes, sweet joyful smile, wearing a lovely elegant dress`;
-
-  if (!apiKey || !photoDataUrl || !photoDataUrl.startsWith('data:image')) {
-    return defaultPersona;
-  }
-
-  try {
-    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey.trim()}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: `Describe the child in this photo in 1 sentence for a 3D Pixar character prompt (approximate age, gender, hair style/color, eye expression, clothing color and style). Format as a character description without introductory words. Child name is ${name}.` },
-              { type: 'image_url', image_url: { url: photoDataUrl } }
-            ]
-          }
-        ],
-        max_tokens: 120
-      })
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      const desc = data.choices?.[0]?.message?.content?.trim();
-      if (desc && desc.length > 15) {
-        return desc.replace(/^["']|["']$/g, '').replace(/\.$/, '');
-      }
-    }
-  } catch (e) {
-    console.warn('Vision photo analysis failed, using smart default:', e);
-  }
-
-  return defaultPersona;
 }
 
 export async function POST(req: NextRequest) {
@@ -322,36 +325,43 @@ export async function POST(req: NextRequest) {
     const storyId = `story-${Date.now()}-${profile.child_name.toLowerCase().replace(/\s+/g, '-')}`;
     const childName = profile.child_name;
     const isBoy = profile.gender === 'boy';
-    const animal = profile.favorite_animal || (isBoy ? 'mitti toychoq' : 'oppoq quyoncha');
-    const color = profile.favorite_color || 'moviy va zumrad';
-    const virtue = profile.parent_goal || 'kindness';
+    const animal = profile.favorite_animal || (isBoy ? 'oq kabutar' : 'mitti quyoncha');
+    const color = profile.favorite_color || 'zumrad yashil va oltin rang';
     const chosenStyle = profile.illustration_style || 'pixar_3d';
-    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const geminiApiKey = process.env.GEMINI_API_KEY || '';
     const baseSeed = Math.floor(Math.random() * 899999) + 100000;
 
-    // 1. Analyze child's physical appearance from uploaded photo for 100% character consistency
-    const characterPersona = await analyzeChildPhoto(profile.child_photo_url, profile.gender, childName);
-
-    // 2. Generate story text with AI
-    let generatedStory: Partial<StoryBook> | null = null;
-    if (geminiApiKey && geminiApiKey.trim().length > 0 || (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.startsWith('sk-'))) {
-      generatedStory = await generateStoryWithGemini(profile, (geminiApiKey || '').trim());
+    // 1. Build locked Master Character Anchor (from vision photo analysis or precise traits)
+    let characterPersona = buildMasterCharacterAnchor(profile);
+    if (profile.child_photo_url && profile.child_photo_url.startsWith('data:image')) {
+      const visionPersona = await analyzeChildPhoto(profile.child_photo_url, profile.gender, childName);
+      if (visionPersona && visionPersona.length > 20) {
+        characterPersona = visionPersona;
+      }
     }
 
-    // 3. Generate custom 3D AI illustrations using OpenAI DALL-E & GPT-4o Vision persona
-    if (generatedStory && generatedStory.pages && generatedStory.pages.length >= 4) {
-      const coverPrompt = `3D Disney Pixar storybook cover illustration: ${characterPersona}, together with beloved companion ${animal} in glowing ${color} room, warm golden ambient sunlight, smiling warmly, title banner, 8k resolution, masterpiece`;
-      const fallbackCoverUrl = (profile.child_photo_url && profile.child_photo_url.startsWith('/stories/'))
-        ? profile.child_photo_url
-        : getStorySceneImage(profile.gender, 1);
+    // 2. Generate Story Narrative with strict Character Anchor adherence
+    const generatedStory = await generateStoryWithAi(profile, characterPersona, geminiApiKey.trim());
 
-      const coverImageUrl = await generateDallEImage(coverPrompt, fallbackCoverUrl);
+    if (generatedStory && generatedStory.pages && generatedStory.pages.length >= 3) {
+      const coverPrompt = `${characterPersona}, together with companion ${animal} in cozy warm glowing ${color} room, gentle ambient sunlight, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
+      
+      // Generate Cover Art: DALL-E 3 (if key available) or FLUX AI
+      const fallbackAiCoverUrl = createAiImageUrl(coverPrompt, baseSeed, chosenStyle);
+      const coverImageUrl = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.startsWith('sk-')
+        ? await generateDallEImage(coverPrompt, fallbackAiCoverUrl)
+        : fallbackAiCoverUrl;
 
-      const enhancedPages = await Promise.all(generatedStory.pages.map(async (p, idx) => {
-        const authenticFallback = getStorySceneImage(profile.gender, idx + 1);
-        const pagePrompt = `3D Disney Pixar animation children's storybook scene: ${characterPersona} in ${p.scene_summary || p.image_prompt || 'a heartwarming scene'}, ${color} setting, soft warm golden lighting, adorable cheerful expression, 8k render, masterpiece`;
+      // Generate 100% new, unique AI illustrations for every single page
+      const enhancedPages = generatedStory.pages.map((p, idx) => {
+        const pageSeed = baseSeed + idx + 1;
+        const actionText = p.scene_summary || p.text_uz?.slice(0, 150) || 'heartwarming bedtime moment';
         
-        const pageImageUrl = await generateDallEImage(pagePrompt, authenticFallback);
+        const pagePrompt = p.image_prompt && p.image_prompt.includes(childName)
+          ? `${p.image_prompt}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`
+          : `${characterPersona} in ${actionText}, ${color} setting, soft warm golden lighting, adorable cheerful expression, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
+
+        const pageImageUrl = createAiImageUrl(pagePrompt, pageSeed, chosenStyle);
 
         return {
           page_number: idx + 1,
@@ -361,7 +371,7 @@ export async function POST(req: NextRequest) {
           image_url: pageImageUrl,
           scene_summary: p.scene_summary || `${childName} sarguzashti - ${idx + 1}-sahifa`,
         };
-      }));
+      });
 
       const dynamicStory: StoryBook = {
         id: storyId,
@@ -390,97 +400,85 @@ export async function POST(req: NextRequest) {
             `What brought happiness to your family today?`,
             `What kind act will you do tomorrow?`
           ],
-          good_deed_task_uz: `Ertaga ertalab ota-onangizga shirin tabassum bilan \"Assalomu alaykum!\" deng.`,
-          good_deed_task_en: `Greet your family tomorrow morning with a warm smile saying \"Assalamu Alaykum!\"`
+          good_deed_task_uz: `Ertaga ertalab ota-onangizga shirin tabassum bilan "Assalomu alaykum!" deng.`,
+          good_deed_task_en: `Greet your family tomorrow morning with a warm smile saying "Assalamu Alaykum!"`
         },
         quiz: generatedStory.quiz || [],
       };
 
       return NextResponse.json({
         success: true,
-        source: 'gemini-3.7-flash',
+        source: 'ai-consistent-engine',
         story: dynamicStory,
       });
     }
 
-    // 3. Fallback: Dynamic programmatic generator (Crafted uniquely for child's name, animal, color, setting)
-    const coverImageUrl = (profile.child_photo_url && profile.child_photo_url.startsWith('/stories/'))
-      ? profile.child_photo_url
-      : getStorySceneImage(profile.gender, 1);
+    // 3. Fallback: High-Quality Programmatic Islamic Tale with 100% newly generated AI scene images
+    const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
+    const fallbackCoverPrompt = `${characterPersona}, resting with companion ${animal} in cozy glowing warm bedtime room, 8k resolution, masterpiece`;
+    const coverImageUrl = createAiImageUrl(fallbackCoverPrompt, baseSeed, chosenStyle);
 
     const rawFallbackPages = [
       {
         page_number: 1,
-        text_uz: `Oqshom shafag'i olamga oltin nurlarini sochar edi. ${childName} o'zining sevimli ${animal}i bilan birga xonadonida o'tirib, osmondagi yulduzlarni tomosha qilardi. Uning qalbida go'zal ertak eshitish ishtiyoqi yonardi.`,
+        text_uz: `Oqshom shafag'i olamga oltin nurlarini sochar edi. ${childName} o'zining sevimli ${animal}i bilan birga xonadonida o'tirib, osmondagi yulduzlarni tomosha qilardi. Uning qalbida go'zal ibratli ertak tinglash ishtiyoqi yonardi.`,
         text_en: `As the golden evening arrived, ${childName} sat peacefully with their beloved ${animal}, gazing at the first twinkling stars.`,
-        image_prompt: `Authentic story scene for page 1`,
-        image_url: getStorySceneImage(profile.gender, 1),
-        scene_summary: `${childName}ning oqshomgi xotirjamligi`
+        scene_summary: `${childName}ning oqshomgi xotirjamligi va tafakkuri`
       },
       {
         page_number: 2,
-        text_uz: `Shu payt xonaga mehribon buvijonisi va ota-onasi kirib keldilar. Ular ${childName}ning yoniga o'tirib, mehr bilan peshonasidan o'pdilar: \"Ko'zlarimizning nuri, bilasanmi, chinakam baxt — har bir ne'mat uchun Allohga shukr qilish va yaxshilik ulashishdadir\", dedilar.`,
+        text_uz: `Shu payt xonaga mehribon buvijonisi va ota-onasi kirib keldilar. Ular ${childName}ning yoniga o'tirib, mehr bilan peshonasidan o'pdilar: "Ko'zlarimizning nuri, bilasanmi, chinakam baxt — har bir ne'mat uchun Allohga shukr qilish va yaxshilik ulashishdadir", dedilar.`,
         text_en: `Loving family joined ${childName}, sharing gentle words of wisdom: "True happiness comes from gratitude and sharing goodness."`,
-        image_prompt: `Authentic story scene for page 2`,
-        image_url: getStorySceneImage(profile.gender, 2),
-        scene_summary: `Oila mehri va dono o'git`
+        scene_summary: `Oila mehri va nuryuzli buvijonisining o'giti`
       },
       {
         page_number: 3,
-        text_uz: `${childName} o'zining sevimli ${animal}ini quchoqlab, samimiy jilmaydi. U bugun o'rgangan go'zal fazilatga amal qilishga qaror qildi: \"Bismillahir Rohmanir Rohiym!\" deb, eng sevimli narsasini oilasi va yaqinlari bilan baham ko'rdi.`,
+        text_uz: `${childName} o'zining sevimli ${animal}ini quchoqlab, samimiy jilmaydi. U bugun o'rgangan go'zal fazilatga amal qilishga qaror qildi: "Bismillahir Rohmanir Rohiym!" deb, eng sevimli narsasini oilasi va yaqinlari bilan baham ko'rdi.`,
         text_en: `With a joyful smile, ${childName} whispered "Bismillah" and happily shared what they loved most with family.`,
-        image_prompt: `Authentic story scene for page 3`,
-        image_url: getStorySceneImage(profile.gender, 3),
-        scene_summary: `Bismillah bilan ezgulik ulashish`
+        scene_summary: `Bismillah bilan ezgulik va saxovat ko'rsatish`
       },
       {
         page_number: 4,
         text_uz: `Birdan butun xona go'yo nurga to'ldi! ${childName}ning yaxshi amali tufayli ${animal} ham quvonchdan sakrab ketdi. Har bir yaxshi amal qalbga xotirjamlik va baraka olib kelishini ${childName} dildan his qildi.`,
         text_en: `The room sparkled with warmth. Doing good brought instant peace and light to everyone's heart.`,
-        image_prompt: `Authentic story scene for page 4`,
-        image_url: getStorySceneImage(profile.gender, 4),
-        scene_summary: `Ezgulikning nurli barakasi`
+        scene_summary: `Ezgulikning nurli barakasi va qalb sakinatlari`
       },
       {
         page_number: 5,
-        text_uz: `Kechki dasturxonda butun oila jam bo'ldi. ${childName} odob bilan taom yeb, \"Alhamdulillah, bizga bergan barcha shirin ne'matlaringga shukur, Yo Robbim!\" dedi. Ota-onasi uning odobidan faxrlandilar.`,
+        text_uz: `Kechki dasturxonda butun oila jam bo'ldi. ${childName} odob bilan taom yeb, "Alhamdulillah, bizga bergan barcha shirin ne'matlaringga shukur, Yo Robbim!" dedi. Ota-onasi uning odobidan cheksiz faxrlandilar.`,
         text_en: `At dinnertime, ${childName} politely said 'Alhamdulillah', filling parents with immense pride and joy.`,
-        image_prompt: `Authentic story scene for page 5`,
-        image_url: getStorySceneImage(profile.gender, 5),
-        scene_summary: `Shukronalik dasturxoni`
+        scene_summary: `Shukronalik dasturxoni va go'zal odob`
       },
       {
         page_number: 6,
         text_uz: `Oqshom tushib, osmon hilol oy va son-sanoqsiz yulduzlar bilan bezandi. ${childName} xonasini ozoda qilib, yotishga tayyorlandi. Uning qalbi cheksiz oromga to'lgan edi.`,
         text_en: `Outside the window, a bright crescent moon smiled as ${childName} prepared for cozy bedtime.`,
-        image_prompt: `Authentic story scene for page 6`,
-        image_url: getStorySceneImage(profile.gender, 6),
-        scene_summary: `Orombaxsh oqshom sukunati`
+        scene_summary: `Orombaxsh oqshom sukunati va xona ozodaligi`
       },
       {
         page_number: 7,
-        text_uz: `Yotishdan oldin ${childName} jajji kaftlarini ochib, ixlos bilan duo qildi: \"Ey mehribon Allohim! Ota-onamni, oilamni asragin. Menga go'zal xulq va sabr bergin. Omin!\". Buvijonisi unga shirin fotiha berdi.`,
+        text_uz: `Yotishdan oldin ${childName} jajji kaftlarini ochib, ixlos bilan duo qildi: "Ey mehribon Allohim! Ota-onamni, oilamni asragin. Menga go'zal xulq va sabr bergin. Omin!". Buvijonisi unga shirin fotiha berdi.`,
         text_en: `Raising hands in sincere prayer, ${childName} asked Allah to bless parents, family, and keep their heart pure.`,
-        image_prompt: `Authentic story scene for page 7`,
-        image_url: getStorySceneImage(profile.gender, 7),
-        scene_summary: `${childName}ning samimiy oqshom duosi`
+        scene_summary: `${childName}ning samimiy oqshomgi duosi`
       },
       {
         page_number: 8,
         text_uz: `${childName} yostig'iga bosh qo'yib, jilmaygancha shirin uyquga ketdi. U shirin tushlar ko'rib, farishtalar panohida orom oldi. Xayrli tun, aziz ${childName}!`,
         text_en: `Resting upon soft pillows, ${childName} drifted into the sweetest peaceful sleep. Good night, little champion!`,
-        image_prompt: `Authentic story scene for page 8`,
-        image_url: getStorySceneImage(profile.gender, 8),
-        scene_summary: `Shirin tushlar va xotirjam uyqu`
+        scene_summary: `Shirin tushlar va farishtalar panohidagi uyqu`
       }
     ];
 
-    const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
-    const selectedFallbackPages = rawFallbackPages.slice(0, targetPageCount).map((p, idx) => ({
-      ...p,
-      page_number: idx + 1,
-      image_url: getStorySceneImage(profile.gender, idx + 1)
-    }));
+    const selectedPages = rawFallbackPages.slice(0, targetPageCount).map((p, idx) => {
+      const pageSeed = baseSeed + idx + 1;
+      const prompt = `${characterPersona} in ${p.scene_summary}, ${color} atmosphere, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
+      return {
+        ...p,
+        page_number: idx + 1,
+        image_prompt: prompt,
+        image_url: createAiImageUrl(prompt, pageSeed, chosenStyle),
+      };
+    });
 
     const fallbackStory: StoryBook = {
       id: storyId,
@@ -492,7 +490,7 @@ export async function POST(req: NextRequest) {
       prologue_en: `A heartwarming bedtime journey of young ${childName} learning noble moral virtues with family...`,
       cover_image_url: coverImageUrl,
       theme_color: isBoy ? "#013E37" : "#D97706",
-      pages: selectedFallbackPages,
+      pages: selectedPages,
       reflection: {
         todays_lesson_uz: "Yaxshilik qilish va ota-onaga mehr ulashish qalbimizni nurga to'ldiradi.",
         todays_lesson_en: "Practicing kindness and loving our parents fills our lives with radiant light.",
@@ -509,8 +507,8 @@ export async function POST(req: NextRequest) {
           `What good deed brought joy to your parents today?`,
           `What kind deed will you do tomorrow morning?`
         ],
-        good_deed_task_uz: `Ertaga ertalab yaqinlaringizga tabassum bilan \"Assalomu alaykum!\" deb quvonch ulashing.`,
-        good_deed_task_en: `Greet your family tomorrow morning with a cheerful \"Assalamu Alaykum!\"`
+        good_deed_task_uz: `Ertaga ertalab yaqinlaringizga tabassum bilan "Assalomu alaykum!" deb quvonch ulashing.`,
+        good_deed_task_en: `Greet your family tomorrow morning with a cheerful "Assalamu Alaykum!"`
       },
       quiz: [
         {

@@ -40,3 +40,5 @@ next-env.d.ts
 .vercel
 .env*
 supabase/.temp/
+data/admin_chats.json
+data/feedbacks.json

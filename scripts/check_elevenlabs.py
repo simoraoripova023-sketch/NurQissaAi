@@ -1,7 +1,7 @@
 import os
 import requests
 
-api_key = os.environ.get('ELEVENLABS_API_KEY', 'sk_a2f342ffaaf5d1c4a6c0c1585187cfd7baeca773a9de137b')
+api_key = os.environ.get('ELEVENLABS_API_KEY', 'sk_36cc88373abb9fb6f6054b7144e8485d98857eff66fe51f6')
 headers = {
     'xi-api-key': api_key
 }

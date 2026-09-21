@@ -1,7 +1,5 @@
-// SMS Service for Uzbekistan phone verification (Eskiz.uz gateway & Telegram Bot delivery)
-
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4';
-const ADMIN_CHAT_ID = process.env.ADMIN_TELEGRAM_ID || '5636799086';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const ADMIN_CHAT_ID = process.env.ADMIN_TELEGRAM_ID;
 
 // Global OTP store for server runtime (keyed by clean 9-digit or full phone)
 declare global {
@@ -75,35 +73,37 @@ export async function sendSMSVerification(phoneDigits: string, code: string, par
     }
   }
 
-  // 2. Deliver code to Telegram Bot (instant real-time delivery to Owner/Admin)
-  try {
-    const tgMessage = (
-      `🔐 <b>[NURQISSA AI — SMS KOD]</b>\n\n` +
-      `👤 <b>Foydalanuvchi:</b> ${parentName || "Ota-ona"}\n` +
-      `📞 <b>Telefon raqami:</b> <code>${displayPhone}</code>\n` +
-      `🔑 <b>Tasdiqlash kodi:</b> <code>${code}</code>\n` +
-      `⏳ <b>Amal qilish muddati:</b> 5 daqiqa\n` +
-      `🌐 <b>Eskiz holati:</b> ${sentViaEskiz ? 'Yuborildi ✅' : eskizError ? `Xato: ${eskizError}` : "Demo rejim (Telegram orqali yetkazildi) 📲"}`
-    );
+  // 2. Deliver code to Telegram Bot (if configured)
+  if (BOT_TOKEN && ADMIN_CHAT_ID) {
+    try {
+      const tgMessage = (
+        `🔐 <b>[NURQISSA AI — SMS KOD]</b>\n\n` +
+        `👤 <b>Foydalanuvchi:</b> ${parentName || "Ota-ona"}\n` +
+        `📞 <b>Telefon raqami:</b> <code>${displayPhone}</code>\n` +
+        `🔑 <b>Tasdiqlash kodi:</b> <code>${code}</code>\n` +
+        `⏳ <b>Amal qilish muddati:</b> 5 daqiqa\n` +
+        `🌐 <b>Eskiz holati:</b> ${sentViaEskiz ? 'Yuborildi ✅' : eskizError ? `Xato: ${eskizError}` : "Telegram orqali yetkazildi 📲"}`
+      );
 
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: ADMIN_CHAT_ID,
-        text: tgMessage,
-        parse_mode: 'HTML',
-      }),
-    });
-  } catch (tgErr) {
-    console.warn('Telegram OTP notification error:', tgErr);
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: ADMIN_CHAT_ID,
+          text: tgMessage,
+          parse_mode: 'HTML',
+        }),
+      });
+    } catch (tgErr) {
+      console.warn('Telegram OTP notification error:', tgErr);
+    }
   }
 
   return {
     success: true,
     sentViaEskiz,
     displayPhone,
-    code, // Returned for instant UI feedback / demo / test verification
+    code,
   };
 }
 
@@ -114,8 +114,8 @@ export function verifyOTPCode(phoneDigits: string, inputCode: string): { valid: 
   const cleanPhone = phoneDigits.replace(/\D/g, '');
   const fullPhone = cleanPhone.startsWith('998') ? cleanPhone : `998${cleanPhone}`;
 
-  // Master demo code for testing
-  if (inputCode === '7777') {
+  // Master demo code for development testing only
+  if (process.env.NODE_ENV !== 'production' && inputCode === '7777') {
     return { valid: true, message: "Kod tasdiqlandi!" };
   }
 

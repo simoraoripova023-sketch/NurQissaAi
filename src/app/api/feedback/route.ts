@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const ADMIN_CHAT_ID = process.env.ADMIN_TELEGRAM_ID;
 const FEEDBACKS_FILE = path.join(process.cwd(), 'data', 'feedbacks.json');
-const ADMIN_ID_FILE = path.join(process.cwd(), 'data', 'admin_chats.json');
 
 export async function POST(req: NextRequest) {
   try {
@@ -75,23 +75,20 @@ export async function POST(req: NextRequest) {
       `📝 <b>Matn:</b>\n<i>${newFeedback.message}</i>`
     );
 
-    // 4. Send EXCLUSIVELY to owner's personal chat ID
-    const ownerId = process.env.ADMIN_TELEGRAM_ID || '5636799086';
-    const adminChats = [ownerId];
-
-    for (const chatId of adminChats) {
+    // 4. Send notification to owner/admin if configured
+    if (BOT_TOKEN && ADMIN_CHAT_ID) {
       try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: chatId,
+            chat_id: ADMIN_CHAT_ID,
             text: tgMessage,
             parse_mode: 'HTML'
           })
         });
       } catch (err) {
-        console.error('Error forwarding to admin chatId', chatId, err);
+        console.error('Error forwarding feedback to Telegram:', err);
       }
     }
 

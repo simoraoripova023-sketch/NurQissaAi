@@ -29,18 +29,27 @@ export default function StoryReaderPage() {
     if (found) {
       setStory(found);
       setLoading(false);
+      if (typeof document !== 'undefined') {
+        document.title = `${found.title_uz} - NurQissa AI`;
+      }
     } else {
       // Try reading from localStorage directly if refreshed
       if (typeof window !== 'undefined') {
-        const stored = localStorage.getItem('nurqissa_stories');
+        const stored = localStorage.getItem('nurqissa_store') || localStorage.getItem('nurqissa_stories');
         if (stored) {
           try {
-            const parsed: StoryBook[] = JSON.parse(stored);
-            const lsFound = parsed.find((s) => s.id === storyId);
-            if (lsFound) {
-              setStory(lsFound);
-              setLoading(false);
-              return;
+            const parsed = JSON.parse(stored);
+            const storyList = parsed.state?.stories || parsed;
+            if (Array.isArray(storyList)) {
+              const lsFound = storyList.find((s: StoryBook) => s && s.id === storyId);
+              if (lsFound) {
+                setStory(lsFound);
+                setLoading(false);
+                if (typeof document !== 'undefined') {
+                  document.title = `${lsFound.title_uz} - NurQissa AI`;
+                }
+                return;
+              }
             }
           } catch (e) {
             console.error(e);

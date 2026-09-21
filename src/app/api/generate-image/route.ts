@@ -1,18 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const NEGATIVE_ENHANCERS = "strictly no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus, 8k render, masterpiece";
+
 export async function POST(req: NextRequest) {
   try {
-    const { prompt, childName, gender, sceneSummary, childPhotoUrl } = await req.json();
+    const { prompt, childName, gender, sceneSummary, style = 'pixar_3d', seed } = await req.json();
 
     if (!prompt) {
       return NextResponse.json({ error: 'Image prompt is required' }, { status: 400 });
     }
 
     const isBoy = gender === 'boy';
-    const characterType = isBoy ? 'cute handsome young Uzbek boy' : 'cute sweet young Uzbek girl';
+    const name = childName || (isBoy ? 'Yusuf' : 'Fotima');
     
-    // Curated high-aesthetic 3D Pixar & Fairytale style prompt
-    const enhancedPrompt = `3D Disney Pixar animation storybook illustration: adorable cute ${characterType} named ${childName || 'Yusuf'}, large sparkling brown eyes, sweet cheerful smile, clean neat modest clothes, ${prompt}, cozy warm golden sunlight, lush blooming garden and cozy room, cinematic lighting, 8k resolution, masterpiece, sharp focus, no blur, no deformed faces`;
+    const characterAnchor = isBoy
+      ? `adorable handsome 6-year-old Uzbek boy named ${name}, neat short dark wavy hair, sparkling warm brown eyes, sweet innocent smile, wearing a neat modest white shirt and soft emerald-green vest`
+      : `adorable sweet 5-year-old Uzbek girl named ${name}, shiny dark hair with soft bangs, sparkling luminous brown eyes, sweet joyful smile, wearing a lovely elegant pastel dress`;
+
+    const styleDescriptor = style === 'watercolor'
+      ? "authentic gentle fairytale watercolor storybook painting, soft dreamy gouache washes, delicate fine pencil lines"
+      : style === 'classic_storybook'
+      ? "classical vintage children's book illustration, rich warm gouache and oil textures, golden sunbeam lighting"
+      : style === 'disney_2d'
+      ? "classic Disney 2D hand-drawn animation style, expressive clean lines, vivid storybook colors"
+      : style === 'ghibli_anime'
+      ? "Studio Ghibli nature-filled anime aesthetic, lush blooming background, whimsical fairytale lighting"
+      : "3D Disney Pixar animation storybook masterpiece, ultra-smooth character rendering, soft glowing golden hour bedtime lighting";
+
+    const enhancedPrompt = prompt.includes(name)
+      ? `${prompt}, ${styleDescriptor}, ${NEGATIVE_ENHANCERS}`
+      : `${characterAnchor} in ${prompt}, ${styleDescriptor}, ${NEGATIVE_ENHANCERS}`;
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey && apiKey.trim().startsWith('sk-')) {
@@ -25,10 +42,11 @@ export async function POST(req: NextRequest) {
           },
           body: JSON.stringify({
             model: 'dall-e-3',
-            prompt: enhancedPrompt.slice(0, 950),
+            prompt: enhancedPrompt.slice(0, 980),
             n: 1,
             size: '1024x1024',
-            quality: 'standard'
+            quality: 'hd',
+            style: 'vivid'
           }),
         });
 
@@ -38,7 +56,7 @@ export async function POST(req: NextRequest) {
           if (imageUrl) {
             return NextResponse.json({
               success: true,
-              source: 'openai-dall-e-3',
+              source: 'openai-dall-e-3-hd',
               imageUrl,
               revisedPrompt: data?.data?.[0]?.revised_prompt || enhancedPrompt,
             });
@@ -49,12 +67,12 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    const seed = Math.floor(Math.random() * 899999) + 100000;
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?model=flux&width=1024&height=1024&nologo=true&seed=${seed}&enhance=true`;
+    const imageSeed = seed || Math.floor(Math.random() * 899999) + 100000;
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?model=flux&width=1024&height=1024&nologo=true&seed=${imageSeed}&enhance=true`;
 
     return NextResponse.json({
       success: true,
-      source: 'dynamic-ai-3d',
+      source: 'flux-consistent-3d',
       imageUrl,
       revisedPrompt: enhancedPrompt,
     });

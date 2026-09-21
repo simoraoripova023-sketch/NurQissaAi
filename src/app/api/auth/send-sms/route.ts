@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       success: true,
       message: "Tasdiqlash kodi telefon raqamingizga yuborildi!",
       displayPhone: result.displayPhone,
-      demoCode: result.code, // Useful for smooth user onboarding & demo environments
+      demoCode: process.env.NODE_ENV !== 'production' ? result.code : undefined,
       sentViaEskiz: result.sentViaEskiz,
     });
   } catch (error: any) {
