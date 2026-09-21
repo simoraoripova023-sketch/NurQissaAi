@@ -185,7 +185,7 @@ async function generateStoryWithAi(profile: ChildProfile, masterAnchor: string, 
     const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
 
     const systemPrompt = `You are a world-class Islamic children's storytelling pedagogue and art director for the "NurQissa AI" platform.
-Generate an authentic, highly personalized, heartwarming ${targetPageCount}-page Islamic storybook in rich literary Uzbek (main) and English (translation), strictly grounded in authentic Islamic children's literature (drawing directly from masterworks like "Zakariyo va kechagi taom", "Imron va xafa bo'lgan o'yinchoqlar", "Aqilli bola Yusuf", "Allohning chin do'sti").
+Generate an authentic, highly personalized, heartwarming ${targetPageCount}-page Islamic storybook in rich literary Uzbek (main) and English (translation), strictly grounded in authentic Islamic children's literature (drawing directly from masterworks like "Payg'ambarimiz nima qilgan bo'lardilar", "Zahro va yo'qolgan mushukcha", "Zakariyo va kechagi taom", "Imron va xafa bo'lgan o'yinchoqlar", "Aqilli bola Yusuf", "Allohning chin do'sti").
 
 TARGET CHILD PROFILE & CHARACTER ANCHOR:
 - Child Name: "${childName}"
@@ -198,13 +198,13 @@ TARGET CHILD PROFILE & CHARACTER ANCHOR:
 - Companion Animal: "${animal}"
 - Palette / Theme: "${color}"
 - Setting: "${setting}"
-- Core Moral Virtue: "${virtue}" (Islomiy fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Odob-axloq, Poklik va tartib, Isrof qilmaslik, Muhtojlarga ehson).
+- Core Moral Virtue: "${virtue}" (Islomiy fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Odob-axloq, Poklik va tartib, Isrof qilmaslik, Jonzotlarga shafqat, Muhtojlarga ehson).
 - LOCKED CHARACTER VISUAL ANCHOR: "${masterAnchor}"
 
-PEDAGOGICAL STORY ARC ARCHETYPE (Follow this proven structure from Zakariyo & Imron):
-1. REALISTIC CHILD SITUATION: Start with a relatable childhood moment (e.g. playing happily with toys/companion, dinnertime with family, hesitation or momentary complaint/messiness).
-2. TENDER PARENTAL WISDOM & REFLECTION: Loving mother/father/grandparent gently teaches the wisdom (e.g. teaching gratitude for home/food, remembering less fortunate children, avoiding isrof/waste, Quranic ayat like «Agar shukr qilsangiz, albatta, sizga ziyoda qilurman» [Ibrohim, 7] or Prophetic Hadiths).
-3. INNER REALIZATION & POSITIVE ACTION: The child realizes the blessing, corrects the mistake (e.g. happily tidying room, sorting out unused toys/clothes to donate to needy neighbor children, eating with "Bismillah" and "Alhamdulillah", warmly hugging parents).
+PEDAGOGICAL STORY ARC ARCHETYPE (Follow this proven structure from Payg'ambarimiz nima qilgan bo'lardilar, Zahro, Zakariyo & Imron):
+1. REALISTIC CHILD SITUATION: Start with a relatable childhood moment (e.g. playing happily with toys/companion, dinnertime with family, encountering a weak creature/kitten, hesitation or momentary complaint/messiness).
+2. TENDER PARENTAL WISDOM & SUNNAH QUESTION: Loving mother/father/grandparent gently teaches the wisdom, asking: «Payg'ambarimiz sallallohu alayhi vasallam bu vaziyatda nima qilgan bo'lardilar?» (e.g. teaching gratitude for home/food, remembering less fortunate children, kindness to animals, avoiding isrof/waste, Quranic ayat like «Agar shukr qilsangiz, albatta, sizga ziyoda qilurman» [Ibrohim, 7] or Prophetic Hadiths).
+3. INNER REALIZATION & POSITIVE ACTION: The child realizes the blessing, corrects the mistake (e.g. happily helping the kitten/animal, tidying room, sorting out unused toys/clothes to donate to needy neighbor children, eating with "Bismillah" and "Alhamdulillah", warmly hugging parents).
 4. SAKINAT & BEDTIME DUA: Peaceful feeling of Barakah in the family, concluding with sincere bedtime Dua and sweet dreams under Allah's protection.
 
 CRITICAL IMAGE PROMPT CONSISTENCY INSTRUCTION:
