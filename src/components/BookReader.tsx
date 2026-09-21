@@ -41,6 +41,7 @@ export default function BookReader({ story }: BookReaderProps) {
   const [copiedLink, setCopiedLink] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [customPageImages, setCustomPageImages] = useState<Record<number, string>>({});
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   const handleGenerateAiImage = async (pageIdx: number) => {
     const page = story.pages[pageIdx - 1];
@@ -56,6 +57,8 @@ export default function BookReader({ story }: BookReaderProps) {
           childName: story.child_profile.child_name,
           gender: story.child_profile.gender,
           sceneSummary: page.scene_summary,
+          style: story.child_profile.illustration_style || 'pixar_3d',
+          seed: pageIdx,
         }),
       });
 
@@ -67,8 +70,8 @@ export default function BookReader({ story }: BookReaderProps) {
       } else {
         alert(
           locale === 'uz'
-            ? data.error || "DALL-E 3 rasm generatsiyasi uchun OpenAI API Key kiritilmagan yoki xatolik yuz berdi (.env.local faylini tekshiring)."
-            : data.error || "OpenAI API Key not configured in .env.local or generation failed."
+            ? data.error || "Rasm generatsiyasi uchun xatolik yuz berdi (.env.local faylini tekshiring)."
+            : data.error || "Generation failed. Please check configuration."
         );
       }
     } catch (err: any) {
@@ -263,10 +266,17 @@ export default function BookReader({ story }: BookReaderProps) {
                   >
                     {/* Left: Decorative Cover Spine & Full-Bleed Visual */}
                     <div className="md:col-span-7 relative overflow-hidden bg-slate-950 flex items-center justify-center h-80 sm:h-96 md:h-auto min-h-[320px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60 group">
+                      {!loadedImages['cover'] && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
+                          <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
+                          <span className="text-xs font-bold font-serif">{locale === 'uz' ? "Nurli muqova surati yuklanmoqda..." : "Loading cover artwork..."}</span>
+                        </div>
+                      )}
                       <img
                         src={story.cover_image_url}
                         alt={title}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        onLoad={() => setLoadedImages(prev => ({ ...prev, cover: true }))}
+                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${loadedImages['cover'] ? 'opacity-100' : 'opacity-0'}`}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#1E1B4B]/90 via-[#1E1B4B]/20 to-transparent pointer-events-none"></div>
                       
@@ -338,10 +348,17 @@ export default function BookReader({ story }: BookReaderProps) {
                   >
                     {/* Left Spread: Grand Full-Bleed Story Illustration (7 Cols) */}
                     <div className="md:col-span-7 relative overflow-hidden bg-slate-950 flex items-center justify-center h-80 sm:h-96 md:h-auto min-h-[320px] md:min-h-full group border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60">
+                      {!loadedImages[`page_${currentPageIndex}`] && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
+                          <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
+                          <span className="text-xs font-bold font-serif">{locale === 'uz' ? `${currentPageIndex}-sahifa surati chizilmoqda...` : `Generating Page ${currentPageIndex} illustration...`}</span>
+                        </div>
+                      )}
                       <img
                         src={customPageImages[currentPageIndex] || story.pages[currentPageIndex - 1].image_url}
                         alt={`Page ${currentPageIndex} Scene`}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+                        onLoad={() => setLoadedImages(prev => ({ ...prev, [`page_${currentPageIndex}`]: true }))}
+                        className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-102 ${loadedImages[`page_${currentPageIndex}`] ? 'opacity-100' : 'opacity-0'}`}
                       />
 
                       {/* Spot the Hidden Object Mini-Game */}

@@ -21,7 +21,7 @@ function buildMasterCharacterAnchor(profile: ChildProfile): string {
     ? profile.character_appearance_description.trim()
     : defaultAppearance;
 
-  const companion = profile.favorite_animal ? `accompanied by a cute friendly ${profile.favorite_animal}` : '';
+  const companion = profile.favorite_animal ? `accompanied by a cute friendly ${translateAnimalToEnglish(profile.favorite_animal)}` : '';
 
   return `${baseAppearance}, wearing ${defaultClothing}${companion ? `, ${companion}` : ''}`;
 }
@@ -57,39 +57,44 @@ function translateColorToEnglish(colorStr: string): string {
 }
 
 /**
- * Generates custom 3D storybook scene illustration with consistent character features using OpenAI DALL-E 3
+ * Generates custom 3D storybook scene illustration with consistent character features using OpenAI
  */
 async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (apiKey && apiKey.trim().startsWith('sk-')) {
-    try {
-      const res = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey.trim()}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'dall-e-3',
-          prompt: prompt.slice(0, 980),
-          n: 1,
-          size: '1024x1024',
-          quality: 'hd',
-          style: 'vivid'
-        })
-      });
+    const modelsToTry = ['gpt-image-1-mini', 'gpt-image-1', 'gpt-image-1.5'];
+    for (const model of modelsToTry) {
+      try {
+        const res = await fetch('https://api.openai.com/v1/images/generations', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey.trim()}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: model,
+            prompt: prompt.slice(0, 950),
+            n: 1,
+            size: '1024x1024'
+          })
+        });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.data?.[0]?.url) {
-          return data.data[0].url;
+        if (res.ok) {
+          const data = await res.json();
+          const b64 = data?.data?.[0]?.b64_json;
+          if (b64) {
+            return `data:image/png;base64,${b64}`;
+          }
+          if (data?.data?.[0]?.url) {
+            return data.data[0].url;
+          }
+        } else {
+          const err = await res.json().catch(() => ({}));
+          console.warn(`OpenAI image notice with ${model}:`, err?.error?.message || res.status);
         }
-      } else {
-        const err = await res.json().catch(() => ({}));
-        console.warn('OpenAI DALL-E notice:', err?.error?.message || res.status);
+      } catch (err) {
+        console.warn(`Error fetching OpenAI image with ${model}:`, err);
       }
-    } catch (err) {
-      console.warn('Error fetching OpenAI image:', err);
     }
   }
 
@@ -97,12 +102,12 @@ async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<
 }
 
 /**
- * Creates dynamic high-definition AI image URL using the FLUX model with locked seed
+ * Creates dynamic high-definition AI image URL using the server-side story-image endpoint
  */
-function createAiImageUrl(prompt: string, seed: number, style: string = 'pixar_3d'): string {
+function createAiImageUrl(prompt: string, storyId: string, pageNum: number, style: string = 'pixar_3d'): string {
   const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.pixar_3d;
   const fullPrompt = `${prompt}, ${stylePrompt}, ${NEGATIVE_ENHANCERS}`;
-  return `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?model=flux&width=1024&height=768&nologo=true&seed=${seed}&enhance=true`;
+  return `/api/story-image?storyId=${encodeURIComponent(storyId)}&page=${pageNum}&prompt=${encodeURIComponent(fullPrompt)}&style=${encodeURIComponent(style)}`;
 }
 
 /**
@@ -191,9 +196,9 @@ TARGET CHILD PROFILE & CHARACTER ANCHOR:
 - LOCKED CHARACTER VISUAL ANCHOR: "${masterAnchor}"
 
 CRITICAL IMAGE PROMPT CONSISTENCY INSTRUCTION:
-For EVERY page, you MUST generate an "image_prompt" following this exact 4-part formula:
+For EVERY page, you MUST generate an "image_prompt" in ENGLISH following this exact 4-part formula:
 Formula: [LOCKED CHARACTER ANCHOR] + [EXACT SCENE PHYSICAL ACTION & EMOTION] + [ENVIRONMENT & ATMOSPHERE] + [LIGHTING & 3D PIXAR RENDER STYLE]
-Example: "${masterAnchor} is kneeling gently beside their grandmother looking at the open illuminated book with sparkling eyes, in a warm cozy room with soft golden evening sunlight and potted green plants, 3D Pixar animation style, 8k render, masterpiece"
+Example: "${masterAnchor} is kneeling gently beside grandmother looking at the open illuminated book with sparkling brown eyes, in a warm cozy room with soft golden evening sunlight and potted green plants, 3D Pixar animation style, vivid colors, 8k render, masterpiece"
 
 AUTHENTIC ISLAMIC LITERATURE RULES:
 1. HADITH & PROPHETIC SUNNAH: Weave authentic Hadiths of Prophet Muhammad (s.a.v.) into the dialogue naturally (e.g., «Tabassum qilish ham sadaqadir», «Poklik iymondandir», «Ota-onaga yaxshilik qilish eng ulug' amallardandir»).
@@ -292,6 +297,7 @@ Output Valid JSON ONLY with this exact schema:
 
     // 2. Try Google Gemini models
     const modelsToTry = [
+      'gemini-2.5-flash',
       'gemini-2.0-flash',
       'gemini-1.5-flash',
       'gemini-1.5-pro'
@@ -349,7 +355,7 @@ export async function POST(req: NextRequest) {
     const color = profile.favorite_color || 'zumrad yashil va oltin rang';
     const chosenStyle = profile.illustration_style || 'pixar_3d';
     const geminiApiKey = process.env.GEMINI_API_KEY || '';
-    const baseSeed = Math.floor(Math.random() * 899999) + 100000;
+    const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
 
     // 1. Build locked Master Character Anchor (from vision photo analysis or precise traits)
     let characterPersona = buildMasterCharacterAnchor(profile);
@@ -364,24 +370,23 @@ export async function POST(req: NextRequest) {
     const generatedStory = await generateStoryWithAi(profile, characterPersona, geminiApiKey.trim());
 
     if (generatedStory && generatedStory.pages && generatedStory.pages.length >= 3) {
-      const coverPrompt = `${characterPersona}, together with companion ${animal} in cozy warm glowing ${color} room, gentle ambient sunlight, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
+      const coverPrompt = `${characterPersona}, together with companion ${translateAnimalToEnglish(animal)} in cozy warm glowing ${translateColorToEnglish(color)} room, gentle ambient sunlight, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
       
-      // Generate Cover Art: DALL-E 3 (if key available) or FLUX AI
-      const fallbackAiCoverUrl = createAiImageUrl(coverPrompt, baseSeed, chosenStyle);
+      // Generate Cover Art: OpenAI gpt-image-1-mini or stream endpoint
+      const fallbackAiCoverUrl = createAiImageUrl(coverPrompt, storyId, 0, chosenStyle);
       const coverImageUrl = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.startsWith('sk-')
         ? await generateDallEImage(coverPrompt, fallbackAiCoverUrl)
         : fallbackAiCoverUrl;
 
       // Generate 100% new, unique AI illustrations for every single page
       const enhancedPages = generatedStory.pages.map((p, idx) => {
-        const pageSeed = baseSeed + idx + 1;
         const actionText = p.scene_summary || p.text_uz?.slice(0, 150) || 'heartwarming bedtime moment';
         
         const pagePrompt = p.image_prompt && p.image_prompt.includes(childName)
           ? `${p.image_prompt}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`
-          : `${characterPersona} in ${actionText}, ${color} setting, soft warm golden lighting, adorable cheerful expression, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
+          : `${characterPersona} in ${actionText}, ${translateColorToEnglish(color)} setting, soft warm golden lighting, adorable cheerful expression, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
 
-        const pageImageUrl = createAiImageUrl(pagePrompt, pageSeed, chosenStyle);
+        const pageImageUrl = createAiImageUrl(pagePrompt, storyId, idx + 1, chosenStyle);
 
         return {
           page_number: idx + 1,
@@ -409,7 +414,7 @@ export async function POST(req: NextRequest) {
           todays_lesson_en: "Every good deed brings light and happiness to our hearts.",
           little_dua_uz: `Yo Allohim! ${childName}ni solih, shukr qiluvchi va ota-onasiga rahmat keltiruvchi farzand qilgin. Omin!`,
           little_dua_en: `O Allah! Bless ${childName} with beautiful character, peace and gratitude. Ameen!`,
-          arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
+          arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّALИحِينَ",
           discussion_questions_uz: [
             `${childName} bugungi qissada qanday yaxshilik qildi?`,
             `Bugun sen qaysi yaxshi amaling bilan oilangni quvontirding?`,
@@ -496,14 +501,19 @@ export async function POST(req: NextRequest) {
       }
     ];
 
+    const fallbackCoverPrompt = `${characterPersona}, together with companion ${animalEn} in cozy warm glowing ${colorEn} room, gentle ambient sunlight, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
+    const fallbackCoverUrl = createAiImageUrl(fallbackCoverPrompt, storyId, 0, chosenStyle);
+    const coverImageUrl = process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.startsWith('sk-')
+      ? await generateDallEImage(fallbackCoverPrompt, fallbackCoverUrl)
+      : fallbackCoverUrl;
+
     const selectedPages = rawFallbackPages.slice(0, targetPageCount).map((p, idx) => {
-      const pageSeed = baseSeed + idx + 1;
       const prompt = `${p.scene_prompt}, ${colorEn}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
       return {
         ...p,
         page_number: idx + 1,
         image_prompt: prompt,
-        image_url: createAiImageUrl(prompt, pageSeed, chosenStyle),
+        image_url: createAiImageUrl(prompt, storyId, idx + 1, chosenStyle),
       };
     });
 
@@ -523,7 +533,7 @@ export async function POST(req: NextRequest) {
         todays_lesson_en: "Practicing kindness and loving our parents fills our lives with radiant light.",
         little_dua_uz: `Yo Robbim! ${childName}ga go'zal odob, mustahkam sog'lik va qanoatli qalb ato etgin. Omin!`,
         little_dua_en: `O Allah! Bless ${childName} with beautiful manners, good health and peace. Ameen!`,
-        arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
+        arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّALИحِينَ",
         discussion_questions_uz: [
           `${childName} bugun qanday yaxshilik qildi?`,
           `Bugun sen qaysi yaxshi ishing bilan ota-onangga quvonch ulashding?`,

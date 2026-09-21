@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       ? "classic Disney 2D hand-drawn animation style, expressive clean lines, vivid storybook colors"
       : style === 'ghibli_anime'
       ? "Studio Ghibli nature-filled anime aesthetic, lush blooming background, whimsical fairytale lighting"
-      : "3D Disney Pixar animation storybook masterpiece, ultra-smooth character rendering, soft glowing golden hour bedtime lighting";
+      : "3D Disney Pixar animation storybook masterpiece, ultra-smooth character rendering, soft glowing golden hour bedtime lighting, vivid rich colors, 8k render";
 
     const enhancedPrompt = prompt.includes(name)
       ? `${prompt}, ${styleDescriptor}, ${NEGATIVE_ENHANCERS}`
@@ -33,47 +33,61 @@ export async function POST(req: NextRequest) {
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey && apiKey.trim().startsWith('sk-')) {
-      try {
-        const response = await fetch('https://api.openai.com/v1/images/generations', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey.trim()}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'dall-e-3',
-            prompt: enhancedPrompt.slice(0, 980),
-            n: 1,
-            size: '1024x1024',
-            quality: 'hd',
-            style: 'vivid'
-          }),
-        });
+      const modelsToTry = ['gpt-image-1-mini', 'gpt-image-1', 'gpt-image-1.5'];
+      
+      for (const model of modelsToTry) {
+        try {
+          const response = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey.trim()}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: model,
+              prompt: enhancedPrompt.slice(0, 950),
+              n: 1,
+              size: '1024x1024',
+            }),
+          });
 
-        if (response.ok) {
-          const data = await response.json();
-          const imageUrl = data?.data?.[0]?.url;
-          if (imageUrl) {
-            return NextResponse.json({
-              success: true,
-              source: 'openai-dall-e-3-hd',
-              imageUrl,
-              revisedPrompt: data?.data?.[0]?.revised_prompt || enhancedPrompt,
-            });
+          if (response.ok) {
+            const data = await response.json();
+            const b64 = data?.data?.[0]?.b64_json;
+            if (b64) {
+              return NextResponse.json({
+                success: true,
+                source: `openai-${model}`,
+                imageUrl: `data:image/png;base64,${b64}`,
+                revisedPrompt: enhancedPrompt,
+              });
+            }
+            const imageUrl = data?.data?.[0]?.url;
+            if (imageUrl) {
+              return NextResponse.json({
+                success: true,
+                source: `openai-${model}`,
+                imageUrl,
+                revisedPrompt: data?.data?.[0]?.revised_prompt || enhancedPrompt,
+              });
+            }
+          } else {
+            const errJson = await response.json().catch(() => ({}));
+            console.warn(`OpenAI image notice with ${model}:`, errJson?.error?.message || response.status);
           }
+        } catch (e) {
+          console.warn(`OpenAI call notice with ${model}:`, e);
         }
-      } catch (e) {
-        console.warn('OpenAI DALL-E direct call notice:', e);
       }
     }
     
-    const imageSeed = seed || Math.floor(Math.random() * 899999) + 100000;
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt)}?model=flux&width=1024&height=1024&nologo=true&seed=${imageSeed}&enhance=true`;
+    // Fallback URL using story-image endpoint
+    const fallbackUrl = `/api/story-image?prompt=${encodeURIComponent(enhancedPrompt)}&style=${style}&page=${seed || 1}`;
 
     return NextResponse.json({
       success: true,
-      source: 'flux-consistent-3d',
-      imageUrl,
+      source: 'story-image-stream',
+      imageUrl: fallbackUrl,
       revisedPrompt: enhancedPrompt,
     });
   } catch (error: any) {
