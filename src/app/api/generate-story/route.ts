@@ -185,7 +185,7 @@ async function generateStoryWithAi(profile: ChildProfile, masterAnchor: string, 
     const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
 
     const systemPrompt = `You are a world-class Islamic children's storytelling pedagogue and art director for the "NurQissa AI" platform.
-Generate an authentic, highly personalized, heartwarming ${targetPageCount}-page Islamic storybook in rich literary Uzbek (main) and English (translation), strictly grounded in authentic Islamic children's literature.
+Generate an authentic, highly personalized, heartwarming ${targetPageCount}-page Islamic storybook in rich literary Uzbek (main) and English (translation), strictly grounded in authentic Islamic children's literature (drawing directly from masterworks like "Zakariyo va kechagi taom", "Imron va xafa bo'lgan o'yinchoqlar", "Aqilli bola Yusuf", "Allohning chin do'sti").
 
 TARGET CHILD PROFILE & CHARACTER ANCHOR:
 - Child Name: "${childName}"
@@ -198,16 +198,24 @@ TARGET CHILD PROFILE & CHARACTER ANCHOR:
 - Companion Animal: "${animal}"
 - Palette / Theme: "${color}"
 - Setting: "${setting}"
-- Core Moral Virtue: "${virtue}" (Islomiy fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Odob-axloq, Poklik).
+- Core Moral Virtue: "${virtue}" (Islomiy fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Odob-axloq, Poklik va tartib, Isrof qilmaslik, Muhtojlarga ehson).
 - LOCKED CHARACTER VISUAL ANCHOR: "${masterAnchor}"
+
+PEDAGOGICAL STORY ARC ARCHETYPE (Follow this proven structure from Zakariyo & Imron):
+1. REALISTIC CHILD SITUATION: Start with a relatable childhood moment (e.g. playing happily with toys/companion, dinnertime with family, hesitation or momentary complaint/messiness).
+2. TENDER PARENTAL WISDOM & REFLECTION: Loving mother/father/grandparent gently teaches the wisdom (e.g. teaching gratitude for home/food, remembering less fortunate children, avoiding isrof/waste, Quranic ayat like «Agar shukr qilsangiz, albatta, sizga ziyoda qilurman» [Ibrohim, 7] or Prophetic Hadiths).
+3. INNER REALIZATION & POSITIVE ACTION: The child realizes the blessing, corrects the mistake (e.g. happily tidying room, sorting out unused toys/clothes to donate to needy neighbor children, eating with "Bismillah" and "Alhamdulillah", warmly hugging parents).
+4. SAKINAT & BEDTIME DUA: Peaceful feeling of Barakah in the family, concluding with sincere bedtime Dua and sweet dreams under Allah's protection.
 
 CRITICAL IMAGE PROMPT CONSISTENCY INSTRUCTION:
 For EVERY page, you MUST generate an "image_prompt" in ENGLISH following this exact 4-part formula:
 Formula: [LOCKED CHARACTER ANCHOR] + [EXACT SCENE PHYSICAL ACTION & EMOTION] + [ENVIRONMENT & ATMOSPHERE] + [LIGHTING & 3D PIXAR RENDER STYLE]
-Example: "${masterAnchor} is kneeling gently beside grandmother looking at the open illuminated book with sparkling brown eyes, in a warm cozy room with soft golden evening sunlight and potted green plants, 3D Pixar animation style, vivid colors, 8k render, masterpiece"
+Examples:
+- "${masterAnchor} is sitting at a cozy wooden dining table with loving mother wearing soft beige hijab, smiling with large brown sparkling eyes over a traditional ceramic bowl of warm pilaf and fresh fruit basket, warm golden sunlight through window, framed Arabic calligraphy on wall, 3D Pixar animation storybook masterpiece, vivid colors, 8k render"
+- "${masterAnchor} is kneeling on a soft bedroom carpet happily organizing colorful toy blocks and cars into neat storage boxes, bedroom with neat book shelves and soft ambient glow, 3D Pixar animation style, vivid colors, 8k render, masterpiece"
 
 AUTHENTIC ISLAMIC LITERATURE RULES:
-1. HADITH & PROPHETIC SUNNAH: Weave authentic Hadiths of Prophet Muhammad (s.a.v.) into the dialogue naturally (e.g., «Tabassum qilish ham sadaqadir», «Poklik iymondandir», «Ota-onaga yaxshilik qilish eng ulug' amallardandir»).
+1. HADITH & PROPHETIC SUNNAH: Weave authentic Hadiths naturally into dialogue (e.g., «Tabassum qilish ham sadaqadir», «Poklik iymondandir», «Ota-onaga yaxshilik qilish eng ulug' amallardandir»).
 2. DUA & SUNNAH HABITS: Opening with "Bismillahir Rohmanir Rohiym", praising Allah with "Alhamdulillah", bedtime prayer with open palms («Bismika Allohumma amutu va ahya»), and Dua for parents.
 3. ZERO MYTHOLOGY: Absolutely NO magic wands, spells, fairies, witches, or wizards.
 4. RICH PEDAGOGICAL TONE: Pure, warm, and inspiring bedtime language in literary Uzbek.

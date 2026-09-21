@@ -1,9 +1,9 @@
 {
   "metadata": {
     "title": "NURQissa AI — Islomiy Adabiyotlar va Qissalar Bilimlar Bazasi",
-    "source_count": 19,
+    "source_count": 21,
     "engine": "PyMuPDF High-Precision Extractor",
-    "generated_at": "2026-08-15"
+    "generated_at": "2026-09-21"
   },
   "books": [
     {
@@ -322,6 +322,49 @@
         "Alloh taolo o‘sha suyaklarni yana\nbirlashtirdi, ularga go‘sht bitkazdi va\neshakka yana jon berdi. Bir zumda\neshak tirik, sog‘lom holiga qaytdi.",
         "Alloh taolo: “Qancha vaqt\no’lib yotdim deb o’ylaysan?”\n- deb so’radi.\nUzayr hayajonda edi: “Bir kun yo\nyarim kun bo’lsa kerak!” - dedi.",
         "Alloh unga dedi: “Bilgin, sen\naslida 100 yil jonsiz yotding.”"
+      ]
+    },
+    {
+      "id": "book_20",
+      "filename": "Zakariyo va kechagi taom.pdf",
+      "title": "Zakariyo va kechagi taom",
+      "author": "Ummu Zakariyya",
+      "genre": "Shukronalik, Taom odobi, Isrof qilmaslik, Oila tarbiyasi",
+      "total_pages": 8,
+      "extracted_length": 1420,
+      "key_pages": [
+        "Zakariyo va kechagi taom\nMuallif: Ummu Zakariyya\n(Muqova: Zakariyo va onasi shinam oshxonada mazzali taom dasturxoni atrofida)",
+        "Onajon bugun nima ovqat yeymiz?\nMana kechagi mazzali ovqatimizdan olib keldim o'g'lim.",
+        "Menga kechagi ovqatingiz kerak emas. Men yangi ovqat yeyishni xohlayman!",
+        "Unday dema o'g'lim! Qancha bolalar bir burda non yeyishga muhtoj. Ularda shu ovqat ham yo'q...",
+        "— Alloh bizga non, suv, meva va issiq uy berdi.\n— Shunday ekan, ne'matlarimizga shukr qilishimiz kerak.\nOnasi dedi: «Agar shukr qilsangiz, albatta, sizga ziyoda qilurman» (Ibrohim surasi, 7-oyat).",
+        "Xatoyimni tushundim onajon. Endi hamma ovqatlarni tanlamasdan yeyman. Allohga shukr qilaman.",
+        "Bismillah.\nMmmm. Alhamdulillah onajon juda mazzali ekan!",
+        "BOLAGA SAVOL:\nZakariyo nimani o'rgandi?\n1. Ovqatni isrof qilmaslikni.\n2. Allohning ne'matlariga shukr qilishni.\n3. Ovqatdan oldin «Bismillah», ovqatdan keyin «Alhamdulillah» deyishni.\nSen ham Zakariyoga o'xshab shukr qilasanmi? 😊"
+      ]
+    },
+    {
+      "id": "book_21",
+      "filename": "Imron va xafa bo'lgan o'yinchoqlar.pdf",
+      "title": "Imron va xafa bo'lgan o'yinchoqlar",
+      "author": "Umida Bahodir qizi",
+      "genre": "Poklik va tartib, Isrofga yo'l qo'ymaslik, Ehson va saxovat, Yetimlarga yordam",
+      "total_pages": 13,
+      "extracted_length": 2350,
+      "key_pages": [
+        "Imron va xafa bo'lgan o'yinchoqlar\nMuallif: Umida Bahodir qizi",
+        "Imron degan bolakay bo'lgan ekan. Uning o'yinchoqlari juda ham ko'p ekan.",
+        "Imron, o'yinchoqlaringni o'ynab bo'lganingdan so'ng, yig'ishtirib qo'y.\nImron o'yinchoqlarini yoyib o'ynashni yaxshi ko'rar, ammo o'ynab bo'lgach, yig'ishtirib olib qo'yishni xohlamas ekan.",
+        "Bir kuni u o'zining yaxshi ko'rgan qizil mashinachasini yo'qotib qo'yibdi. Uni hamma yerdan izlabdi, hamma joyni ag'dar-to'ntar qilib yuboribdi.",
+        "Va nihoyat u mashinani bir uyum o'yinchoq tagidan topibdi. Topa olganidan xursand bo'lib ketibdi.",
+        "Xonani ertaga yig'ishtiraman, bugun kech bo'ldi.\nAmmo shu safar ham u o'yinchoqlarini yig'ishga erinib, yig'ishtirmasdan uxlashga yotibdi.",
+        "Biz endi bu yerdan ketamiz, egamiz bizni asramadi, yig'ishtirmadi...\nKechqurun u tush ko'ribdi, tushida o'yinchoqlari undan xafa bo'lganini, ular uydan ketmoqchi bo'lganini ko'ribdi.",
+        "Hayriyat, tushim ekan, hammasi joyida!\nErtalab uyg'onsa, bu hammasi uning tushi ekan. 'Hayriyat, tushum ekan' - deb xursand bo'lib ketibdi.",
+        "Hayriyat, hammasi joyida! Endi xonani tez yig'ishtiraman!\nTezda o'rnidan turibdi va o'yinchoqlarini yig'ishtira boshlabdi.",
+        "O'g'lim, nonushtaga kel!\nOyisi ertalab Imronni nonushtaga aytaman deb kelsa, Imron hamma joyni tartibli qilib qo'yganini ko'rib, xursand bo'lib ketibdi.",
+        "Kel, ortiqcha o'yinchoqlar va kiyimlarni muhtoj odamlarga beramiz!\nShunda oyisi debdi: 'O'g'lim, xonangiz tez betartib bo'lib ketishi sababi, o'yinchoqlarning haddan tashqari ko'pligidir. O'yinchoqlarni bunday har yerda yotishi isrofga olib keladi, keling, anchadan buyon o'ynalmagan o'yinchoqlar va ortiqcha kiyimlarni biror muhtojga beramiz.'",
+        "Donation for Needy\nShundan keyin Imron va uning oyisi mahalladagi bir bolakayning uyiga borib, kiyim va o'yinchoqlarni berib kelishibdi. U bolakayning dadasi bir necha yillar oldin avtohalokatda vafot etgan, oyisining esa har xil kiyim-u o'yinchoqlar uchun imkoniyati yetmas ekan.",
+        "Uyga qaytishda Imron qilgan ishlaridan xursand bo'libdi.\n'Oyijon, endi men o'yinchoqlarimni doim yig'ishtirib qo'yaman. Siz va dadamga ortiqcha o'yinchoq olib bering deb xarxasha qilmayman. Agar o'yinchoqlarim ko'payib ketsa, uni boshqalar bilan baham ko'raman', - debdi."
       ]
     }
   ]
