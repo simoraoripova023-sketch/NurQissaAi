@@ -240,7 +240,7 @@ Output Valid JSON ONLY with this exact schema:
     "todays_lesson_en": "...",
     "hadith_sharif_uz": "«...» (Hadisi Sharif)",
     "hadith_sharif_en": "«...» (Prophetic Hadith)",
-    "arabic_dua": "رَبِّ هَبْ لِي مِنَ الصَّALИحِينَ",
+    "arabic_dua": "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
     "little_dua_uz": "...",
     "little_dua_en": "...",
     "discussion_questions_uz": ["...", "...", "..."],
@@ -428,7 +428,7 @@ export async function POST(req: NextRequest) {
           todays_lesson_en: "Every good deed brings light and happiness to our hearts.",
           little_dua_uz: `Yo Allohim! ${childName}ni solih, shukr qiluvchi va ota-onasiga rahmat keltiruvchi farzand qilgin. Omin!`,
           little_dua_en: `O Allah! Bless ${childName} with beautiful character, peace and gratitude. Ameen!`,
-          arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّALИحِينَ",
+          arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
           discussion_questions_uz: [
             `${childName} bugungi qissada qanday yaxshilik qildi?`,
             `Bugun sen qaysi yaxshi amaling bilan oilangni quvontirding?`,
@@ -545,7 +545,7 @@ export async function POST(req: NextRequest) {
         todays_lesson_en: "Practicing kindness and loving our parents fills our lives with radiant light.",
         little_dua_uz: `Yo Robbim! ${childName}ga go'zal odob, mustahkam sog'lik va qanoatli qalb ato etgin. Omin!`,
         little_dua_en: `O Allah! Bless ${childName} with beautiful manners, good health and peace. Ameen!`,
-        arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّALИحِينَ",
+        arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
         discussion_questions_uz: [
           `${childName} bugun qanday yaxshilik qildi?`,
           `Bugun sen qaysi yaxshi ishing bilan ota-onangga quvonch ulashding?`,
