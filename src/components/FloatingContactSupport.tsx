@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, Send, X, Check, Sparkles, HelpCircle, 
   AlertTriangle, Lightbulb, Bot, User, ArrowRight, Loader2,
-  RefreshCw, BookOpen, HeartHandshake, ShieldCheck
+  Phone, Mail, Crown, HeartHandshake, ShieldCheck, MessageSquare
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
@@ -21,22 +21,29 @@ export default function FloatingContactSupport() {
   const isUz = locale === 'uz';
 
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'ai_chat' | 'feedback'>('ai_chat');
+  const [activeTab, setActiveTab] = useState<'nur_assistant' | 'founder' | 'feedback'>('nur_assistant');
 
-  // AI Chat States
+  // Nur Yordamchi Chat States
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome_1',
       role: 'assistant',
       content: isUz 
-        ? "Assalomu alaykum! Men **NurQissa 24/7 AI Yordamchisi**man. 🌟\n\nPlatformadan foydalanish, farzandingizga shaxsiy ertak yaratish, Islomiy odoblar yoki qattiq muqovali kitob buyurtma qilish bo'yicha savollaringiz bo'lsa, bemalol so'rang!"
-        : "Hello! I am **NurQissa 24/7 AI Support Assistant**. 🌟\n\nFeel free to ask me anything about creating personalized stories, Islamic values, or ordering hardcover books!",
+        ? "Assalomu alaykum! Men **Nur Yordamchi**man. 🌟\n\nPlatformadan foydalanish, farzandingizga shaxsiy ertak yaratish, Islomiy odoblar yoki qattiq muqovali kitob buyurtma qilish bo'yicha savollaringiz bo'lsa, bemalol so'rang!\n\nAgar loyiha asoschisi bilan to'g'ridan-to'g'ri shaxsan bog'lanmoqchi bo'lsangiz, yuqoridagi **\"👑 Asoschi bilan aloqa\"** bo'limiga o'tishingiz mumkin."
+        : "Hello! I am **Nur Assistant**. 🌟\n\nFeel free to ask me anything about creating personalized stories, Islamic values, or ordering hardcover books! If you wish to reach out directly to the founder, please select the **\"👑 Contact Founder\"** tab.",
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Founder Contact Form States
+  const [founderName, setFounderName] = useState('');
+  const [founderContact, setFounderContact] = useState('');
+  const [founderMsg, setFounderMsg] = useState('');
+  const [isFounderSubmitting, setIsFounderSubmitting] = useState(false);
+  const [isFounderSuccess, setIsFounderSuccess] = useState(false);
 
   // Feedback Form States
   const [feedbackType, setFeedbackType] = useState<'taklif' | 'shikoyat' | 'savol'>('taklif');
@@ -52,16 +59,16 @@ export default function FloatingContactSupport() {
     "📖 Shaxsiy ertak qanday yaratiladi?",
     "📦 Qattiq muqovali kitob buyurtmasi",
     "🌳 Odob daraxti nima?",
-    "🎨 Bo'yash sahifalari bormi?"
+    "👑 Asoschi bilan bog'lanish"
   ] : [
     "📖 How to create a story?",
     "📦 Hardcover book order",
     "🌳 What is Manners Tree?",
-    "🎨 Are there coloring pages?"
+    "👑 Contact Founder"
   ];
 
   useEffect(() => {
-    if (activeTab === 'ai_chat') {
+    if (activeTab === 'nur_assistant') {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, activeTab, isOpen]);
@@ -69,6 +76,11 @@ export default function FloatingContactSupport() {
   const handleSendChatMessage = async (textToSend?: string) => {
     const text = (textToSend || chatInput).trim();
     if (!text || isChatLoading) return;
+
+    if (text.includes("Asoschi") || text.includes("Founder") || text.includes("bog'lanish")) {
+      setActiveTab('founder');
+      return;
+    }
 
     const userMessage: ChatMessage = {
       id: `u_${Date.now()}`,
@@ -118,13 +130,47 @@ export default function FloatingContactSupport() {
           id: `bot_${Date.now()}`,
           role: 'assistant',
           content: isUz 
-            ? "Tarmoq bilan aloqa uzildi. Iltimos, qayta urinib ko'ring yoki Telegram botimizga yozing."
+            ? "Tarmoq bilan aloqa uzildi. Iltimos, qayta urinib ko'ring yoki Telegram orqali yozing."
             : "Network issue. Please retry or contact us on Telegram.",
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
     } finally {
       setIsChatLoading(false);
+    }
+  };
+
+  const handleFounderDirectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!founderMsg.trim()) return;
+
+    setIsFounderSubmitting(true);
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'asoschi',
+          name: founderName.trim() || (isUz ? 'Hurmatli mijoz' : 'Valued Customer'),
+          contact: founderContact.trim() || (isUz ? "Ko'rsatilmadi" : 'Not provided'),
+          message: founderMsg.trim()
+        })
+      });
+
+      if (res.ok) {
+        setIsFounderSuccess(true);
+        setTimeout(() => {
+          setIsFounderSuccess(false);
+          setFounderMsg('');
+          setFounderName('');
+          setFounderContact('');
+          setIsOpen(false);
+        }, 2500);
+      }
+    } catch (err) {
+      console.error('Founder direct submit error:', err);
+    } finally {
+      setIsFounderSubmitting(false);
     }
   };
 
@@ -171,7 +217,7 @@ export default function FloatingContactSupport() {
           whileTap={{ scale: 0.94 }}
           onClick={() => setIsOpen(!isOpen)}
           className="relative flex items-center gap-2.5 px-4 py-3.5 sm:px-5 sm:py-3.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-500 text-white font-black text-xs sm:text-sm shadow-2xl shadow-emerald-700/40 border-2 border-amber-300 hover:shadow-emerald-600/60 transition-all group"
-          title={isUz ? "24/7 AI Yordamchi & Takliflar" : "24/7 AI Support & Feedback"}
+          title={isUz ? "Nur Yordamchi & Asoschi bilan aloqa" : "Nur Assistant & Contact Founder"}
         >
           {/* Pulsing indicator */}
           <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
@@ -179,9 +225,9 @@ export default function FloatingContactSupport() {
             <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400"></span>
           </span>
 
-          <Bot className="w-5 h-5 text-amber-200 group-hover:rotate-12 transition-transform" />
-          <span className="hidden sm:inline font-display">
-            {isOpen ? (isUz ? "Yopish" : "Close") : (isUz ? "AI Yordamchi & Aloqa" : "AI Support & Feedback")}
+          <Sparkles className="w-5 h-5 text-amber-200 group-hover:rotate-12 transition-transform" />
+          <span className="hidden sm:inline font-display font-black">
+            {isOpen ? (isUz ? "Yopish" : "Close") : (isUz ? "Nur Yordamchi & Aloqa" : "Nur Assistant & Contact")}
           </span>
         </motion.button>
       </div>
@@ -190,7 +236,7 @@ export default function FloatingContactSupport() {
       <AnimatePresence>
         {isOpen && (
           <div 
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-end sm:justify-center p-2 sm:p-6 bg-black/60 backdrop-blur-sm no-print print:hidden"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-end sm:justify-center p-2 sm:p-6 bg-black/65 backdrop-blur-sm no-print print:hidden"
             onClick={() => setIsOpen(false)}
           >
             <motion.div
@@ -214,100 +260,65 @@ export default function FloatingContactSupport() {
               </button>
 
               {/* Header */}
-              <div className="relative z-10 space-y-1 pb-3 border-b border-amber-200/60 dark:border-emerald-800/60 flex-shrink-0">
+              <div className="relative z-10 space-y-1 pb-2.5 border-b border-amber-200/60 dark:border-emerald-800/60 flex-shrink-0">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 text-xs font-black uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>{isUz ? "NurQissa Markazi" : "NurQissa Center"}</span>
+                  <span>{isUz ? "NurQissa Markazi" : "NurQissa Hub"}</span>
                 </div>
 
                 <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-amber-100 font-display">
-                  {isUz ? "Qo'llab-quvvatlash va Takliflar" : "Support & Suggestions"}
+                  {isUz ? "Nur Yordamchi va Asoschi Aloqasi" : "Nur Assistant & Founder Contact"}
                 </h3>
               </div>
 
-              {/* Top Action Cards: AI Chat vs Telegram Bot */}
-              <div className="relative z-10 grid grid-cols-2 gap-2.5 py-3 flex-shrink-0">
-                {/* 24/7 AI Chat Tab Toggle Button */}
-                <button
-                  onClick={() => setActiveTab('ai_chat')}
-                  className={`p-2.5 sm:p-3 rounded-2xl border transition-all flex items-center gap-2.5 text-left shadow-sm ${
-                    activeTab === 'ai_chat'
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border-emerald-400 shadow-emerald-500/20 ring-2 ring-amber-300'
-                      : 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-700 hover:border-emerald-500'
-                  }`}
-                >
-                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform ${
-                    activeTab === 'ai_chat' ? 'bg-white/20 text-white' : 'bg-emerald-600 text-white'
-                  }`}>
-                    <Bot className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className={`font-black text-xs truncate ${
-                      activeTab === 'ai_chat' ? 'text-white' : 'text-emerald-900 dark:text-emerald-200'
-                    }`}>
-                      {isUz ? "24/7 AI Yordamchi" : "24/7 AI Assistant"}
-                    </div>
-                    <div className={`text-[10px] truncate ${
-                      activeTab === 'ai_chat' ? 'text-emerald-100' : 'text-emerald-700 dark:text-emerald-400'
-                    }`}>
-                      {isUz ? "Jonli aqlli suhbat" : "Instant answers"}
-                    </div>
-                  </div>
-                </button>
-
-                {/* Direct Telegram Bot Link */}
-                <a
-                  href={TELEGRAM_BOT}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2.5 sm:p-3 rounded-2xl bg-sky-50 dark:bg-sky-950/50 border border-sky-300 dark:border-sky-700 hover:border-sky-500 transition-all flex items-center gap-2.5 group shadow-sm text-left"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-sky-500 flex items-center justify-center text-white flex-shrink-0 group-hover:scale-110 transition-transform">
-                    <Send className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="font-bold text-xs text-sky-900 dark:text-sky-200 truncate">
-                      {isUz ? "Telegram Bot" : "Telegram Bot"}
-                    </div>
-                    <div className="text-[10px] text-sky-700 dark:text-sky-400 truncate">
-                      @nurqissaaa_bot
-                    </div>
-                  </div>
-                </a>
-              </div>
-
-              {/* Sub-tabs: AI Chat vs Taklif & Shikoyat */}
-              <div className="relative z-10 flex border-b border-amber-200/50 dark:border-emerald-800/50 pb-2 mb-2 gap-2 flex-shrink-0">
+              {/* Navigation Tabs (3 distinct options) */}
+              <div className="relative z-10 grid grid-cols-3 gap-1.5 py-2.5 flex-shrink-0 border-b border-amber-200/50 dark:border-emerald-800/50">
+                {/* 1. Nur Yordamchi Tab */}
                 <button
                   type="button"
-                  onClick={() => setActiveTab('ai_chat')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    activeTab === 'ai_chat'
-                      ? 'bg-amber-400 dark:bg-emerald-600 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-emerald-950'
+                  onClick={() => setActiveTab('nur_assistant')}
+                  className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 rounded-2xl text-center font-black text-[11px] sm:text-xs transition-all border ${
+                    activeTab === 'nur_assistant'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-400 shadow-md shadow-emerald-700/20 ring-2 ring-amber-300'
+                      : 'bg-white dark:bg-emerald-950/80 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-emerald-800 hover:bg-amber-50'
                   }`}
                 >
-                  <Bot className="w-3.5 h-3.5" />
-                  <span>{isUz ? "AI Yordamchi bilan suhbat" : "AI Support Chat"}</span>
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
+                  <span className="truncate">{isUz ? "Nur Yordamchi" : "Nur Assistant"}</span>
                 </button>
 
+                {/* 2. Asoschi bilan aloqa Tab */}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('founder')}
+                  className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 rounded-2xl text-center font-black text-[11px] sm:text-xs transition-all border ${
+                    activeTab === 'founder'
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-amber-400 shadow-md shadow-amber-600/20 ring-2 ring-amber-300'
+                      : 'bg-white dark:bg-emerald-950/80 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-emerald-800 hover:bg-amber-50'
+                  }`}
+                >
+                  <Crown className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
+                  <span className="truncate">{isUz ? "Asoschi Aloqasi" : "Founder Contact"}</span>
+                </button>
+
+                {/* 3. Taklif & Fikrlar Tab */}
                 <button
                   type="button"
                   onClick={() => setActiveTab('feedback')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 py-2 px-1.5 rounded-2xl text-center font-black text-[11px] sm:text-xs transition-all border ${
                     activeTab === 'feedback'
-                      ? 'bg-amber-400 dark:bg-emerald-600 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-emerald-950'
+                      ? 'bg-gradient-to-r from-teal-600 to-emerald-700 text-white border-teal-400 shadow-md shadow-teal-700/20 ring-2 ring-amber-300'
+                      : 'bg-white dark:bg-emerald-950/80 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-emerald-800 hover:bg-amber-50'
                   }`}
                 >
-                  <Lightbulb className="w-3.5 h-3.5" />
-                  <span>{isUz ? "Fikr & Taklif yuborish" : "Leave Feedback"}</span>
+                  <Lightbulb className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
+                  <span className="truncate">{isUz ? "Taklif/Fikr" : "Feedback"}</span>
                 </button>
               </div>
 
-              {/* Tab 1: AI Chat View */}
-              {activeTab === 'ai_chat' && (
-                <div className="relative z-10 flex-1 flex flex-col min-h-0">
+              {/* TAB 1: Nur Yordamchi (24/7 AI Chat) */}
+              {activeTab === 'nur_assistant' && (
+                <div className="relative z-10 flex-1 flex flex-col min-h-0 pt-1">
                   {/* Messages Area */}
                   <div className="flex-1 overflow-y-auto space-y-3 pr-1 min-h-[220px] max-h-[300px]">
                     {messages.map((msg) => (
@@ -317,7 +328,7 @@ export default function FloatingContactSupport() {
                       >
                         {msg.role === 'assistant' && (
                           <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white flex-shrink-0 shadow-sm mt-1">
-                            <Bot className="w-4 h-4" />
+                            <Sparkles className="w-4 h-4 text-amber-200" />
                           </div>
                         )}
 
@@ -345,18 +356,18 @@ export default function FloatingContactSupport() {
                     {isChatLoading && (
                       <div className="flex gap-2.5 items-center text-xs text-emerald-700 dark:text-emerald-300">
                         <div className="w-7 h-7 rounded-xl bg-emerald-600 flex items-center justify-center text-white flex-shrink-0 animate-pulse">
-                          <Bot className="w-4 h-4" />
+                          <Sparkles className="w-4 h-4 text-amber-200" />
                         </div>
                         <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-emerald-950/80 rounded-2xl border border-amber-200/60 dark:border-emerald-800">
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
-                          <span>{isUz ? "AI javob tayyorlamoqda..." : "AI is thinking..."}</span>
+                          <span>{isUz ? "Nur Yordamchi yozmoqda..." : "Nur Assistant is thinking..."}</span>
                         </div>
                       </div>
                     )}
                     <div ref={chatEndRef} />
                   </div>
 
-                  {/* Quick question suggestions */}
+                  {/* Quick Suggestions */}
                   <div className="py-2 flex gap-1.5 overflow-x-auto no-scrollbar flex-shrink-0">
                     {quickQuestions.map((q, idx) => (
                       <button
@@ -383,7 +394,7 @@ export default function FloatingContactSupport() {
                       type="text"
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
-                      placeholder={isUz ? "Savolingizni yozing..." : "Ask your question..."}
+                      placeholder={isUz ? "Nur Yordamchiga savol bering..." : "Ask Nur Assistant..."}
                       disabled={isChatLoading}
                       className="flex-1 px-3.5 py-2.5 rounded-xl bg-white dark:bg-emerald-950/80 border border-slate-300 dark:border-emerald-700 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
                     />
@@ -398,7 +409,115 @@ export default function FloatingContactSupport() {
                 </div>
               )}
 
-              {/* Tab 2: Feedback Form View */}
+              {/* TAB 2: Asoschi bilan to'g'ridan-to'g'ri aloqa (Founder Direct Contact) */}
+              {activeTab === 'founder' && (
+                <div className="relative z-10 flex-1 overflow-y-auto pt-1 space-y-3">
+                  {/* Founder Intro Card */}
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-emerald-950/70 dark:to-teal-950/70 border border-amber-300 dark:border-amber-600/50 shadow-sm flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white flex-shrink-0 shadow-md">
+                      <Crown className="w-5 h-5 text-amber-100" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="text-xs sm:text-sm font-black text-slate-900 dark:text-amber-100">
+                        {isUz ? "Loyiha Asoschisi va Rahbariyat Aloqasi" : "Direct Founder & Management Access"}
+                      </h4>
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-tight mt-0.5">
+                        {isUz 
+                          ? "Maxsus hamkorlik, shaxsiy kitoblar, homiylik yoki to'g'ridan-to'g'ri maslahat uchun quyidagi vositalardan foydalaning."
+                          : "Reach out directly to the founder for special partnerships, custom books or inquiries."}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Direct Telegram Channel Button */}
+                  <a
+                    href={TELEGRAM_BOT}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full p-3 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white transition-all flex items-center justify-between shadow-md group"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                        <Send className="w-4 h-4" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-bold text-xs">
+                          {isUz ? "Telegram orqali to'g'ridan-to'g'ri yozish" : "Direct Telegram Message"}
+                        </div>
+                        <div className="text-[11px] text-sky-100">@nurqissaaa_bot</div>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </a>
+
+                  {/* Direct Founder Message Form */}
+                  <div className="pt-1">
+                    <div className="text-xs font-bold text-slate-700 dark:text-amber-200 mb-2 flex items-center gap-1.5">
+                      <MessageSquare className="w-3.5 h-3.5 text-amber-500" />
+                      <span>{isUz ? "Asoschiga shaxsiy xabar qoldiring:" : "Leave a Direct Message to Founder:"}</span>
+                    </div>
+
+                    <form onSubmit={handleFounderDirectSubmit} className="space-y-2.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input
+                          type="text"
+                          required
+                          value={founderName}
+                          onChange={(e) => setFounderName(e.target.value)}
+                          placeholder={isUz ? "Ismingiz *" : "Your Name *"}
+                          className="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950/80 border border-slate-300 dark:border-emerald-700 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        />
+                        <input
+                          type="text"
+                          required
+                          value={founderContact}
+                          onChange={(e) => setFounderContact(e.target.value)}
+                          placeholder={isUz ? "Telefon yoki Telegram *" : "Phone or Telegram *"}
+                          className="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950/80 border border-slate-300 dark:border-emerald-700 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        />
+                      </div>
+
+                      <textarea
+                        required
+                        rows={3}
+                        value={founderMsg}
+                        onChange={(e) => setFounderMsg(e.target.value)}
+                        placeholder={isUz ? "Asoschiga yetkazmoqchi bo'lgan shaxsiy taklif yoki savolingizni yozing..." : "Write your personal message to the founder..."}
+                        className="w-full px-3 py-2 rounded-xl bg-white dark:bg-emerald-950/80 border border-slate-300 dark:border-emerald-700 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                      />
+
+                      <button
+                        type="submit"
+                        disabled={isFounderSubmitting || !founderMsg.trim()}
+                        className={`w-full py-2.5 rounded-2xl font-black text-xs sm:text-sm text-white flex items-center justify-center gap-2 shadow-lg transition-all ${
+                          isFounderSuccess
+                            ? 'bg-emerald-600 border border-emerald-500 shadow-emerald-500/40'
+                            : 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:opacity-95 shadow-amber-600/30'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        {isFounderSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>{isUz ? "Asoschiga yuborilmoqda..." : "Sending directly to founder..."}</span>
+                          </>
+                        ) : isFounderSuccess ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            <span>{isUz ? "Xabaringiz asoschiga yetkazildi! Rahmat!" : "Message delivered to founder!"}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Crown className="w-4 h-4 text-amber-200" />
+                            <span>{isUz ? "Asoschiga Shaxsiy Xabar Yuborish" : "Send Directly to Founder"}</span>
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: Taklif va Shikoyat yuborish */}
               {activeTab === 'feedback' && (
                 <div className="relative z-10 flex-1 overflow-y-auto pt-1">
                   <form onSubmit={handleFeedbackSubmit} className="space-y-3">
@@ -495,7 +614,7 @@ export default function FloatingContactSupport() {
                             ? (isUz ? "Qayerda xatolik yoki noqulaylik yuz berdi?.." : "What issue did you encounter?...")
                             : (isUz ? "Savolingizni yozing..." : "Write your question here...")
                         }
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-emerald-950/80 border border-slate-300 dark:border-emerald-700 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
+                        className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-emerald-950/80 border border-slate-300 dark:border-emerald-700 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"
                       />
                     </div>
 
@@ -503,7 +622,7 @@ export default function FloatingContactSupport() {
                     <button
                       type="submit"
                       disabled={isSubmitting || !userMsg.trim()}
-                      className={`w-full py-3 rounded-2xl font-black text-xs sm:text-sm text-white flex items-center justify-center gap-2 shadow-lg transition-all ${
+                      className={`w-full py-2.5 rounded-2xl font-black text-xs sm:text-sm text-white flex items-center justify-center gap-2 shadow-lg transition-all ${
                         isSuccess
                           ? 'bg-emerald-600 border border-emerald-500 shadow-emerald-500/40'
                           : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-500 hover:opacity-95 shadow-emerald-700/30'

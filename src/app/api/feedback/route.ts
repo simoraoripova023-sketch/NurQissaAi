@@ -57,11 +57,11 @@ export async function POST(req: NextRequest) {
       // Serverless environments like Vercel have read-only filesystem, which is normal
     }
 
-    // 3. Format notification for Telegram
     const emojiMap: Record<string, string> = {
       taklif: '💡 YANGI TAKLIF',
       shikoyat: '⚠️ YANGI SHIKOYAT / MUAMMO',
       savol: '❓ YANGI SAVOL / MUROJAAT',
+      asoschi: '👑 ASOSCHI / RAHBARIYATGA SHAXSIY MUROJAAT',
       buyurtma: '📚 YANGI KITOB BUYURTMASI (QATTIQ MUQOVA)'
     };
 
