@@ -180,7 +180,7 @@ export default function AudioNarrationBar({ currentText, audioUrl, currentPage, 
   }, []);
 
   return (
-    <div className="bg-[#1E1B4B] text-white px-4 sm:px-6 py-3.5 rounded-2xl shadow-xl border border-amber-400/30 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+    <div className="bg-[#1E1B4B] text-white px-3 sm:px-5 py-2.5 sm:py-3.5 rounded-2xl shadow-xl border border-amber-400/30 flex items-center justify-between gap-2 sm:gap-4">
       {/* Hidden Audio Element for High Quality Studio Audio */}
       <audio
         ref={audioRef}
@@ -195,17 +195,17 @@ export default function AudioNarrationBar({ currentText, audioUrl, currentPage, 
       />
 
       {/* Left info & animated waveform */}
-      <div className="flex items-center gap-3 w-full sm:w-auto">
-        <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
-          <Volume2 className="w-5 h-5" />
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-300 shrink-0">
+          <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
         </div>
-        <div>
-          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>
+        <div className="min-w-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold text-amber-300 truncate">
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" />
+            <span className="truncate">
               {audioUrl 
-                ? (locale === 'uz' ? "🎙️ Jonli Dublyaj & AI Ovoz" : "🎙️ Studio Voice Narration")
-                : (locale === 'uz' ? "Ovozli Ertakchi (AI TTS)" : "Bedtime AI Voice")}
+                ? (locale === 'uz' ? "🎙️ Dublyaj" : "🎙️ Voice Audio")
+                : (locale === 'uz' ? "AI Ovoz" : "Bedtime AI")}
             </span>
           </div>
           <p className="text-[11px] text-slate-300">

@@ -211,12 +211,12 @@ export default function FloatingContactSupport() {
   return (
     <>
       {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50 no-print print:hidden">
+      <div className="fixed bottom-3.5 right-3.5 sm:bottom-6 sm:right-6 z-50 no-print print:hidden pb-[env(safe-area-inset-bottom,0px)]">
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.94 }}
           onClick={() => setIsOpen(!isOpen)}
-          className="relative flex items-center gap-2.5 px-4 py-3.5 sm:px-5 sm:py-3.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-500 text-white font-black text-xs sm:text-sm shadow-2xl shadow-emerald-700/40 border-2 border-amber-300 hover:shadow-emerald-600/60 transition-all group"
+          className="relative flex items-center gap-2 px-3.5 py-3 sm:px-5 sm:py-3.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-500 text-white font-black text-xs sm:text-sm shadow-2xl shadow-emerald-700/40 border-2 border-amber-300 hover:shadow-emerald-600/60 transition-all group"
           title={isUz ? "Nur Yordamchi & Asoschi bilan aloqa" : "Nur Assistant & Contact Founder"}
         >
           {/* Pulsing indicator */}
@@ -225,7 +225,7 @@ export default function FloatingContactSupport() {
             <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-400"></span>
           </span>
 
-          <Sparkles className="w-5 h-5 text-amber-200 group-hover:rotate-12 transition-transform" />
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-200 group-hover:rotate-12 transition-transform" />
           <span className="hidden sm:inline font-display font-black">
             {isOpen ? (isUz ? "Yopish" : "Close") : (isUz ? "Nur Yordamchi & Aloqa" : "Nur Assistant & Contact")}
           </span>
@@ -236,7 +236,7 @@ export default function FloatingContactSupport() {
       <AnimatePresence>
         {isOpen && (
           <div 
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-end sm:justify-center p-2 sm:p-6 bg-black/65 backdrop-blur-sm no-print print:hidden"
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 md:p-6 bg-black/65 backdrop-blur-sm no-print print:hidden pb-[env(safe-area-inset-bottom,8px)]"
             onClick={() => setIsOpen(false)}
           >
             <motion.div
@@ -244,7 +244,7 @@ export default function FloatingContactSupport() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 40, scale: 0.95 }}
               transition={{ duration: 0.25 }}
-              className="relative w-full max-w-lg bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl p-4 sm:p-6 border-2 border-amber-400/80 dark:border-emerald-600/80 shadow-2xl overflow-hidden max-h-[92vh] flex flex-col"
+              className="relative w-full max-w-lg bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl p-3.5 sm:p-5 md:p-6 border-2 border-amber-400/80 dark:border-emerald-600/80 shadow-2xl overflow-hidden max-h-[86vh] sm:max-h-[90vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Decorative background glow */}

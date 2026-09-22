@@ -322,12 +322,12 @@ export default function HeroIslamicBook() {
                 animate="center"
                 exit="exit"
                 style={{ transformStyle: 'preserve-3d' }}
-                className="relative w-full h-[360px] sm:h-[390px] overflow-hidden"
+                className="relative w-full h-[370px] sm:h-[400px] overflow-hidden"
               >
                 
                 {/* 1. TYPE = PURE FULL-PAGE IMAGE (Faqatgina to'liq surat!) */}
                 {currentLeaf.type === 'image' && (
-                  <div className="relative w-full h-full bg-[#001D19] flex flex-col justify-between p-4">
+                  <div className="relative w-full h-full bg-[#001D19] flex flex-col justify-between p-3.5 sm:p-4">
                     {/* The Full Artwork */}
                     <img
                       src={currentLeaf.image_url}
@@ -337,7 +337,7 @@ export default function HeroIslamicBook() {
 
                     {/* Top Leaf Indicator Pill */}
                     <div className="relative z-10 flex items-center justify-between">
-                      <div className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-amber-300/40 text-[10px] font-black text-amber-200 shadow-md flex items-center gap-1.5">
+                      <div className="px-2.5 sm:px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-amber-300/40 text-[10px] font-black text-amber-200 shadow-md flex items-center gap-1.5">
                         <ImageIcon className="w-3 h-3 text-amber-300" />
                         <span>{locale === 'uz' ? "Suratli Sahifa" : "Illustration Page"}</span>
                       </div>
@@ -348,7 +348,7 @@ export default function HeroIslamicBook() {
                     </div>
 
                     {/* Bottom Caption Pill */}
-                    <div className="relative z-10 self-start px-3.5 py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-amber-300/50 text-xs font-black text-amber-200 shadow-lg">
+                    <div className="relative z-10 self-start px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-black/70 backdrop-blur-md border border-amber-300/50 text-[11px] sm:text-xs font-black text-amber-200 shadow-lg line-clamp-1">
                       ✨ {currentLeaf.caption}
                     </div>
                   </div>
@@ -356,7 +356,7 @@ export default function HeroIslamicBook() {
 
                 {/* 2. TYPE = PURE FULL-PAGE TEXT (Faqatgina to'liq matn!) */}
                 {currentLeaf.type === 'text' && (
-                  <div className="w-full h-full bg-[#FFFDF5] dark:bg-[#012A25] p-6 sm:p-7 flex flex-col justify-between relative shadow-inner">
+                  <div className="w-full h-full bg-[#FFFDF5] dark:bg-[#012A25] p-4 sm:p-6 md:p-7 flex flex-col justify-between relative shadow-inner overflow-y-auto">
                     
                     {/* Top Bismillah Header */}
                     <div>
@@ -442,7 +442,7 @@ export default function HeroIslamicBook() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                className="w-full p-6 flex flex-col justify-between bg-gradient-to-b from-[#012E29] to-[#001815] text-white h-[360px] sm:h-[390px]"
+                className="w-full p-4 sm:p-6 flex flex-col justify-between bg-gradient-to-b from-[#012E29] to-[#001815] text-white h-[370px] sm:h-[400px]"
               >
                 <div className="space-y-2 text-center pt-2">
                   <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-400/20 border-2 border-amber-300 flex items-center justify-center shadow-lg">

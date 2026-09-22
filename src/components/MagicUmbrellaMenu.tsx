@@ -284,7 +284,7 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="absolute left-0 top-full mt-3 w-80 sm:w-84 bg-[#FFFDF5]/95 dark:bg-[#002621]/95 backdrop-blur-xl border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-4 sm:p-5 shadow-2xl space-y-3 z-50 overflow-hidden"
+            className="absolute left-0 sm:left-0 top-full mt-3 w-[calc(100vw-20px)] max-w-[340px] sm:w-84 bg-[#FFFDF5]/95 dark:bg-[#002621]/95 backdrop-blur-xl border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-3.5 sm:p-5 shadow-2xl space-y-3 z-50 overflow-hidden max-h-[85vh] overflow-y-auto"
           >
             {/* Fairytale Background Ambient Glow */}
             <div className="absolute -top-12 -left-12 w-36 h-36 bg-amber-400/20 dark:bg-butter-300/10 rounded-full blur-2xl pointer-events-none" />
