@@ -185,6 +185,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "It was a golden summer morning. Sweet little Fatima happily ran in the courtyard, her heart fluttering with joy awaiting her beloved grandmother's visit.",
         image_prompt: "happy sweet little girl in sunny garden greeting smiling grandmother, warm fairytale book art",
         image_url: "/stories/fotima/page_1.jpeg",
+        audio_url: "/stories/fotima/audio_1.mp3",
         scene_summary: "Fotimaxon va buvijonisining quvonchli uchrashuvi"
       },
       {
@@ -193,6 +194,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Grandmother opened her arms wide with a beaming smile: \"Assalamu Alaykum, my radiant flower! Guess what magical treasure I brought you from the Land of Letters!\"",
         image_prompt: "smiling loving grandmother holding beautifully wrapped golden book for little girl",
         image_url: "/stories/fotima/page_2.jpeg",
+        audio_url: "/stories/fotima/audio_2.mp3",
         scene_summary: "Harflar O'lkasidan kelgan sirli hadya"
       },
       {
@@ -201,6 +203,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Opening the gilded book, grandmother gently explained: \"These are the noble letters of the Holy Quran, filled with divine warmth and light that illuminate our souls.\"",
         image_prompt: "magical glowing golden letters floating gently around cozy room, enchanting bedtime art",
         image_url: "/stories/fotima/page_3.jpeg",
+        audio_url: "/stories/fotima/audio_3.mp3",
         scene_summary: "Buvijonisi bilan Qur'on nurlarini ochish"
       },
       {
@@ -209,6 +212,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Hugging the book, Fatima asked with sparkling eyes: \"Grandma, when we recite, are we speaking with Allah?\" Grandmother kissed her forehead: \"Yes, precious soul, Allah always hears our whispers.\"",
         image_prompt: "little girl with joyful radiant eyes looking at glowing open book with grandmother",
         image_url: "/stories/fotima/page_4.jpeg",
+        audio_url: "/stories/fotima/audio_4.mp3",
         scene_summary: "Alloh bilan dildan so'zlashish siri"
       },
       {
@@ -217,6 +221,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Fatima lovingly drew the letters. \"Alif\" stood tall and noble, while \"Ba\" smiled like a cheerful companion. Every stroke brought giggles of pure joy.",
         image_prompt: "playful colorful letters floating in fairytale room as little girl giggles happily",
         image_url: "/stories/fotima/page_5.jpeg",
+        audio_url: "/stories/fotima/audio_5.mp3",
         scene_summary: "Harflarni quvonch va mehr bilan o'rganish"
       },
       {
@@ -225,6 +230,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "In the evening, Fatima proudly recited the letters to her loving parents. Their eyes welled with happy tears as they hugged her: \"You are the greatest joy of our hearts, sweet child!\"",
         image_prompt: "happy parents hugging smiling little girl in warm illuminated living room",
         image_url: "/stories/fotima/page_6.jpeg",
+        audio_url: "/stories/fotima/audio_6.mp3",
         scene_summary: "Oila mehri va ota-ona iftixori"
       },
       {
@@ -233,6 +239,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Holding grandmother's hand at bedtime, Fatima whispered sweetly: \"O Loving Lord, fill our home with light, protect my parents, and grant us kindness forever!\"",
         image_prompt: "little girl in cozy bed whispering bedtime prayer with gentle smile",
         image_url: "/stories/fotima/page_7.jpeg",
+        audio_url: "/stories/fotima/audio_7.mp3",
         scene_summary: "Fotimaxonning samimiy oqshom duosi"
       },
       {
@@ -241,6 +248,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Under the twinkling night stars, celestial peace settled in. Hugging her precious little book, sweet Fatima drifted into the dreamiest sleep. \"Alhamdulillah!\"",
         image_prompt: "peaceful sweet girl sleeping in cozy bed with crescent moon shining outside window, 3d fairytale art",
         image_url: "/stories/fotima/page_8.jpeg",
+        audio_url: "/stories/fotima/audio_8.mp3",
         scene_summary: "Shirin orom, orzular va xotirjam uyqu"
       }
     ],
@@ -328,6 +336,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "It was a bright, sunny morning. Sweet 3-year-old Zubayr happily ran after colorful butterflies in the garden: 'Look Grandpa, the butterfly is flying!' His kind grandfather smiled and called him: 'My little lamb, do you know who made these beautiful flowers and fluttery butterflies?'",
         image_prompt: "cheerful 3-year-old toddler boy Zubayr chasing colorful butterflies in a lush blooming sunny garden with smiling elderly grandfather watching lovingly, 3D Disney Pixar style Islamic art",
         image_url: "/stories/zubayr/page_1.jpeg",
+        audio_url: "/stories/zubayr/audio_1.mp3",
         scene_summary: "Jajji Zubayr va kapalaklar quvonchi"
       },
       {
@@ -336,6 +345,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Grandfather gently pointed toward the glowing celestial light: 'Loving Allah created us and the whole wide world! When Allah says one special word: 'BE!' ('Kun!'), everything appears instantly! Little birds sing and sweet flowers bloom!' Little Zubayr repeated happily: 'Be!' and giggled with joy.",
         image_prompt: "grandfather pointing to magical golden light beams and celestial sky, cozy fairytale illustration",
         image_url: "/stories/zubayr/page_2.jpeg",
+        audio_url: "/stories/zubayr/audio_2.mp3",
         scene_summary: "Mehribon Allohning «BO'L!» degan amri va nurlar"
       },
       {
@@ -344,6 +354,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Grandfather continued: 'Allah created the very first human from soft earth. His name was Prophet Adam. To keep him company, Allah created Hawwa as his loving friend and companion. They dwelt peacefully together.' Zubayr asked: 'Is Adam our big grandpa?'",
         image_prompt: "two noble figures Adam and Hawwa in celestial hall of Paradise, soft glowing ambiance",
         image_url: "/stories/zubayr/page_3.jpeg",
+        audio_url: "/stories/zubayr/audio_3.mp3",
         scene_summary: "Ilk inson Odam Ato va Momo Havoning yaratilishi"
       },
       {
@@ -352,6 +363,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "'Yes, precious soul!' smiled grandpa. 'Adam and Hawwa lived in Paradise. Crystal rivers and cascades flowed through magnificent gardens with fragrant blooming trees. They lived in pure joy and tranquility.'",
         image_prompt: "crystal rivers and waterfalls cascading through lush heavenly garden of Paradise, peaceful 3D scenery",
         image_url: "/stories/zubayr/page_4.jpeg",
+        audio_url: "/stories/zubayr/audio_4.mp3",
         scene_summary: "Jannat anhorlari va betakror go'zal bog'lar"
       },
       {
@@ -360,6 +372,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Grandfather sat beside Zubayr and explained lovingly: 'Allah told them: Do not approach this one forbidden tree. But the jealous devil whispered lies and tempted them.' Little Zubayr pouted softly: 'Telling lies is very bad, right Grandpa?'",
         image_prompt: "kind grandfather sitting in cozy room telling bedtime wisdom story to attentive little toddler boy",
         image_url: "/stories/zubayr/page_5.jpeg",
+        audio_url: "/stories/zubayr/audio_5.mp3",
         scene_summary: "Bobosining shaytonning aldovi haqidagi sabog'i"
       },
       {
@@ -368,6 +381,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "As Zubayr felt sad, grandfather gently comforted and hugged him: 'Realizing their mistake, Adam and Hawwa immediately prayed: O Allah, forgive us! And loving Allah forgave them.' Zubayr nodded: 'When I make a mistake, I always say I am sorry too!'",
         image_prompt: "grandfather comforting and hugging sad toddler boy with gentle smile in warm cozy room",
         image_url: "/stories/zubayr/page_6.jpeg",
+        audio_url: "/stories/zubayr/audio_6.mp3",
         scene_summary: "Bobosining taskini, samimiy uzr so'rash va kechirim"
       },
       {
@@ -376,6 +390,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "'Then they came down to Earth,' grandfather explained. 'Allah taught Prophet Adam how to farm wheat and bake warm fragrant bread in clay ovens. They worked with honesty and said Alhamdulillah for every loaf.' Zubayr smiled: 'I love warm bread too!'",
         image_prompt: "rustic clay tandoor oven with freshly baked round golden flatbreads and glowing embers, cozy bakery art",
         image_url: "/stories/zubayr/page_7.jpeg",
+        audio_url: "/stories/zubayr/audio_7.mp3",
         scene_summary: "Tandirda shirin non yopish va halol mehnat"
       },
       {
@@ -384,6 +399,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "In the garden, grandfather and grandmother embraced little Zubayr together: 'Zubayr, all people are children of Prophet Adam. We are one big loving family! We must always care for each other and spread kindness.'",
         image_prompt: "grandparents lovingly hugging happy toddler boy together in a green sunny garden, joyful family scene",
         image_url: "/stories/zubayr/page_8.jpeg",
+        audio_url: "/stories/zubayr/audio_8.mp3",
         scene_summary: "Katta va ahil oila mehri"
       },
       {
@@ -392,6 +408,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Little Zubayr opened his tiny hands in heartfelt prayer: 'Dear Allah! Protect my grandpa, grandma, mommy, and daddy! Help me always be a sweet, good, and polite boy! Ameen!'",
         image_prompt: "sweet toddler boy making heartfelt prayer dua with open hands in soft golden evening light",
         image_url: "/stories/zubayr/page_9.jpeg",
+        audio_url: "/stories/zubayr/audio_9.mp3",
         scene_summary: "Jajji Zubayrning samimiy shirin duosi"
       },
       {
@@ -400,6 +417,7 @@ export const SAMPLE_STORIES: StoryBook[] = [
         text_en: "Grandfather kissed and cuddled his grandson lovingly: 'May your life be full of light, my clever boy!' Feeling warm and safe in grandfather's arms, Zubayr whispered 'Alhamdulillah' and drifted into peaceful sleep.",
         image_prompt: "grandfather warmly hugging and cuddling sleepy toddler grandson in golden evening sunset ambiance, serene bedtime art",
         image_url: "/stories/zubayr/page_10.jpeg",
+        audio_url: "/stories/zubayr/audio_10.mp3",
         scene_summary: "Bobo va nabira mehr-oqibati, shukronalik va xotirjamlik"
       }
     ],

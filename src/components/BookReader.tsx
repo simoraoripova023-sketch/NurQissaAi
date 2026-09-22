@@ -157,9 +157,9 @@ export default function BookReader({ story }: BookReaderProps) {
 
   const currentAudioUrl = 
     currentPageIndex === 0
-      ? (story.id === 'aqilli-bola-yusuf' ? '/stories/yusuf/nurqissa_full.mp3' : '/audio/actor_dublyaj_main.mp3')
+      ? (story.id === 'aqilli-bola-yusuf' ? '/stories/yusuf/nurqissa_full.mp3' : story.pages[0]?.audio_url)
       : currentPageIndex <= totalPages 
-      ? (story.pages[currentPageIndex - 1]?.audio_url || '/audio/actor_dublyaj_main.mp3')
+      ? story.pages[currentPageIndex - 1]?.audio_url
       : undefined;
 
   return (
