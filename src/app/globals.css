@@ -39,7 +39,10 @@ body {
 
 /* Prevent auto-zoom on iOS inputs and ensure clean word wrapping on mobile */
 @media (max-width: 640px) {
-  input, select, textarea {
+
+  input,
+  select,
+  textarea {
     font-size: 16px !important;
   }
 }
@@ -104,7 +107,7 @@ body {
 }
 
 .book-spine-gradient {
-  background: linear-gradient(90deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.02) 20%, transparent 50%, rgba(0,0,0,0.02) 80%, rgba(0,0,0,0.15) 100%);
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.02) 20%, transparent 50%, rgba(0, 0, 0, 0.02) 80%, rgba(0, 0, 0, 0.15) 100%);
 }
 
 /* Smooth custom scrollbars */
@@ -132,8 +135,15 @@ body {
 }
 
 @keyframes floatAnimation {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(1deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
 }
 
 .animate-gentle-float {
@@ -144,6 +154,7 @@ body {
    PDF & PRINT STYLES - CLEAN STORYBOOK EXPORT
    ========================================================= */
 @media print {
+
   /* Hide all website navigation, headers, footers, overlays, and controls */
   header,
   footer,
@@ -156,7 +167,8 @@ body {
   }
 
   /* Reset document layout for clean white paper printing */
-  html, body {
+  html,
+  body {
     background: #ffffff !important;
     color: #0f172a !important;
     margin: 0 !important;
@@ -207,7 +219,8 @@ body {
   }
 
   /* Single-page Certificate print rules */
-  #tashakkurnoma-print-area, #tashakkurnoma-print-area * {
+  #tashakkurnoma-print-area,
+  #tashakkurnoma-print-area * {
     visibility: visible !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -232,6 +245,3 @@ body {
     z-index: 999999 !important;
   }
 }
-
-
-

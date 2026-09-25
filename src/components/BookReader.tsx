@@ -7,7 +7,7 @@ import {
   ChevronLeft, ChevronRight, BookOpen, Volume2, Download, 
   Printer, Heart, Share2, Sparkles, Moon, Maximize2, Minimize2, 
   MessageCircle, Target, ArrowLeft, Bookmark, HelpCircle, Trophy,
-  Wand2, Loader2, Image as ImageIcon
+  Wand2, Loader2, Image as ImageIcon, X, FileText, Check
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
@@ -20,6 +20,98 @@ import confetti from 'canvas-confetti';
 
 interface BookReaderProps {
   story: StoryBook;
+}
+
+// Cute Smiling Star (matching children's book design)
+function CuteSmilingStar({ className = "w-10 h-10" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 100 100" fill="none">
+      <polygon
+        points="50,6 63,35 95,38 71,62 78,94 50,77 22,94 29,62 5,38 37,35"
+        fill="#FBBF24"
+        stroke="#F59E0B"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <circle cx="41" cy="45" r="3.5" fill="#78350F" />
+      <circle cx="59" cy="45" r="3.5" fill="#78350F" />
+      <circle cx="42" cy="43.5" r="1.2" fill="#FFFFFF" />
+      <circle cx="60" cy="43.5" r="1.2" fill="#FFFFFF" />
+      <path d="M 43,55 Q 50,63 57,55" stroke="#78350F" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+      <ellipse cx="36" cy="54" rx="4" ry="2.2" fill="#F87171" opacity="0.85" />
+      <ellipse cx="64" cy="54" rx="4" ry="2.2" fill="#F87171" opacity="0.85" />
+    </svg>
+  );
+}
+
+// Laurel Branch for page framing
+function LaurelBranch({ flip = false, className = "w-8 h-8" }: { flip?: boolean; className?: string }) {
+  return (
+    <svg className={`${className} ${flip ? '-scale-x-100' : ''}`} viewBox="0 0 80 80" fill="none">
+      <path d="M 15,75 Q 30,45 68,15" stroke="#15803D" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M 22,65 C 14,56 22,50 28,52 C 28,60 25,64 22,65 Z" fill="#22C55E" />
+      <path d="M 29,60 C 38,53 36,63 30,66 C 28,63 28,61 29,60 Z" fill="#16A34A" />
+      <path d="M 37,48 C 28,39 37,33 43,35 C 43,43 40,47 37,48 Z" fill="#22C55E" />
+      <path d="M 46,43 C 55,36 53,46 47,49 C 45,46 45,44 46,43 Z" fill="#16A34A" />
+      <path d="M 54,31 C 45,22 54,16 60,18 C 60,26 57,30 54,31 Z" fill="#22C55E" />
+      <path d="M 64,26 C 73,19 71,29 65,32 C 63,29 63,27 64,26 Z" fill="#16A34A" />
+      <path d="M 66,15 C 62,7 72,6 74,12 C 73,18 68,17 66,15 Z" fill="#22C55E" />
+    </svg>
+  );
+}
+
+// Blooming Flower Cluster for Corners
+function FlowerCluster({ className = "w-10 h-10" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 100 100" fill="none">
+      <circle cx="56" cy="44" r="16" fill="#F472B6" />
+      <circle cx="56" cy="44" r="7" fill="#FDE047" />
+      <circle cx="32" cy="66" r="12" fill="#FBBF24" />
+      <circle cx="32" cy="66" r="5" fill="#F59E0B" />
+      <path d="M 20,40 Q 30,30 42,42 Q 30,50 20,40 Z" fill="#22C55E" />
+      <path d="M 66,68 Q 80,60 78,76 Q 66,80 66,68 Z" fill="#16A34A" />
+    </svg>
+  );
+}
+
+// Golden Rosette Medallion with Laurel sprigs for Page Number
+function GoldenRosetteMedal({ pageNumber }: { pageNumber: number | string }) {
+  return (
+    <div className="flex items-center justify-center gap-1.5 sm:gap-2 select-none">
+      <div className="text-emerald-100 hidden sm:block">
+        <LaurelBranch flip className="w-7 h-7 sm:w-8 sm:h-8" />
+      </div>
+      <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
+        {/* Scalloped Outer Rosette Disc */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-500 via-amber-300 to-amber-500 shadow-md ring-2 ring-amber-400/90 flex items-center justify-center">
+          <div className="w-full h-full rounded-full border-2 border-dashed border-amber-700/40"></div>
+        </div>
+        {/* Inner Cream Disc */}
+        <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FFFDF2] border border-amber-300 flex items-center justify-center shadow-inner">
+          <span className="font-serif font-black text-lg sm:text-xl text-emerald-950">
+            {pageNumber}
+          </span>
+        </div>
+      </div>
+      <div className="text-emerald-100 hidden sm:block">
+        <LaurelBranch className="w-7 h-7 sm:w-8 sm:h-8" />
+      </div>
+    </div>
+  );
+}
+
+// Helper to format playful dual-tone title
+function getDualToneTitle(summary?: string, fallback = '') {
+  const text = (summary || fallback || '').trim();
+  const words = text.split(' ');
+  if (words.length <= 1) {
+    return { line1: text, line2: '' };
+  }
+  const mid = Math.ceil(words.length / 2);
+  return {
+    line1: words.slice(0, mid).join(' '),
+    line2: words.slice(mid).join(' '),
+  };
 }
 
 export default function BookReader({ story }: BookReaderProps) {
@@ -42,6 +134,8 @@ export default function BookReader({ story }: BookReaderProps) {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [customPageImages, setCustomPageImages] = useState<Record<number, string>>({});
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  const [isBookPrintModalOpen, setIsBookPrintModalOpen] = useState(false);
+  const [printPaperSize, setPrintPaperSize] = useState<'A4' | 'A5'>('A4');
 
   const handleGenerateAiImage = async (pageIdx: number) => {
     const page = story.pages[pageIdx - 1];
@@ -142,7 +236,11 @@ export default function BookReader({ story }: BookReaderProps) {
     }
   };
 
-  const handleDownloadPdf = () => {
+  const handleDownloadPdf = (paperSize?: 'A4' | 'A5') => {
+    const size = paperSize || printPaperSize;
+    if (typeof document !== 'undefined') {
+      document.body.setAttribute('data-paper-size', size);
+    }
     // Print window triggers native high-res PDF generation with custom page breaks
     window.print();
   };
@@ -240,10 +338,21 @@ export default function BookReader({ story }: BookReaderProps) {
                 )}
               </button>
 
+              {/* Kitob Versiya (PDF / Bosma Maket) */}
+              <button
+                onClick={() => setIsBookPrintModalOpen(true)}
+                className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-105 text-slate-950 text-xs font-black shadow-sm transition-all flex items-center gap-1.5 border border-amber-300"
+                title="Bosmaga tayyor kitob maketini (A4/A5) ko'rish va PDF yuklab olish"
+              >
+                <Printer className="w-4 h-4 text-slate-950" />
+                <span className="hidden sm:inline">Kitob Maketi (PDF)</span>
+                <span className="sm:hidden">PDF Kitob</span>
+              </button>
+
               {/* Puzzle Game button */}
               <Link
                 href="/games"
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-pine-950 text-xs font-black shadow-sm transition-all"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-110 text-white text-xs font-black shadow-sm transition-all"
                 title={locale === 'uz' ? "Ushbu ertak bilan mozaika o'yini o'ynash" : "Play puzzle game with this story"}
               >
                 <span>🧩</span>
@@ -261,24 +370,51 @@ export default function BookReader({ story }: BookReaderProps) {
             </div>
           </div>
 
-          {/* Realistic Book Spread Reader Container */}
-          <div className="book-container my-4">
-            <div className="relative bg-white dark:bg-[#002621] rounded-3xl overflow-hidden shadow-book-lg border border-amber-300/80 dark:border-emerald-700/80 min-h-[480px] sm:min-h-[540px] flex flex-col justify-between">
+          {/* Realistic Children's Picturebook Reader Container (Portrait Layout) */}
+          <div className="book-container my-4 max-w-2xl mx-auto w-full relative">
+            
+            {/* Desktop Floating Navigation Arrows */}
+            <div className="hidden xl:flex items-center justify-between absolute inset-y-0 -left-20 -right-20 pointer-events-none z-30">
+              {currentPageIndex > 0 ? (
+                <button
+                  onClick={prevPage}
+                  className="pointer-events-auto p-3.5 rounded-full bg-white dark:bg-emerald-900 text-slate-800 dark:text-amber-200 shadow-xl border-2 border-amber-300 dark:border-emerald-600 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group"
+                  title={t.prevPage}
+                >
+                  <ChevronLeft className="w-6 h-6 text-emerald-700 dark:text-amber-300 group-hover:-translate-x-0.5 transition-transform" />
+                </button>
+              ) : <div />}
+
+              {currentPageIndex < totalPages + 1 ? (
+                <button
+                  onClick={nextPage}
+                  className="pointer-events-auto p-3.5 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-xl border-2 border-amber-300 hover:brightness-105 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group"
+                  title={t.nextPage}
+                >
+                  <ChevronRight className="w-6 h-6 text-slate-950 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              ) : <div />}
+            </div>
+
+            <div className="relative bg-[#FFFDF5] dark:bg-[#002621] rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-2xl border-2 sm:border-4 border-amber-300/80 dark:border-emerald-700/80 flex flex-col justify-between">
               
-              {/* Book Pages with Page Turn Transitions */}
+              {/* Book Pages with Page Transitions */}
               <AnimatePresence mode="wait">
-                {/* COVER VIEW (Index 0) */}
+                
+                {/* ========================================================================= */}
+                {/* COVER VIEW (Index 0)                                                      */}
+                {/* ========================================================================= */}
                 {currentPageIndex === 0 && (
                   <motion.div
                     key="cover"
-                    initial={{ opacity: 0, rotateY: -15 }}
-                    animate={{ opacity: 1, rotateY: 0 }}
-                    exit={{ opacity: 0, rotateY: 15 }}
-                    transition={{ duration: 0.4 }}
-                    className="grid grid-cols-1 md:grid-cols-12 min-h-[500px] sm:min-h-[560px] md:min-h-[620px]"
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.35 }}
+                    className="flex flex-col w-full"
                   >
-                    {/* Left: Decorative Cover Spine & Full-Bleed Visual */}
-                    <div className="md:col-span-7 relative overflow-hidden bg-slate-950 flex items-center justify-center h-80 sm:h-96 md:h-auto min-h-[320px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60 group">
+                    {/* Top: Grand Full-Width Cover Visual */}
+                    <div className="relative w-full h-[340px] sm:h-[420px] md:h-[470px] overflow-hidden bg-slate-950 group">
                       {!loadedImages['cover'] && (
                         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
                           <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
@@ -289,169 +425,226 @@ export default function BookReader({ story }: BookReaderProps) {
                         src={story.cover_image_url}
                         alt={title}
                         onLoad={() => setLoadedImages(prev => ({ ...prev, cover: true }))}
-                        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${loadedImages['cover'] ? 'opacity-100' : 'opacity-0'}`}
+                        className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${loadedImages['cover'] ? 'opacity-100' : 'opacity-0'}`}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#1E1B4B]/90 via-[#1E1B4B]/20 to-transparent pointer-events-none"></div>
-                      
                       <div className="absolute top-4 left-4 z-10">
-                        <span className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-amber-400/95 backdrop-blur-md text-slate-950 font-black text-xs uppercase tracking-wider shadow-md border border-amber-300">
+                        <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-400/95 backdrop-blur-md text-slate-950 font-black text-xs uppercase tracking-wider shadow-md border border-amber-300">
                           <Sparkles className="w-3.5 h-3.5 text-amber-900" />
                           <span>{locale === 'uz' ? "Shaxsiy Ertak Kitobi" : "Personalized Storybook"}</span>
                         </span>
                       </div>
-
-                      <div className="absolute bottom-5 left-5 right-5 z-10 text-white space-y-1">
-                        <p className="text-xs font-bold text-amber-300 uppercase tracking-widest">
-                          {story.child_profile.child_name} • {story.pages.length} {locale === 'uz' ? "sahifali qissa" : "pages"}
-                        </p>
-                        <h3 className="text-xl sm:text-2xl md:text-3xl font-black font-display text-white drop-shadow-md line-clamp-2">
-                          {title}
-                        </h3>
-                      </div>
                     </div>
 
-                    {/* Right: Book Title, Dedication, Prologue */}
-                    <div className="md:col-span-5 p-6 sm:p-8 md:p-10 flex flex-col justify-between bg-[#FFFDF9] dark:bg-[#01342e] dark:text-amber-50 book-spine-gradient transition-colors duration-300">
-                      <div className="space-y-4 sm:space-y-6">
-                        <div className="space-y-1 sm:space-y-2">
-                          <p className="text-[10px] sm:text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-widest">
-                            NurQissa AI Bedtime Series
-                          </p>
-                          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E1B4B] dark:text-amber-200 font-display leading-tight">
-                            {title}
-                          </h2>
+                    {/* Bottom: Book Cover Title & Dedication Card */}
+                    <div className="relative bg-[#FFFDF0] dark:bg-[#042820] px-3 sm:px-6 pt-4 pb-2 transition-colors duration-300">
+                      <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm text-center">
+                        
+                        {/* Top Left Laurel */}
+                        <div className="absolute -top-3 -left-2 z-20 pointer-events-none">
+                          <LaurelBranch className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600" />
                         </div>
 
-                        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-amber-50/80 dark:bg-emerald-950/80 border border-amber-200 dark:border-emerald-700/60 space-y-0.5 sm:space-y-1">
+                        {/* Top Right Smiling Star */}
+                        <div className="absolute -top-4 -right-3 z-20 pointer-events-none animate-bounce" style={{ animationDuration: '3s' }}>
+                          <CuteSmilingStar className="w-9 h-9 sm:w-11 sm:h-11 drop-shadow-md" />
+                        </div>
+
+                        {/* Confetti Dots */}
+                        <div className="absolute top-10 left-3 w-2.5 h-2.5 rounded-full bg-rose-400/80 pointer-events-none" />
+                        <div className="absolute top-12 right-4 w-2.5 h-2.5 rounded-full bg-sky-400/80 pointer-events-none" />
+                        <div className="absolute bottom-8 left-3 text-xs select-none pointer-events-none">💚</div>
+
+                        {/* Bottom Flowers */}
+                        <div className="absolute -bottom-3 -left-3 z-20 pointer-events-none">
+                          <FlowerCluster className="w-9 h-9 sm:w-11 sm:h-11" />
+                        </div>
+                        <div className="absolute -bottom-3 -right-3 z-20 pointer-events-none -scale-x-100">
+                          <FlowerCluster className="w-9 h-9 sm:w-11 sm:h-11" />
+                        </div>
+
+                        <p className="text-[11px] sm:text-xs font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest mb-1">
+                          NurQissa AI Bedtime Series
+                        </p>
+                        
+                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-amber-200 font-display leading-tight mb-3 px-2">
+                          {title}
+                        </h2>
+
+                        <div className="inline-block p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-amber-50/90 dark:bg-emerald-950/80 border border-amber-300 dark:border-emerald-700/60 mb-3 max-w-md mx-auto">
                           <p className="text-[10px] sm:text-[11px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
                             {locale === 'uz' ? "Maxsus bag'ishlov:" : "Special Dedication:"}
                           </p>
-                          <p className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-emerald-100">
+                          <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-emerald-100">
                             {story.child_profile.child_name} {locale === 'uz' ? "uchun mehr va duolar bilan" : "with love and prayers"}
                           </p>
                         </div>
 
-                        <p className="text-xs sm:text-sm md:text-base text-slate-700 dark:text-amber-100/90 italic leading-relaxed">
+                        <p className="text-xs sm:text-sm text-slate-700 dark:text-amber-100/90 italic leading-relaxed max-w-lg mx-auto mb-4 px-2">
                           "{prologue}"
                         </p>
-                      </div>
 
-                      <div className="pt-4 sm:pt-6">
                         <button
                           onClick={nextPage}
-                          className="w-full py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-500 hover:brightness-110 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg shadow-amber-500/20 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2"
+                          className="w-full max-w-md mx-auto py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
                           <span>{locale === 'uz' ? "Ertakni o'qishni boshlash" : "Start Reading Story"}</span>
-                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <ChevronRight className="w-5 h-5" />
                         </button>
+
                       </div>
+                    </div>
+
+                    {/* Grassy Meadow Base */}
+                    <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-6 py-3 flex items-center justify-center border-t border-amber-300/40">
+                      <GoldenRosetteMedal pageNumber="⭐" />
                     </div>
                   </motion.div>
                 )}
 
-                {/* STORY SPREAD PAGES (Index 1 to 8) */}
-                {currentPageIndex >= 1 && currentPageIndex <= totalPages && (
-                  <motion.div
-                    key={currentPageIndex}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.35 }}
-                    className="grid grid-cols-1 md:grid-cols-12 min-h-[500px] sm:min-h-[560px] md:min-h-[620px]"
-                  >
-                    {/* Left Spread: Grand Full-Bleed Story Illustration (7 Cols) */}
-                    <div className="md:col-span-7 relative overflow-hidden bg-slate-950 flex items-center justify-center h-80 sm:h-96 md:h-auto min-h-[320px] md:min-h-full group border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60">
-                      {!loadedImages[`page_${currentPageIndex}`] && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
-                          <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
-                          <span className="text-xs font-bold font-serif">{locale === 'uz' ? `${currentPageIndex}-sahifa surati chizilmoqda...` : `Generating Page ${currentPageIndex} illustration...`}</span>
+                {/* ========================================================================= */}
+                {/* STORY SPREAD PAGES (Index 1 to totalPages) - MATCHING CHILDREN'S BOOK     */}
+                {/* ========================================================================= */}
+                {currentPageIndex >= 1 && currentPageIndex <= totalPages && (() => {
+                  const page = story.pages[currentPageIndex - 1];
+                  const dualTitle = getDualToneTitle(page.scene_summary, title);
+                  
+                  return (
+                    <motion.div
+                      key={currentPageIndex}
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex flex-col w-full"
+                    >
+                      {/* Top: Grand Full-Width Story Illustration (Unobstructed) */}
+                      <div className="relative w-full h-[330px] sm:h-[410px] md:h-[460px] overflow-hidden bg-slate-950 group">
+                        {!loadedImages[`page_${currentPageIndex}`] && (
+                          <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
+                            <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
+                            <span className="text-xs font-bold font-serif">{locale === 'uz' ? `${currentPageIndex}-sahifa surati yuklanmoqda...` : `Loading Page ${currentPageIndex}...`}</span>
+                          </div>
+                        )}
+                        <img
+                          src={customPageImages[currentPageIndex] || page.image_url}
+                          alt={`Page ${currentPageIndex} Scene`}
+                          onLoad={() => setLoadedImages(prev => ({ ...prev, [`page_${currentPageIndex}`]: true }))}
+                          className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${loadedImages[`page_${currentPageIndex}`] ? 'opacity-100' : 'opacity-0'}`}
+                        />
+
+                        {/* Spot the Hidden Object Mini-Game */}
+                        <HiddenObjectGame pageNumber={currentPageIndex} storyId={story.id} />
+
+                        {/* AI Image Generation Overlay Button */}
+                        <div className="absolute top-3 right-3 z-30 opacity-90 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => handleGenerateAiImage(currentPageIndex)}
+                            disabled={isGeneratingImage}
+                            className="px-2.5 py-1.5 rounded-xl bg-black/70 hover:bg-black/90 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
+                            title={locale === 'uz' ? "Ushbu sahna uchun yangi AI rasm chizish" : "Generate new AI illustration"}
+                          >
+                            {isGeneratingImage ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                                <span>{locale === 'uz' ? "Chizilmoqda..." : "Generating..."}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Wand2 className="w-3.5 h-3.5 text-amber-400" />
+                                <span>AI DALL-E 3</span>
+                              </>
+                            )}
+                          </button>
                         </div>
-                      )}
-                      <img
-                        src={customPageImages[currentPageIndex] || story.pages[currentPageIndex - 1].image_url}
-                        alt={`Page ${currentPageIndex} Scene`}
-                        onLoad={() => setLoadedImages(prev => ({ ...prev, [`page_${currentPageIndex}`]: true }))}
-                        className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-102 ${loadedImages[`page_${currentPageIndex}`] ? 'opacity-100' : 'opacity-0'}`}
-                      />
-
-                      {/* Spot the Hidden Object Mini-Game */}
-                      <HiddenObjectGame pageNumber={currentPageIndex} storyId={story.id} />
-
-                      {/* AI Image Generation Overlay Button */}
-                      <div className="absolute top-3 right-3 z-30 opacity-90 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => handleGenerateAiImage(currentPageIndex)}
-                          disabled={isGeneratingImage}
-                          className="px-2.5 py-1.5 rounded-xl bg-black/70 hover:bg-black/90 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
-                          title={locale === 'uz' ? "Ushbu sahna uchun OpenAI DALL-E 3 orqali yangi AI rasm chizish" : "Generate new DALL-E 3 illustration for this scene"}
-                        >
-                          {isGeneratingImage ? (
-                            <>
-                              <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
-                              <span>{locale === 'uz' ? "Chizilmoqda..." : "Generating..."}</span>
-                            </>
-                          ) : (
-                            <>
-                              <Wand2 className="w-3.5 h-3.5 text-amber-400" />
-                              <span>AI DALL-E 3</span>
-                            </>
-                          )}
-                        </button>
                       </div>
-                      
-                      {/* Scene subtitle */}
-                      {story.pages[currentPageIndex - 1].scene_summary && (
-                        <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 bg-black/70 backdrop-blur-md px-3.5 py-2 rounded-xl text-white text-xs sm:text-sm border border-white/15 flex items-center gap-2 z-20 shadow-md">
-                          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-                          <span className="line-clamp-1 font-medium">{story.pages[currentPageIndex - 1].scene_summary}</span>
+
+                      {/* Bottom: Children's Book Scalloped Framed Card */}
+                      <div className="relative bg-[#FFFDF0] dark:bg-[#042820] px-3 sm:px-6 pt-4 pb-2 transition-colors duration-300">
+                        
+                        {/* The Framed Container with Dashed Embroidery */}
+                        <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm">
+                          
+                          {/* Top Left: Laurel Sprig */}
+                          <div className="absolute -top-3 -left-2 z-20 pointer-events-none">
+                            <LaurelBranch className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600" />
+                          </div>
+
+                          {/* Top Right: Smiling Star */}
+                          <div className="absolute -top-4 -right-3 z-20 pointer-events-none animate-bounce" style={{ animationDuration: '3s' }}>
+                            <CuteSmilingStar className="w-9 h-9 sm:w-11 sm:h-11 drop-shadow-md" />
+                          </div>
+
+                          {/* Playful Confetti Dots */}
+                          <div className="absolute top-10 left-3 w-2.5 h-2.5 rounded-full bg-rose-400/80 pointer-events-none" />
+                          <div className="absolute top-20 left-2 w-3 h-3 rounded-full bg-amber-400/80 pointer-events-none" />
+                          <div className="absolute top-12 right-4 w-2.5 h-2.5 rounded-full bg-sky-400/80 pointer-events-none" />
+                          <div className="absolute top-24 right-2 w-2 h-2 rounded-full bg-emerald-400/80 pointer-events-none" />
+                          <div className="absolute bottom-10 left-3 text-xs select-none pointer-events-none">💚</div>
+
+                          {/* Bottom Left Flowers */}
+                          <div className="absolute -bottom-3 -left-3 z-20 pointer-events-none">
+                            <FlowerCluster className="w-9 h-9 sm:w-11 sm:h-11" />
+                          </div>
+
+                          {/* Bottom Right Flowers */}
+                          <div className="absolute -bottom-3 -right-3 z-20 pointer-events-none -scale-x-100">
+                            <FlowerCluster className="w-9 h-9 sm:w-11 sm:h-11" />
+                          </div>
+
+                          {/* Dual-Tone Playful Title */}
+                          <div className="text-center space-y-0.5 mb-3 sm:mb-4 px-6">
+                            <h2 className="text-xl sm:text-2xl font-black text-emerald-800 dark:text-emerald-300 font-display tracking-tight">
+                              {dualTitle.line1}
+                            </h2>
+                            {dualTitle.line2 && (
+                              <h3 className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 font-display tracking-tight">
+                                {dualTitle.line2}
+                              </h3>
+                            )}
+                          </div>
+
+                          {/* Story Narrative Text */}
+                          <div className="my-2 sm:my-4 px-2 sm:px-4">
+                            <p className="text-center text-slate-800 dark:text-[#FFFDF5] font-sans font-semibold text-base sm:text-lg md:text-xl leading-relaxed sm:leading-loose tracking-wide">
+                              {locale === 'uz' ? page.text_uz : page.text_en}
+                            </p>
+                          </div>
+
                         </div>
-                      )}
-                    </div>
-
-                    {/* Right Spread: Story Text & Typography (5 Cols) */}
-                    <div className="md:col-span-5 p-6 sm:p-8 md:p-10 flex flex-col justify-between bg-[#FFFDF9] dark:bg-[#01342e] dark:text-amber-50 book-spine-gradient transition-colors duration-300">
-                      
-                      {/* Header of page */}
-                      <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-amber-100 dark:border-emerald-800 text-[11px] sm:text-xs font-bold text-amber-800 dark:text-amber-300">
-                        <span className="uppercase tracking-widest line-clamp-1">{title}</span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-emerald-950 text-amber-900 dark:text-amber-200 font-mono shrink-0 ml-2 border border-transparent dark:border-emerald-700/60">
-                          {t.page} {currentPageIndex} / {totalPages}
-                        </span>
                       </div>
 
-                      {/* Main Story Narrative */}
-                      <div className="my-auto py-4 sm:py-6">
-                        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-900 dark:text-[#FFFDF5] leading-relaxed font-serif tracking-wide selection:bg-amber-200">
-                          {locale === 'uz'
-                            ? story.pages[currentPageIndex - 1].text_uz
-                            : story.pages[currentPageIndex - 1].text_en}
-                        </p>
-                      </div>
-
-                      {/* Footer / Next Button */}
-                      <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-amber-100 dark:border-emerald-800 gap-2">
+                      {/* Grassy Meadow Base & Golden Rosette Medallion */}
+                      <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-t border-amber-300/40">
+                        
+                        {/* Prev Button */}
                         <button
                           onClick={prevPage}
-                          className="p-2 sm:p-2.5 rounded-xl border border-amber-200 dark:border-emerald-700 text-slate-700 dark:text-emerald-200 hover:bg-amber-50 dark:hover:bg-emerald-900 font-bold text-xs flex items-center gap-1 transition-all"
+                          className="px-3 sm:px-4 py-2 rounded-xl bg-white/90 hover:bg-white text-emerald-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
                         >
-                          <ChevronLeft className="w-4 h-4" />
-                          <span>{t.prevPage}</span>
+                          <ChevronLeft className="w-4 h-4 text-emerald-700" />
+                          <span className="hidden sm:inline">{t.prevPage}</span>
                         </button>
 
+                        {/* Golden Rosette Center Badge */}
+                        <GoldenRosetteMedal pageNumber={currentPageIndex} />
+
+                        {/* Next Button */}
                         <button
                           onClick={nextPage}
-                          className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
+                          className="px-4 sm:px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
                         >
                           <span>{currentPageIndex === totalPages ? t.reflectionTab : t.nextPage}</span>
-                          <ChevronRight className="w-4 h-4" />
+                          <ChevronRight className="w-4 h-4 text-slate-900" />
                         </button>
                       </div>
 
-                    </div>
-                  </motion.div>
-                )}
+                    </motion.div>
+                  );
+                })()}
 
-                {/* FINAL REFLECTION & BACK COVER (Index = totalPages + 1) */}
+                {/* ========================================================================= */}
+                {/* FINAL REFLECTION & BACK COVER (Index = totalPages + 1)                    */}
+                {/* ========================================================================= */}
                 {currentPageIndex > totalPages && (
                   <motion.div
                     key="reflection-view"
@@ -459,83 +652,95 @@ export default function BookReader({ story }: BookReaderProps) {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.98 }}
                     transition={{ duration: 0.35 }}
-                    className="p-8 sm:p-12 bg-[#FFFDF9] dark:bg-[#01342e] dark:text-amber-50 min-h-[460px] sm:min-h-[520px] flex flex-col justify-between space-y-6 transition-colors duration-300"
+                    className="flex flex-col w-full"
                   >
-                    <div className="text-center space-y-2 max-w-xl mx-auto">
-                      <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mx-auto shadow-inner">
-                        <Moon className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
+                    <div className="relative bg-[#FFFDF0] dark:bg-[#042820] p-6 sm:p-10 transition-colors duration-300">
+                      <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-6 sm:p-8 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm space-y-6">
+                        
+                        <div className="text-center space-y-2 max-w-xl mx-auto">
+                          <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mx-auto shadow-inner">
+                            <Moon className="w-6 h-6 text-emerald-600 dark:text-emerald-300" />
+                          </div>
+                          <h3 className="text-2xl sm:text-3xl font-extrabold text-[#1E1B4B] dark:text-amber-200 font-display">
+                            {locale === 'uz' ? "Ertak Tamom, Saboq Davom..." : "The End of the Story, the Beginning of Wisdom"}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-slate-600 dark:text-emerald-200">
+                            {locale === 'uz' ? "Farzandingiz bilan bugungi kunni shirin suhbat va duo bilan yakunlang" : "Complete tonight with a warm talk and peaceful prayer"}
+                          </p>
+                        </div>
+
+                        {/* Highlights Box */}
+                        <div className="space-y-4 max-w-xl mx-auto w-full">
+                          {/* Today's lesson */}
+                          <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/90 dark:bg-emerald-950/80 border border-amber-300 dark:border-emerald-700/60 space-y-1">
+                            <div className="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold text-xs">
+                              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                              <span>{t.todaysLesson}</span>
+                            </div>
+                            <p className="text-xs sm:text-sm text-slate-800 dark:text-emerald-100 leading-relaxed font-semibold">
+                              {locale === 'uz' ? story.reflection.todays_lesson_uz : story.reflection.todays_lesson_en}
+                            </p>
+                          </div>
+
+                          {/* Dua */}
+                          <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700/60 space-y-1">
+                            <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-300 font-bold text-xs">
+                              <span>🤲</span>
+                              <span>{t.littleDua}</span>
+                            </div>
+                            <p className="text-xs sm:text-sm text-emerald-950 dark:text-emerald-100 italic leading-relaxed font-medium">
+                              "{locale === 'uz' ? story.reflection.little_dua_uz : story.reflection.little_dua_en}"
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Actions Bar */}
+                        <div className="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-amber-200 dark:border-emerald-800">
+                          <button
+                            onClick={() => {
+                              setActiveQuizStory(story);
+                              setIsQuizOpen(true);
+                            }}
+                            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-600 hover:brightness-110 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all"
+                          >
+                            <HelpCircle className="w-4 h-4 text-amber-200" />
+                            <span>{t.storyQuizTitle} 🌟</span>
+                          </button>
+
+                          <button
+                            onClick={() => setIsReflectionOpen(true)}
+                            className="px-5 py-2.5 rounded-xl bg-[#1E1B4B] dark:bg-emerald-900 hover:bg-[#2A2566] dark:hover:bg-emerald-800 text-amber-300 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all border border-transparent dark:border-emerald-700"
+                          >
+                            <MessageCircle className="w-4 h-4 text-amber-400" />
+                            <span>{t.reflectionTab}</span>
+                          </button>
+
+                          <button
+                            onClick={() => setIsOrderModalOpen(true)}
+                            className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all"
+                          >
+                            <Printer className="w-4 h-4 text-amber-200" />
+                            <span>{t.orderHardcover}</span>
+                          </button>
+
+                          <button
+                            onClick={() => setCurrentPageIndex(0)}
+                            className="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-emerald-700 text-slate-700 dark:text-amber-200 hover:bg-slate-50 dark:hover:bg-emerald-900 font-bold text-xs transition-all"
+                          >
+                            {locale === 'uz' ? "Qaytadan o'qish 🔄" : "Read Again 🔄"}
+                          </button>
+                        </div>
+
                       </div>
-                      <h3 className="text-2xl sm:text-3xl font-extrabold text-[#1E1B4B] dark:text-amber-200 font-display">
-                        {locale === 'uz' ? "Ertak Tamom, Saboq Davom..." : "The End of the Story, the Beginning of Wisdom"}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-emerald-200">
-                        {locale === 'uz' ? "Farzandingiz bilan bugungi kunni shirin suhbat va duo bilan yakunlang" : "Complete tonight with a warm talk and peaceful prayer"}
-                      </p>
                     </div>
 
-                    {/* Highlights Box */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto w-full">
-                      {/* Today's lesson */}
-                      <div className="p-5 rounded-2xl bg-amber-50 dark:bg-emerald-950/80 border border-amber-200/80 dark:border-emerald-700/60 space-y-1.5">
-                        <div className="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold text-xs">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                          <span>{t.todaysLesson}</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-slate-800 dark:text-emerald-100 leading-relaxed font-medium">
-                          {locale === 'uz' ? story.reflection.todays_lesson_uz : story.reflection.todays_lesson_en}
-                        </p>
-                      </div>
-
-                      {/* Dua */}
-                      <div className="p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200/80 dark:border-emerald-700/60 space-y-1.5">
-                        <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-300 font-bold text-xs">
-                          <span>🤲</span>
-                          <span>{t.littleDua}</span>
-                        </div>
-                        <p className="text-xs sm:text-sm text-emerald-950 dark:text-emerald-100 italic leading-relaxed">
-                          "{locale === 'uz' ? story.reflection.little_dua_uz : story.reflection.little_dua_en}"
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Actions Bar */}
-                    <div className="flex flex-wrap items-center justify-center gap-4 pt-4 border-t border-amber-100 dark:border-emerald-800">
-                      <button
-                        onClick={() => {
-                          setActiveQuizStory(story);
-                          setIsQuizOpen(true);
-                        }}
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-600 hover:brightness-110 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all"
-                      >
-                        <HelpCircle className="w-4 h-4 text-amber-200" />
-                        <span>{t.storyQuizTitle} 🌟</span>
-                      </button>
-
-                      <button
-                        onClick={() => setIsReflectionOpen(true)}
-                        className="px-6 py-3 rounded-xl bg-[#1E1B4B] dark:bg-emerald-900 hover:bg-[#2A2566] dark:hover:bg-emerald-800 text-amber-300 font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all border border-transparent dark:border-emerald-700"
-                      >
-                        <MessageCircle className="w-4 h-4 text-amber-400" />
-                        <span>{t.reflectionTab} ({locale === 'uz' ? "Suhbat & Ovoz" : "Discussion & Voice"})</span>
-                      </button>
-
-                      <button
-                        onClick={() => setIsOrderModalOpen(true)}
-                        className="px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md transition-all"
-                      >
-                        <Printer className="w-4 h-4 text-amber-200" />
-                        <span>{t.orderHardcover}</span>
-                      </button>
-
-                      <button
-                        onClick={() => setCurrentPageIndex(0)}
-                        className="px-4 py-3 rounded-xl border border-slate-300 dark:border-emerald-700 text-slate-700 dark:text-amber-200 hover:bg-slate-50 dark:hover:bg-emerald-900 font-bold text-xs transition-all"
-                      >
-                        {locale === 'uz' ? "Qaytadan o'qish 🔄" : "Read Again 🔄"}
-                      </button>
+                    {/* Grassy Meadow Base */}
+                    <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-6 py-3 flex items-center justify-center border-t border-amber-300/40">
+                      <GoldenRosetteMedal pageNumber="🌙" />
                     </div>
                   </motion.div>
                 )}
+
               </AnimatePresence>
 
             </div>
@@ -592,14 +797,14 @@ export default function BookReader({ story }: BookReaderProps) {
               🌙 {t.reflectionTab}
             </button>
 
-            {/* Quick PDF button */}
+            {/* Quick PDF / Book button */}
             <button
-              onClick={handleDownloadPdf}
-              className="ml-auto px-3.5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all"
-              title="PDF formatida chop etish"
+              onClick={() => setIsBookPrintModalOpen(true)}
+              className="ml-auto px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 text-xs font-black shrink-0 flex items-center gap-1.5 transition-all shadow-sm"
+              title="Bosmaga tayyor kitob maketini (A4/A5) ko'rish va PDF yuklab olish"
             >
-              <Download className="w-3.5 h-3.5 text-amber-300" />
-              <span className="hidden sm:inline">PDF</span>
+              <Printer className="w-3.5 h-3.5 text-slate-950" />
+              <span>Kitob Maketi</span>
             </button>
           </div>
 
@@ -615,102 +820,393 @@ export default function BookReader({ story }: BookReaderProps) {
 
         {/* Story Quiz Modal */}
         <StoryQuizModal />
+
+        {/* ========================================================================= */}
+        {/* ON-SCREEN BOOK PRINT PREVIEW MODAL (A4 / A5 TYPOGRAPHY FORMAT)            */}
+        {/* ========================================================================= */}
+        <AnimatePresence>
+          {isBookPrintModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-y-auto"
+            >
+              <motion.div
+                initial={{ scale: 0.95, y: 15 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.95, y: 15 }}
+                className="relative w-full max-w-4xl max-h-[92vh] bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl shadow-2xl border-2 sm:border-4 border-amber-300 dark:border-emerald-700 flex flex-col overflow-hidden text-slate-900 dark:text-amber-100"
+              >
+                {/* Modal Top Control Bar */}
+                <div className="p-4 sm:p-5 bg-white/95 dark:bg-emerald-950/95 border-b border-amber-200 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-100 dark:bg-emerald-900 flex items-center justify-center text-amber-700 dark:text-amber-300 shadow-inner">
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h2 className="text-base sm:text-lg font-black text-slate-950 dark:text-amber-200 font-display">
+                        {locale === 'uz' ? "Bosmaga Tayyor Kitob Maketi (PDF)" : "Print-Ready Storybook Layout (PDF)"}
+                      </h2>
+                      <p className="text-xs text-amber-800 dark:text-emerald-300 font-medium">
+                        {locale === 'uz' ? "A4 / A5 formatdagi to'liq bolalar kitobi maketi" : "A4 / A5 children's book format"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Format Switcher & Actions */}
+                  <div className="flex items-center gap-2">
+                    <div className="inline-flex rounded-xl p-1 bg-amber-100/80 dark:bg-emerald-900/80 border border-amber-300 dark:border-emerald-700 text-xs font-bold">
+                      <button
+                        onClick={() => setPrintPaperSize('A4')}
+                        className={`px-3 py-1 rounded-lg transition-all ${
+                          printPaperSize === 'A4'
+                            ? 'bg-amber-500 text-white shadow-sm font-black'
+                            : 'text-slate-700 dark:text-amber-200 hover:text-slate-950'
+                        }`}
+                      >
+                        📄 A4 (Katta)
+                      </button>
+                      <button
+                        onClick={() => setPrintPaperSize('A5')}
+                        className={`px-3 py-1 rounded-lg transition-all ${
+                          printPaperSize === 'A5'
+                            ? 'bg-amber-500 text-white shadow-sm font-black'
+                            : 'text-slate-700 dark:text-amber-200 hover:text-slate-950'
+                        }`}
+                      >
+                        📖 A5 (Klassik)
+                      </button>
+                    </div>
+
+                    {/* Print / Save PDF button */}
+                    <button
+                      onClick={() => handleDownloadPdf(printPaperSize)}
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-xs shadow-md transition-all flex items-center gap-1.5"
+                    >
+                      <Printer className="w-4 h-4 text-slate-950" />
+                      <span>{locale === 'uz' ? "PDF Yuklab Olish (Chop Etish)" : "Download PDF / Print"}</span>
+                    </button>
+
+                    {/* Close modal */}
+                    <button
+                      onClick={() => setIsBookPrintModalOpen(false)}
+                      className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-emerald-900 dark:hover:bg-emerald-800 text-slate-700 dark:text-amber-200 transition-all"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Modal Scrollable Book Preview Body */}
+                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-slate-100 dark:bg-slate-950/60">
+                  <div className="max-w-2xl mx-auto space-y-8">
+                    
+                    {/* Preview Notification Banner */}
+                    <div className="p-3.5 rounded-2xl bg-amber-100/90 dark:bg-emerald-950/80 border border-amber-300 dark:border-emerald-700 text-xs flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 text-amber-950 dark:text-amber-200 font-bold">
+                        <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>{locale === 'uz' ? `Tanlangan format: ${printPaperSize} bolalar kitobi. Quyida barcha sahifalar ketma-ket ko'rsatilgan.` : `Current format: ${printPaperSize}. All pages previewed below.`}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsBookPrintModalOpen(false);
+                          setIsOrderModalOpen(true);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 transition-all"
+                      >
+                        {t.orderHardcover} 🚚
+                      </button>
+                    </div>
+
+                    {/* PAGE 1: PREVIEW COVER */}
+                    <div className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
+                      <div className="px-4 py-2 bg-amber-100 dark:bg-emerald-950 border-b border-amber-200 dark:border-emerald-800 flex items-center justify-between text-xs font-black text-amber-950 dark:text-amber-200">
+                        <span>📖 1-sahifa: Kitob Muqovasi</span>
+                        <span>NurQissa AI</span>
+                      </div>
+                      <div className="relative w-full h-72 sm:h-80 overflow-hidden bg-slate-900">
+                        <img src={story.cover_image_url} alt={title} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="p-5 sm:p-6 bg-[#FFFDF0] dark:bg-[#042820]">
+                        <div className="relative rounded-2xl border-2 border-dashed border-emerald-500/70 p-5 bg-[#FFFDF5] dark:bg-emerald-950/40 text-center">
+                          <h2 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-amber-200 font-display mb-2">{title}</h2>
+                          <p className="text-xs text-amber-800 dark:text-amber-300 font-bold mb-2">
+                            {story.child_profile.child_name} {locale === 'uz' ? "uchun mehr va duolar bilan" : "with love and prayers"}
+                          </p>
+                          <p className="text-xs italic text-slate-700 dark:text-amber-100 max-w-md mx-auto">"{prologue}"</p>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-t from-[#438321] to-[#5FA832] py-2.5 flex items-center justify-center">
+                        <GoldenRosetteMedal pageNumber="⭐" />
+                      </div>
+                    </div>
+
+                    {/* STORY PAGES PREVIEWS */}
+                    {story.pages.map((p) => {
+                      const dualTitle = getDualToneTitle(p.scene_summary, title);
+                      return (
+                        <div key={p.page_number} className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
+                          <div className="px-4 py-2 bg-amber-100 dark:bg-emerald-950 border-b border-amber-200 dark:border-emerald-800 flex items-center justify-between text-xs font-black text-amber-950 dark:text-amber-200">
+                            <span>📄 Sahifa {p.page_number} / {totalPages}</span>
+                            <span className="truncate max-w-[200px]">{p.scene_summary || title}</span>
+                          </div>
+                          
+                          {/* Image */}
+                          <div className="relative w-full h-72 sm:h-80 overflow-hidden bg-slate-900">
+                            <img
+                              src={customPageImages[p.page_number] || p.image_url}
+                              alt={`Sahna ${p.page_number}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+
+                          {/* Scalloped Framed Card */}
+                          <div className="p-4 sm:p-6 bg-[#FFFDF0] dark:bg-[#042820]">
+                            <div className="relative rounded-2xl border-2 border-dashed border-emerald-500/70 p-5 bg-[#FFFDF5] dark:bg-emerald-950/40 text-center">
+                              <div className="absolute -top-3 -left-2 pointer-events-none">
+                                <LaurelBranch className="w-8 h-8 text-emerald-600" />
+                              </div>
+                              <div className="absolute -top-3 -right-2 pointer-events-none">
+                                <CuteSmilingStar className="w-8 h-8" />
+                              </div>
+                              <div className="absolute -bottom-2 -left-2 pointer-events-none">
+                                <FlowerCluster className="w-8 h-8" />
+                              </div>
+                              <div className="absolute -bottom-2 -right-2 pointer-events-none -scale-x-100">
+                                <FlowerCluster className="w-8 h-8" />
+                              </div>
+
+                              <div className="mb-2">
+                                <h3 className="text-lg sm:text-xl font-black text-emerald-800 dark:text-emerald-300">{dualTitle.line1}</h3>
+                                {dualTitle.line2 && (
+                                  <h4 className="text-lg sm:text-xl font-black text-amber-600 dark:text-amber-400">{dualTitle.line2}</h4>
+                                )}
+                              </div>
+
+                              <p className="text-sm sm:text-base font-medium leading-relaxed text-slate-900 dark:text-[#FFFDF5] max-w-lg mx-auto">
+                                {locale === 'uz' ? p.text_uz : p.text_en}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Grassy Meadow Base & Rosette */}
+                          <div className="bg-gradient-to-t from-[#438321] to-[#5FA832] py-2 flex items-center justify-center">
+                            <GoldenRosetteMedal pageNumber={p.page_number} />
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* FINAL REFLECTION PREVIEW */}
+                    <div className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-emerald-400/80 shadow-xl overflow-hidden flex flex-col">
+                      <div className="px-4 py-2 bg-emerald-100 dark:bg-emerald-950 border-b border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-black text-emerald-950 dark:text-emerald-200">
+                        <span>🌙 Yakuniy Saboq & Duo</span>
+                        <span>NurQissa AI</span>
+                      </div>
+                      <div className="p-6 bg-[#FFFDF0] dark:bg-[#042820] space-y-4">
+                        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-emerald-950/80 border border-amber-300 dark:border-emerald-700 text-center">
+                          <p className="text-xs font-bold text-amber-950 dark:text-amber-300 uppercase mb-1">🌟 {t.todaysLesson}</p>
+                          <p className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-emerald-100">
+                            {locale === 'uz' ? story.reflection.todays_lesson_uz : story.reflection.todays_lesson_en}
+                          </p>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700 text-center">
+                          <p className="text-xs font-bold text-emerald-950 dark:text-emerald-300 uppercase mb-1">🤲 {t.littleDua}</p>
+                          <p className="text-xs sm:text-sm italic font-bold text-emerald-950 dark:text-emerald-100">
+                            "{locale === 'uz' ? story.reflection.little_dua_uz : story.reflection.little_dua_en}"
+                          </p>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-t from-[#438321] to-[#5FA832] py-2 flex items-center justify-center">
+                        <GoldenRosetteMedal pageNumber="🌙" />
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-3 sm:p-4 bg-white/95 dark:bg-emerald-950/95 border-t border-amber-200 dark:border-emerald-800 flex items-center justify-between gap-3 shrink-0 text-xs">
+                  <span className="text-slate-600 dark:text-emerald-200 font-medium hidden sm:inline">
+                    💡 Chop etish dialogida "Save as PDF" (PDF sifatida saqlash) ni tanlang.
+                  </span>
+                  <div className="flex items-center gap-2 ml-auto">
+                    <button
+                      onClick={() => setIsBookPrintModalOpen(false)}
+                      className="px-4 py-2 rounded-xl border border-slate-300 dark:border-emerald-700 font-bold hover:bg-slate-100 dark:hover:bg-emerald-900 transition-all"
+                    >
+                      {locale === 'uz' ? "Yopish" : "Close"}
+                    </button>
+                    <button
+                      onClick={() => handleDownloadPdf(printPaperSize)}
+                      className="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 hover:brightness-110 text-slate-950 font-black flex items-center gap-1.5 shadow-md transition-all"
+                    >
+                      <Printer className="w-4 h-4 text-slate-950" />
+                      <span>{locale === 'uz' ? "Chop Etish / PDF" : "Print / PDF"}</span>
+                    </button>
+                  </div>
+                </div>
+
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </div>
 
       {/* ========================================================================= */}
-      {/* PRINT-ONLY DEDICATED STORYBOOK FOR CLEAN HIGH-RES PDF GENERATION          */}
+      {/* PRINT-ONLY DEDICATED STORYBOOK FOR CLEAN HIGH-RES PDF & TYPOGRAPHY EXPORT */}
       {/* ========================================================================= */}
       <div className="hidden print:block w-full max-w-4xl mx-auto text-slate-900 bg-white" data-print="storybook">
         
-        {/* PDF PAGE 1: LUXURY BOOK COVER */}
-        <div className="pdf-story-page flex flex-col justify-between items-center text-center p-6 border-4 border-amber-400/70 rounded-3xl bg-amber-50/30">
-          <div className="w-full flex items-center justify-between pb-3 border-b-2 border-amber-300 text-xs font-bold text-amber-950 uppercase tracking-widest">
+        {/* PDF PAGE 1: LUXURY CHILDREN'S BOOK COVER */}
+        <div className="pdf-story-page relative p-4 flex flex-col justify-between items-center text-center bg-[#FFFDF5] border-4 border-amber-400/80 rounded-[32px] overflow-hidden">
+          {/* Header watermark */}
+          <div className="w-full flex items-center justify-between pb-2 border-b-2 border-amber-300 text-[11px] font-black text-emerald-900 uppercase tracking-widest">
             <span>✨ NurQissa AI Bedtime Series</span>
-            <span>🌟 Shaxsiy Ibratli Ertak Kitobi</span>
+            <span>🌟 Bolalar Shaxsiy Ertak Kitobi</span>
           </div>
 
-          <div className="my-auto w-full flex flex-col items-center max-w-2xl py-4">
-            <div className="w-full max-w-lg mb-5 overflow-hidden rounded-2xl border-2 border-amber-400 shadow-md">
+          <div className="my-auto w-full flex flex-col items-center max-w-2xl py-2">
+            {/* Top Cover Visual */}
+            <div className="w-full max-w-xl h-80 overflow-hidden rounded-3xl border-2 border-amber-400 shadow-md mb-4 bg-slate-900">
               <img
                 src={story.cover_image_url}
                 alt={title}
-                className="w-full h-80 object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-200/90 border border-amber-400 text-amber-950 font-black text-xs uppercase tracking-wider mb-3">
-              <span>{`👶 ${story.child_profile.child_name} (${story.child_profile.age} ${locale === 'uz' ? "yosh" : "years old"}) ${locale === 'uz' ? "uchun maxsus bag'ishlangan" : "special dedication"}`}</span>
-            </div>
+            {/* Scalloped Framed Card */}
+            <div className="w-full max-w-xl relative rounded-[28px] border-2 border-dashed border-emerald-600/70 p-6 bg-[#FFFDF0] text-center shadow-inner">
+              <div className="absolute -top-3 -left-2 pointer-events-none">
+                <LaurelBranch className="w-9 h-9 text-emerald-600" />
+              </div>
+              <div className="absolute -top-4 -right-3 pointer-events-none">
+                <CuteSmilingStar className="w-10 h-10" />
+              </div>
+              <div className="absolute -bottom-3 -left-3 pointer-events-none">
+                <FlowerCluster className="w-10 h-10" />
+              </div>
+              <div className="absolute -bottom-3 -right-3 pointer-events-none -scale-x-100">
+                <FlowerCluster className="w-10 h-10" />
+              </div>
 
-            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 font-display mb-4 leading-tight">
-              {title}
-            </h1>
+              <div className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-200/90 border border-amber-400 text-amber-950 font-black text-xs uppercase tracking-wider mb-2">
+                <span>{`👶 ${story.child_profile.child_name} (${story.child_profile.age} ${locale === 'uz' ? "yosh" : "years old"}) ${locale === 'uz' ? "uchun maxsus nashr" : "special edition"}`}</span>
+              </div>
 
-            <div className="p-4 rounded-xl bg-amber-100/60 border border-amber-300 text-sm italic text-slate-800 max-w-xl leading-relaxed">
-              {`"${prologue}"`}
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-950 font-display mb-3 leading-tight">
+                {title}
+              </h1>
+
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-300 text-xs font-bold text-amber-950 max-w-md mx-auto mb-2">
+                {locale === 'uz' ? "Maxsus bag'ishlov:" : "Special Dedication:"} {story.child_profile.child_name} {locale === 'uz' ? "uchun cheksiz mehr va duolar bilan" : "with love and prayers"}
+              </div>
+
+              <p className="text-xs sm:text-sm italic text-slate-700 max-w-md mx-auto leading-relaxed">
+                "{prologue}"
+              </p>
             </div>
           </div>
 
-          <div className="w-full pt-3 border-t-2 border-amber-300 flex items-center justify-between text-[11px] font-bold text-slate-600">
+          {/* Grassy Meadow Base with Star Rosette */}
+          <div className="w-full pt-2 border-t-2 border-amber-300 flex items-center justify-between text-[11px] font-bold text-white bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] px-6 py-2.5 rounded-b-[24px]">
             <span>NurQissa AI • nurqissa.ai</span>
-            <span>{story.pages.length} {locale === 'uz' ? "sahifali sehrli ertak" : "pages fairytale"}</span>
+            <GoldenRosetteMedal pageNumber="⭐" />
+            <span>{story.pages.length} {locale === 'uz' ? "sahifali ertak" : "pages"}</span>
           </div>
         </div>
 
         {/* PDF PAGES 2 .. N+1: STORY PAGES */}
-        {story.pages.map((page) => (
-          <div key={page.page_number} className="pdf-story-page flex flex-col justify-between p-6">
-            {/* Top Page Header */}
-            <div className="w-full flex items-center justify-between pb-2 border-b border-amber-300 text-xs font-bold text-slate-700">
-              <span className="text-amber-950 uppercase tracking-wider truncate max-w-md">{title}</span>
-              <span className="bg-amber-100 text-amber-950 px-3 py-0.5 rounded-full text-xs font-bold font-mono border border-amber-200">
-                {locale === 'uz' ? "Sahifa" : "Page"} {page.page_number} / {totalPages}
-              </span>
-            </div>
-
-            {/* Center: High-Res Story Illustration & Text */}
-            <div className="my-auto w-full flex flex-col items-center py-2">
-              <div className="w-full max-w-2xl overflow-hidden rounded-2xl border-2 border-amber-300 shadow-sm mb-4">
-                <img
-                  src={customPageImages[page.page_number] || page.image_url}
-                  alt={`Sahna ${page.page_number}`}
-                  className="w-full h-80 object-cover"
-                />
+        {story.pages.map((page) => {
+          const dualTitle = getDualToneTitle(page.scene_summary, title);
+          return (
+            <div key={page.page_number} className="pdf-story-page relative p-4 flex flex-col justify-between items-center text-center bg-[#FFFDF5] border-4 border-amber-300/80 rounded-[32px] overflow-hidden my-0">
+              
+              {/* Top Page Header */}
+              <div className="w-full flex items-center justify-between pb-2 border-b border-amber-200 text-xs font-black text-emerald-900">
+                <span className="uppercase tracking-widest truncate max-w-md">{title}</span>
+                <span className="bg-amber-100 text-amber-950 px-3 py-0.5 rounded-full text-xs font-bold font-mono border border-amber-200">
+                  {locale === 'uz' ? "Sahifa" : "Page"} {page.page_number} / {totalPages}
+                </span>
               </div>
 
-              {page.scene_summary && (
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-950 text-xs font-semibold mb-3">
-                  <span>{`✨ ${page.scene_summary}`}</span>
+              {/* Center: High-Res Story Illustration & Text */}
+              <div className="my-auto w-full flex flex-col items-center py-1">
+                {/* Grand Illustration (100% visible, unobstructed) */}
+                <div className="w-full max-w-2xl h-80 overflow-hidden rounded-3xl border-2 border-amber-300 shadow-md mb-3 bg-slate-900">
+                  <img
+                    src={customPageImages[page.page_number] || page.image_url}
+                    alt={`Sahna ${page.page_number}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              )}
 
-              <div className="w-full max-w-2xl px-4 py-2">
-                <p className="text-xl sm:text-2xl leading-relaxed text-slate-900 font-serif text-justify font-normal">
-                  {locale === 'uz' ? page.text_uz : page.text_en}
-                </p>
+                {/* Scalloped Framed Card underneath */}
+                <div className="w-full max-w-2xl relative rounded-[28px] border-2 border-dashed border-emerald-600/70 p-6 bg-[#FFFDF0] text-center shadow-inner">
+                  {/* Top-Left Laurel */}
+                  <div className="absolute -top-3 -left-2 pointer-events-none">
+                    <LaurelBranch className="w-9 h-9 text-emerald-600" />
+                  </div>
+                  {/* Top-Right Smiling Star */}
+                  <div className="absolute -top-4 -right-3 pointer-events-none">
+                    <CuteSmilingStar className="w-10 h-10" />
+                  </div>
+                  {/* Confetti dots */}
+                  <div className="absolute top-10 left-3 w-2.5 h-2.5 rounded-full bg-rose-400/80" />
+                  <div className="absolute top-12 right-4 w-2.5 h-2.5 rounded-full bg-sky-400/80" />
+                  <div className="absolute bottom-10 left-3 text-xs">💚</div>
+                  {/* Bottom Flowers */}
+                  <div className="absolute -bottom-3 -left-3 pointer-events-none">
+                    <FlowerCluster className="w-10 h-10" />
+                  </div>
+                  <div className="absolute -bottom-3 -right-3 pointer-events-none -scale-x-100">
+                    <FlowerCluster className="w-10 h-10" />
+                  </div>
+
+                  {/* Dual-Tone Title */}
+                  <div className="text-center space-y-0.5 mb-3 px-4">
+                    <h2 className="text-xl sm:text-2xl font-black text-emerald-800 font-display tracking-tight">
+                      {dualTitle.line1}
+                    </h2>
+                    {dualTitle.line2 && (
+                      <h3 className="text-xl sm:text-2xl font-black text-amber-600 font-display tracking-tight">
+                        {dualTitle.line2}
+                      </h3>
+                    )}
+                  </div>
+
+                  {/* Narrative Text */}
+                  <p className="text-base sm:text-lg leading-relaxed text-slate-900 font-sans font-semibold max-w-xl mx-auto px-2">
+                    {locale === 'uz' ? page.text_uz : page.text_en}
+                  </p>
+                </div>
+              </div>
+
+              {/* Grassy Meadow Base with Golden Rosette Medal */}
+              <div className="w-full pt-1.5 border-t border-amber-300 flex items-center justify-between text-[11px] font-bold text-white bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] px-6 py-2.5 rounded-b-[24px]">
+                <span>{`NurQissa AI • ${story.child_profile.child_name}`}</span>
+                <GoldenRosetteMedal pageNumber={page.page_number} />
+                <span>{locale === 'uz' ? `Sahifa ${page.page_number}` : `Page ${page.page_number}`}</span>
               </div>
             </div>
-
-            {/* Bottom Page Footer */}
-            <div className="w-full pt-2 border-t border-amber-200 flex items-center justify-between text-[11px] text-slate-600 font-semibold">
-              <span>{`NurQissa AI • ${story.child_profile.child_name} ${locale === 'uz' ? "uchun maxsus ertak" : "story"}`}</span>
-              <span>{locale === 'uz' ? `Sahifa ${page.page_number}` : `Page ${page.page_number}`}</span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* PDF FINAL PAGE: REFLECTION, DUA & LESSON */}
-        <div className="pdf-story-page flex flex-col justify-between p-6 bg-emerald-50/30 border-4 border-emerald-400/70 rounded-3xl">
-          <div className="w-full flex items-center justify-between pb-3 border-b-2 border-emerald-300 text-xs font-bold text-emerald-950 uppercase tracking-widest">
+        <div className="pdf-story-page relative p-4 flex flex-col justify-between items-center text-center bg-[#FFFDF5] border-4 border-emerald-400/80 rounded-[32px] overflow-hidden">
+          <div className="w-full flex items-center justify-between pb-2 border-b-2 border-emerald-300 text-xs font-black text-emerald-950 uppercase tracking-widest">
             <span>🌙 Ertak Tamom, Saboq Davom...</span>
             <span>NurQissa AI Hikmatlar Qutisi</span>
           </div>
 
-          <div className="my-auto w-full flex flex-col items-center max-w-2xl space-y-4 py-3">
+          <div className="my-auto w-full flex flex-col items-center max-w-2xl py-2 space-y-3">
             <div className="text-center space-y-1">
               <span className="text-3xl">🤲</span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 font-display">
-                {locale === 'uz' ? "Bugungi Ibratli Saboq va Duo" : "Today's Moral Wisdom & Prayer"}
+                {locale === 'uz' ? "Bugungi Ibratli Saboq va Mitti Duo" : "Today's Moral Wisdom & Little Prayer"}
               </h2>
               <p className="text-xs text-slate-600 font-medium">
                 {locale === 'uz' ? `${story.child_profile.child_name} bilan shirin suhbat va go'zal tarbiya daqiqalari` : `Warm reflections with ${story.child_profile.child_name}`}
@@ -718,43 +1214,45 @@ export default function BookReader({ story }: BookReaderProps) {
             </div>
 
             {/* Today's lesson box */}
-            <div className="w-full p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-slate-900 space-y-1">
-              <p className="text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center gap-1">
+            <div className="w-full p-4 rounded-2xl bg-[#FFFDF0] border-2 border-amber-300 text-slate-900 space-y-1 text-center">
+              <p className="text-xs font-black text-amber-950 uppercase tracking-wider flex items-center justify-center gap-1">
                 <span>{`🌟 ${t.todaysLesson}`}</span>
               </p>
-              <p className="text-sm font-medium text-slate-800 leading-relaxed">
+              <p className="text-sm font-semibold text-slate-800 leading-relaxed max-w-lg mx-auto">
                 {locale === 'uz' ? story.reflection.todays_lesson_uz : story.reflection.todays_lesson_en}
               </p>
             </div>
 
             {/* Dua box */}
-            <div className="w-full p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 text-slate-900 space-y-1">
-              <p className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1">
+            <div className="w-full p-4 rounded-2xl bg-emerald-50/90 border-2 border-emerald-300 text-slate-900 space-y-1 text-center">
+              <p className="text-xs font-black text-emerald-950 uppercase tracking-wider flex items-center justify-center gap-1">
                 <span>{`🤲 ${t.littleDua}`}</span>
               </p>
-              <p className="text-sm font-semibold text-emerald-950 italic leading-relaxed">
+              <p className="text-sm font-bold text-emerald-950 italic leading-relaxed max-w-lg mx-auto">
                 {`"${locale === 'uz' ? story.reflection.little_dua_uz : story.reflection.little_dua_en}"`}
               </p>
             </div>
 
-            {/* Discussion questions if any */}
+            {/* Discussion questions */}
             {story.reflection.discussion_questions_uz && story.reflection.discussion_questions_uz.length > 0 && (
-              <div className="w-full p-4 rounded-2xl bg-white border border-slate-300 text-slate-800 space-y-2">
-                <p className="text-xs font-bold text-indigo-950 uppercase tracking-wider">
+              <div className="w-full p-4 rounded-2xl bg-white border border-slate-300 text-slate-800 space-y-2 text-left">
+                <p className="text-xs font-black text-indigo-950 uppercase tracking-wider">
                   {locale === 'uz' ? "💬 Ota-ona va farzand o'rtasidagi suhbat savollari:" : "💬 Discussion Questions:"}
                 </p>
                 <ul className="space-y-1 text-xs text-slate-700 list-disc list-inside">
                   {(locale === 'uz' ? story.reflection.discussion_questions_uz : story.reflection.discussion_questions_en).map((q, qIdx) => (
-                    <li key={qIdx}>{q}</li>
+                    <li key={qIdx} className="font-medium">{q}</li>
                   ))}
                 </ul>
               </div>
             )}
           </div>
 
-          <div className="w-full pt-3 border-t-2 border-emerald-300 flex items-center justify-between text-[11px] font-bold text-slate-600">
+          {/* Grassy Meadow Base with Crescent Rosette */}
+          <div className="w-full pt-1.5 border-t border-emerald-300 flex items-center justify-between text-[11px] font-bold text-white bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] px-6 py-2.5 rounded-b-[24px]">
             <span>NurQissa AI — nurqissa.ai</span>
-            <span>{locale === 'uz' ? "Mehr va ezgulik ulashishda davom eting! ✨" : "Spread love and wisdom! ✨"}</span>
+            <GoldenRosetteMedal pageNumber="🌙" />
+            <span>{locale === 'uz' ? "Mehr va ezgulik ulashishda davom eting! ✨" : "Spread love! ✨"}</span>
           </div>
         </div>
       </div>
