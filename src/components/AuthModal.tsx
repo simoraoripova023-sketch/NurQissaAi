@@ -10,6 +10,7 @@ import {
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
 import { cleanUzbekPhoneDigits, formatUzbekPhoneDisplay, isUzbekPhoneValid } from '@/lib/phoneHelper';
+import { CONTACT_CONFIG } from '@/lib/contact';
 import confetti from 'canvas-confetti';
 
 export default function AuthModal() {
@@ -628,6 +629,15 @@ export default function AuthModal() {
                 </p>
               )}
             </div>
+
+            {/* Direct Support link if SMS has issues */}
+            <div className="pt-2 text-center text-[11px] text-pine-700/80 dark:text-butter-300/80 flex items-center justify-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-pine-800 dark:text-butter-300 shrink-0" />
+              <span>{locale === 'uz' ? "SMS kelmadimi? Aloqa markazi:" : "Didn't get SMS? Support:"}</span>
+              <a href={CONTACT_CONFIG.telLink} className="font-black text-pine-950 dark:text-butter-100 hover:underline">
+                {CONTACT_CONFIG.phone}
+              </a>
+            </div>
           </div>
         ) : authStep === 'google' ? (
           /* Google Account Sign-In Screen */
@@ -956,10 +966,19 @@ export default function AuthModal() {
           </>
         )}
 
-        {/* Trust Note */}
-        <div className="mt-5 pt-3 border-t border-butter-300 dark:border-pine-700 flex items-center justify-center gap-2 text-[11px] font-bold text-pine-700 dark:text-butter-300 text-center">
-          <ShieldCheck className="w-4 h-4 text-pine-800 dark:text-butter-300" />
-          <span>{locale === 'uz' ? "Xavfsiz va bolalar ma'lumotlari to'liq himoyalangan" : "100% Safe & Child Privacy Protected"}</span>
+        {/* Trust Note & Official Contact */}
+        <div className="mt-5 pt-3 border-t border-butter-300 dark:border-pine-700 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-bold text-pine-700 dark:text-butter-300 text-center">
+          <div className="flex items-center gap-1.5 justify-center">
+            <ShieldCheck className="w-4 h-4 text-pine-800 dark:text-butter-300 shrink-0" />
+            <span>{locale === 'uz' ? "Xavfsiz va to'liq himoyalangan" : "100% Safe & Protected"}</span>
+          </div>
+          <div className="flex items-center gap-1 justify-center">
+            <Phone className="w-3.5 h-3.5 text-pine-800 dark:text-butter-300 shrink-0" />
+            <span>{locale === 'uz' ? "Aloqa:" : "Support:"}</span>
+            <a href={CONTACT_CONFIG.telLink} className="font-black text-pine-900 dark:text-butter-100 hover:underline">
+              {CONTACT_CONFIG.phone}
+            </a>
+          </div>
         </div>
 
       </motion.div>

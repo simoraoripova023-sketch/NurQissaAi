@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Moon, Sparkles, Heart, BookOpen, ShieldCheck, Mail, Phone, Instagram, Send } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
+import { CONTACT_CONFIG } from '@/lib/contact';
 
 export default function Footer() {
   const { locale } = useAppStore();
@@ -120,11 +121,11 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="tel:+998901234567" 
+                  href={CONTACT_CONFIG.telLink} 
                   className="flex items-center gap-2 hover:text-emerald-300 transition-colors group"
                 >
                   <Phone className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs">+998 (90) 123-45-67</span>
+                  <span className="text-xs font-semibold">{CONTACT_CONFIG.phone}</span>
                 </a>
               </li>
               <li>

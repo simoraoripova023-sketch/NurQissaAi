@@ -6,6 +6,7 @@ import { X, Book, CheckCircle, Printer, Sparkles, MapPin, Phone, User, Package, 
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
 import { cleanUzbekPhoneDigits, formatUzbekPhoneDisplay } from '@/lib/phoneHelper';
+import { CONTACT_CONFIG } from '@/lib/contact';
 import confetti from 'canvas-confetti';
 
 export default function HardcoverOrderModal() {
@@ -97,7 +98,14 @@ export default function HardcoverOrderModal() {
               <p className="text-sm text-slate-600 leading-relaxed max-w-sm mx-auto">
                 {t.orderSuccess}
               </p>
-              <div className="pt-4">
+              <div className="pt-2 text-xs text-slate-500 flex items-center justify-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                <span>{locale === 'uz' ? "Tezkor aloqa va operator:" : "Urgent questions & operator:"}</span>
+                <a href={CONTACT_CONFIG.telLink} className="font-bold text-emerald-700 hover:underline">
+                  {CONTACT_CONFIG.phone}
+                </a>
+              </div>
+              <div className="pt-3">
                 <button
                   onClick={handleClose}
                   className="px-8 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md transition-all"
@@ -239,6 +247,16 @@ export default function HardcoverOrderModal() {
                     </>
                   )}
                 </button>
+
+                <div className="mt-3 pt-3 border-t border-amber-200/60 flex items-center justify-between text-[11px] text-slate-600">
+                  <span className="flex items-center gap-1 font-medium">
+                    <Phone className="w-3 h-3 text-emerald-600" />
+                    <span>{locale === 'uz' ? "Buyurtma bo'yicha operator:" : "Order phone operator:"}</span>
+                  </span>
+                  <a href={CONTACT_CONFIG.telLink} className="font-bold text-emerald-700 hover:underline">
+                    {CONTACT_CONFIG.phone}
+                  </a>
+                </div>
               </div>
 
             </form>

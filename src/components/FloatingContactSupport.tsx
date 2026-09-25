@@ -8,6 +8,7 @@ import {
   Phone, Mail, Crown, HeartHandshake, ShieldCheck, MessageSquare
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
+import { CONTACT_CONFIG } from '@/lib/contact';
 
 interface ChatMessage {
   id: string;
@@ -429,26 +430,48 @@ export default function FloatingContactSupport() {
                     </div>
                   </div>
 
-                  {/* Direct Telegram Channel Button */}
-                  <a
-                    href={TELEGRAM_BOT}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full p-3 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white transition-all flex items-center justify-between shadow-md group"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-white">
-                        <Send className="w-4 h-4" />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-bold text-xs">
-                          {isUz ? "Telegram orqali to'g'ridan-to'g'ri yozish" : "Direct Telegram Message"}
+                  {/* Direct Contact Buttons (Phone & Telegram) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {/* Direct Phone Call Button */}
+                    <a
+                      href={CONTACT_CONFIG.telLink}
+                      className="p-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all flex items-center justify-between shadow-md group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                          <Phone className="w-4 h-4" />
                         </div>
-                        <div className="text-[11px] text-sky-100">@nurqissaaa_bot</div>
+                        <div className="text-left">
+                          <div className="font-bold text-[11px] leading-tight">
+                            {isUz ? "Qo'ng'iroq qilish" : "Phone Call"}
+                          </div>
+                          <div className="text-[11px] text-emerald-100 font-semibold">{CONTACT_CONFIG.phone}</div>
+                        </div>
                       </div>
-                    </div>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </a>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </a>
+
+                    {/* Direct Telegram Channel Button */}
+                    <a
+                      href={CONTACT_CONFIG.telegramBot}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white transition-all flex items-center justify-between shadow-md group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                          <Send className="w-4 h-4" />
+                        </div>
+                        <div className="text-left">
+                          <div className="font-bold text-[11px] leading-tight">
+                            {isUz ? "Telegram orqali" : "Telegram Bot"}
+                          </div>
+                          <div className="text-[11px] text-sky-100">{CONTACT_CONFIG.telegramUsername}</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </div>
 
                   {/* Direct Founder Message Form */}
                   <div className="pt-1">
@@ -648,6 +671,20 @@ export default function FloatingContactSupport() {
                   </form>
                 </div>
               )}
+
+              {/* Persistent Official Phone Support Footer */}
+              <div className="relative z-10 pt-2.5 mt-2 border-t border-amber-200/50 dark:border-emerald-800/50 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400 flex-shrink-0">
+                <span className="flex items-center gap-1 font-semibold text-slate-600 dark:text-slate-300">
+                  <Phone className="w-3.5 h-3.5 text-emerald-600 dark:text-amber-400" />
+                  <span>{isUz ? "Rasmiy aloqa raqami:" : "Official Support:"}</span>
+                </span>
+                <a
+                  href={CONTACT_CONFIG.telLink}
+                  className="font-black text-emerald-700 dark:text-amber-300 hover:underline inline-flex items-center gap-1"
+                >
+                  {CONTACT_CONFIG.phone}
+                </a>
+              </div>
 
             </motion.div>
           </div>

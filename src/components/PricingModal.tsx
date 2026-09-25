@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import { 
   X, Sparkles, Check, Crown, Star, Gem, ShieldCheck, 
-  CreditCard, ArrowRight, Heart, Gift, Zap, Send, Loader2, QrCode, Smartphone
+  CreditCard, ArrowRight, Heart, Gift, Zap, Send, Loader2, QrCode, Smartphone, Phone
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
+import { CONTACT_CONFIG } from '@/lib/contact';
 import confetti from 'canvas-confetti';
 
 export default function PricingModal() {
@@ -501,18 +502,27 @@ export default function PricingModal() {
                 </div>
               </div>
 
-              {/* Telegram Support Link */}
-              <div className="pt-3 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-pine-800 mt-4">
-                {isUz ? "Savollaringiz bormi yoki yordam kerakmi?" : "Have questions or need help?"}{" "}
-                <a
-                  href="https://t.me/nurqissaaa_bot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-emerald-800/40 hover:bg-emerald-700/60 border border-emerald-500/50 text-emerald-200 text-xs font-bold transition-all shadow-md"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  Telegram Bot: @nurqissaaa_bot
-                </a>
+              {/* Support Links (Phone & Telegram) */}
+              <div className="pt-3 text-center text-xs text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-pine-800 mt-4 space-y-2">
+                <p>{isUz ? "Savollaringiz bormi yoki yordam kerakmi?" : "Have questions or need help?"}</p>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <a
+                    href={CONTACT_CONFIG.telLink}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-emerald-700/30 hover:bg-emerald-700/50 border border-emerald-500/40 text-emerald-300 text-xs font-bold transition-all shadow-sm"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>{CONTACT_CONFIG.phone}</span>
+                  </a>
+                  <a
+                    href={CONTACT_CONFIG.telegramBot}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-sky-600/30 hover:bg-sky-600/50 border border-sky-400/40 text-sky-200 text-xs font-bold transition-all shadow-sm"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Telegram: {CONTACT_CONFIG.telegramUsername}</span>
+                  </a>
+                </div>
               </div>
             </div>
           )}
