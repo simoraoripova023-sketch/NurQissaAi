@@ -136,6 +136,7 @@ export default function BookReader({ story }: BookReaderProps) {
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
   const [isBookPrintModalOpen, setIsBookPrintModalOpen] = useState(false);
   const [printPaperSize, setPrintPaperSize] = useState<'A4' | 'A5'>('A4');
+  const [readerMode, setReaderMode] = useState<'single' | 'spread'>('single');
 
   const handleGenerateAiImage = async (pageIdx: number) => {
     const page = story.pages[pageIdx - 1];
@@ -338,6 +339,32 @@ export default function BookReader({ story }: BookReaderProps) {
                 )}
               </button>
 
+              {/* Reader View Mode Switcher: 1-Sahifa / Ochiq Kitob (2-sahifa) */}
+              <div className="hidden sm:inline-flex rounded-xl p-1 bg-white dark:bg-emerald-950 border border-amber-300 dark:border-emerald-700 text-xs font-bold shadow-sm">
+                <button
+                  onClick={() => setReaderMode('single')}
+                  className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg transition-all flex items-center gap-1 ${
+                    readerMode === 'single'
+                      ? 'bg-amber-400 text-slate-950 font-black shadow-sm'
+                      : 'text-slate-700 dark:text-amber-200 hover:text-slate-950'
+                  }`}
+                  title="1 sahifali vertikal kitob ko'rinishi"
+                >
+                  <span>📱 1 Sahifa</span>
+                </button>
+                <button
+                  onClick={() => setReaderMode('spread')}
+                  className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg transition-all flex items-center gap-1 ${
+                    readerMode === 'spread'
+                      ? 'bg-amber-400 text-slate-950 font-black shadow-sm'
+                      : 'text-slate-700 dark:text-amber-200 hover:text-slate-950'
+                  }`}
+                  title="2 sahifali ochiq kitob (Haqiqiy kitob varaqlari)"
+                >
+                  <span>📖 Ochiq Kitob</span>
+                </button>
+              </div>
+
               {/* Kitob Versiya (PDF / Bosma Maket) */}
               <button
                 onClick={() => setIsBookPrintModalOpen(true)}
@@ -370,8 +397,8 @@ export default function BookReader({ story }: BookReaderProps) {
             </div>
           </div>
 
-          {/* Realistic Children's Picturebook Reader Container (Portrait Layout) */}
-          <div className="book-container my-4 max-w-2xl mx-auto w-full relative">
+          {/* Realistic Children's Picturebook Reader Container (Dual-Mode: 1-Page vs 2-Page Spread) */}
+          <div className={`book-container my-4 mx-auto w-full relative transition-all duration-300 ${readerMode === 'spread' ? 'max-w-5xl' : 'max-w-2xl'}`}>
             
             {/* Desktop Floating Navigation Arrows */}
             <div className="hidden xl:flex items-center justify-between absolute inset-y-0 -left-20 -right-20 pointer-events-none z-30">
@@ -411,10 +438,10 @@ export default function BookReader({ story }: BookReaderProps) {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.98 }}
                     transition={{ duration: 0.35 }}
-                    className="flex flex-col w-full"
+                    className={`w-full ${readerMode === 'spread' ? 'grid grid-cols-1 md:grid-cols-12 min-h-[480px] md:min-h-[540px]' : 'flex flex-col'}`}
                   >
-                    {/* Top: Grand Full-Width Cover Visual */}
-                    <div className="relative w-full h-[340px] sm:h-[420px] md:h-[470px] overflow-hidden bg-slate-950 group">
+                    {/* Cover Visual: Left in spread mode, Top in single mode */}
+                    <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[340px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[340px] sm:h-[420px] md:h-[470px]'}`}>
                       {!loadedImages['cover'] && (
                         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
                           <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
@@ -435,9 +462,9 @@ export default function BookReader({ story }: BookReaderProps) {
                       </div>
                     </div>
 
-                    {/* Bottom: Book Cover Title & Dedication Card */}
-                    <div className="relative bg-[#FFFDF0] dark:bg-[#042820] px-3 sm:px-6 pt-4 pb-2 transition-colors duration-300">
-                      <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm text-center">
+                    {/* Cover Info Card: Right in spread mode, Bottom in single mode */}
+                    <div className={`relative bg-[#FFFDF0] dark:bg-[#042820] flex flex-col justify-between transition-colors duration-300 ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-5 p-6 sm:p-8' : 'px-3 sm:px-6 pt-4 pb-2'}`}>
+                      <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm text-center my-auto">
                         
                         {/* Top Left Laurel */}
                         <div className="absolute -top-3 -left-2 z-20 pointer-events-none">
@@ -492,17 +519,26 @@ export default function BookReader({ story }: BookReaderProps) {
                         </button>
 
                       </div>
+
+                      {/* Rosette Medal at bottom */}
+                      {readerMode === 'spread' && (
+                        <div className="mt-4 pt-3 border-t border-amber-200 dark:border-emerald-800 flex items-center justify-center">
+                          <GoldenRosetteMedal pageNumber="⭐" />
+                        </div>
+                      )}
                     </div>
 
-                    {/* Grassy Meadow Base */}
-                    <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-6 py-3 flex items-center justify-center border-t border-amber-300/40">
-                      <GoldenRosetteMedal pageNumber="⭐" />
-                    </div>
+                    {/* Grassy Meadow Base in single-page mode */}
+                    {readerMode === 'single' && (
+                      <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-6 py-3 flex items-center justify-center border-t border-amber-300/40">
+                        <GoldenRosetteMedal pageNumber="⭐" />
+                      </div>
+                    )}
                   </motion.div>
                 )}
 
                 {/* ========================================================================= */}
-                {/* STORY SPREAD PAGES (Index 1 to totalPages) - MATCHING CHILDREN'S BOOK     */}
+                {/* STORY SPREAD PAGES (Index 1 to totalPages) - DUAL MODE                     */}
                 {/* ========================================================================= */}
                 {currentPageIndex >= 1 && currentPageIndex <= totalPages && (() => {
                   const page = story.pages[currentPageIndex - 1];
@@ -515,10 +551,10 @@ export default function BookReader({ story }: BookReaderProps) {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.98 }}
                       transition={{ duration: 0.3 }}
-                      className="flex flex-col w-full"
+                      className={`w-full ${readerMode === 'spread' ? 'grid grid-cols-1 md:grid-cols-12 min-h-[500px] md:min-h-[560px]' : 'flex flex-col'}`}
                     >
-                      {/* Top: Grand Full-Width Story Illustration (Unobstructed) */}
-                      <div className="relative w-full h-[330px] sm:h-[410px] md:h-[460px] overflow-hidden bg-slate-950 group">
+                      {/* STORY ILLUSTRATION: Left Page in spread mode, Top in single mode */}
+                      <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[380px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[330px] sm:h-[410px] md:h-[460px]'}`}>
                         {!loadedImages[`page_${currentPageIndex}`] && (
                           <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
                             <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
@@ -531,6 +567,11 @@ export default function BookReader({ story }: BookReaderProps) {
                           onLoad={() => setLoadedImages(prev => ({ ...prev, [`page_${currentPageIndex}`]: true }))}
                           className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${loadedImages[`page_${currentPageIndex}`] ? 'opacity-100' : 'opacity-0'}`}
                         />
+
+                        {/* Subtle book spine seam shadow on the right in spread mode */}
+                        {readerMode === 'spread' && (
+                          <div className="hidden md:block absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-black/25 to-transparent pointer-events-none" />
+                        )}
 
                         {/* Spot the Hidden Object Mini-Game */}
                         <HiddenObjectGame pageNumber={currentPageIndex} storyId={story.id} />
@@ -558,11 +599,11 @@ export default function BookReader({ story }: BookReaderProps) {
                         </div>
                       </div>
 
-                      {/* Bottom: Children's Book Scalloped Framed Card */}
-                      <div className="relative bg-[#FFFDF0] dark:bg-[#042820] px-3 sm:px-6 pt-4 pb-2 transition-colors duration-300">
+                      {/* STORY TEXT & FRAMED CARD: Right Page in spread mode, Bottom in single mode */}
+                      <div className={`relative bg-[#FFFDF0] dark:bg-[#042820] flex flex-col justify-between transition-colors duration-300 ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-5 p-4 sm:p-6 md:p-8' : 'px-3 sm:px-6 pt-4 pb-2'}`}>
                         
                         {/* The Framed Container with Dashed Embroidery */}
-                        <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm">
+                        <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm my-auto">
                           
                           {/* Top Left: Laurel Sprig */}
                           <div className="absolute -top-3 -left-2 z-20 pointer-events-none">
@@ -611,32 +652,57 @@ export default function BookReader({ story }: BookReaderProps) {
                           </div>
 
                         </div>
+
+                        {/* In spread mode: Dedicated footer row */}
+                        {readerMode === 'spread' && (
+                          <div className="mt-4 pt-3 border-t border-amber-200 dark:border-emerald-800 flex items-center justify-between">
+                            <button
+                              onClick={prevPage}
+                              className="px-3 sm:px-4 py-2 rounded-xl bg-white dark:bg-emerald-950 hover:bg-slate-50 dark:hover:bg-emerald-900 text-emerald-950 dark:text-amber-200 border border-amber-300 dark:border-emerald-700 font-black text-xs shadow-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
+                            >
+                              <ChevronLeft className="w-4 h-4 text-emerald-700 dark:text-amber-400" />
+                              <span className="hidden sm:inline">{t.prevPage}</span>
+                            </button>
+
+                            <GoldenRosetteMedal pageNumber={currentPageIndex} />
+
+                            <button
+                              onClick={nextPage}
+                              className="px-4 sm:px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
+                            >
+                              <span>{currentPageIndex === totalPages ? t.reflectionTab : t.nextPage}</span>
+                              <ChevronRight className="w-4 h-4 text-slate-900" />
+                            </button>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Grassy Meadow Base & Golden Rosette Medallion */}
-                      <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-t border-amber-300/40">
-                        
-                        {/* Prev Button */}
-                        <button
-                          onClick={prevPage}
-                          className="px-3 sm:px-4 py-2 rounded-xl bg-white/90 hover:bg-white text-emerald-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
-                        >
-                          <ChevronLeft className="w-4 h-4 text-emerald-700" />
-                          <span className="hidden sm:inline">{t.prevPage}</span>
-                        </button>
+                      {/* In single-page mode: Grassy Meadow Base & Golden Rosette Medallion */}
+                      {readerMode === 'single' && (
+                        <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-t border-amber-300/40">
+                          
+                          {/* Prev Button */}
+                          <button
+                            onClick={prevPage}
+                            className="px-3 sm:px-4 py-2 rounded-xl bg-white/90 hover:bg-white text-emerald-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
+                          >
+                            <ChevronLeft className="w-4 h-4 text-emerald-700" />
+                            <span className="hidden sm:inline">{t.prevPage}</span>
+                          </button>
 
-                        {/* Golden Rosette Center Badge */}
-                        <GoldenRosetteMedal pageNumber={currentPageIndex} />
+                          {/* Golden Rosette Center Badge */}
+                          <GoldenRosetteMedal pageNumber={currentPageIndex} />
 
-                        {/* Next Button */}
-                        <button
-                          onClick={nextPage}
-                          className="px-4 sm:px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
-                        >
-                          <span>{currentPageIndex === totalPages ? t.reflectionTab : t.nextPage}</span>
-                          <ChevronRight className="w-4 h-4 text-slate-900" />
-                        </button>
-                      </div>
+                          {/* Next Button */}
+                          <button
+                            onClick={nextPage}
+                            className="px-4 sm:px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
+                          >
+                            <span>{currentPageIndex === totalPages ? t.reflectionTab : t.nextPage}</span>
+                            <ChevronRight className="w-4 h-4 text-slate-900" />
+                          </button>
+                        </div>
+                      )}
 
                     </motion.div>
                   );
