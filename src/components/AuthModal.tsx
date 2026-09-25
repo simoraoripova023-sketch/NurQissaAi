@@ -425,17 +425,17 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="relative w-full max-w-md bg-[#FFFDF5] dark:bg-[#002621] border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md bg-[#FFFDF5] dark:bg-[#002621] border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-4 sm:p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[92vh] my-auto"
       >
         {/* Close Button */}
         <button
           onClick={() => setIsAuthModalOpen(false)}
-          className="absolute top-5 right-5 p-2 rounded-full bg-butter-200 hover:bg-butter-300 text-pine-900 border border-pine-800 transition-colors"
+          className="absolute top-3.5 right-3.5 sm:top-5 sm:right-5 p-2 rounded-full bg-butter-200 hover:bg-butter-300 text-pine-900 border border-pine-800 transition-colors cursor-pointer z-20"
           aria-label="Close modal"
         >
           <X className="w-4 h-4" />

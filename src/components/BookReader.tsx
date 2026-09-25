@@ -77,24 +77,24 @@ function FlowerCluster({ className = "w-10 h-10" }: { className?: string }) {
 // Golden Rosette Medallion with Laurel sprigs for Page Number
 function GoldenRosetteMedal({ pageNumber }: { pageNumber: number | string }) {
   return (
-    <div className="flex items-center justify-center gap-1.5 sm:gap-2 select-none">
+    <div className="flex items-center justify-center gap-1 sm:gap-2 select-none">
       <div className="text-emerald-100 hidden sm:block">
-        <LaurelBranch flip className="w-7 h-7 sm:w-8 sm:h-8" />
+        <LaurelBranch flip className="w-6 h-6 sm:w-8 sm:h-8" />
       </div>
-      <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
+      <div className="relative w-10 h-10 sm:w-13 sm:h-13 flex items-center justify-center">
         {/* Scalloped Outer Rosette Disc */}
         <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-500 via-amber-300 to-amber-500 shadow-md ring-2 ring-amber-400/90 flex items-center justify-center">
           <div className="w-full h-full rounded-full border-2 border-dashed border-amber-700/40"></div>
         </div>
         {/* Inner Cream Disc */}
-        <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FFFDF2] border border-amber-300 flex items-center justify-center shadow-inner">
-          <span className="font-serif font-black text-lg sm:text-xl text-emerald-950">
+        <div className="relative w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#FFFDF2] border border-amber-300 flex items-center justify-center shadow-inner">
+          <span className="font-serif font-black text-sm sm:text-lg text-emerald-950">
             {pageNumber}
           </span>
         </div>
       </div>
       <div className="text-emerald-100 hidden sm:block">
-        <LaurelBranch className="w-7 h-7 sm:w-8 sm:h-8" />
+        <LaurelBranch className="w-6 h-6 sm:w-8 sm:h-8" />
       </div>
     </div>
   );
@@ -441,11 +441,11 @@ export default function BookReader({ story }: BookReaderProps) {
                     className={`w-full ${readerMode === 'spread' ? 'grid grid-cols-1 md:grid-cols-12 min-h-[480px] md:min-h-[540px]' : 'flex flex-col'}`}
                   >
                     {/* Cover Visual: Left in spread mode, Top in single mode */}
-                    <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[340px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[340px] sm:h-[420px] md:h-[470px]'}`}>
+                    <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[300px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[250px] xs:h-[300px] sm:h-[400px] md:h-[470px]'}`}>
                       {!loadedImages['cover'] && (
                         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
-                          <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
-                          <span className="text-xs font-bold font-serif">{locale === 'uz' ? "Nurli muqova surati yuklanmoqda..." : "Loading cover artwork..."}</span>
+                          <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-amber-400" />
+                          <span className="text-[11px] sm:text-xs font-bold font-serif">{locale === 'uz' ? "Nurli muqova surati yuklanmoqda..." : "Loading cover artwork..."}</span>
                         </div>
                       )}
                       <img
@@ -454,51 +454,51 @@ export default function BookReader({ story }: BookReaderProps) {
                         onLoad={() => setLoadedImages(prev => ({ ...prev, cover: true }))}
                         className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${loadedImages['cover'] ? 'opacity-100' : 'opacity-0'}`}
                       />
-                      <div className="absolute top-4 left-4 z-10">
-                        <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-400/95 backdrop-blur-md text-slate-950 font-black text-xs uppercase tracking-wider shadow-md border border-amber-300">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-900" />
+                      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full bg-amber-400/95 backdrop-blur-md text-slate-950 font-black text-[11px] sm:text-xs uppercase tracking-wider shadow-md border border-amber-300">
+                          <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-900" />
                           <span>{locale === 'uz' ? "Shaxsiy Ertak Kitobi" : "Personalized Storybook"}</span>
                         </span>
                       </div>
                     </div>
 
                     {/* Cover Info Card: Right in spread mode, Bottom in single mode */}
-                    <div className={`relative bg-[#FFFDF0] dark:bg-[#042820] flex flex-col justify-between transition-colors duration-300 ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-5 p-6 sm:p-8' : 'px-3 sm:px-6 pt-4 pb-2'}`}>
-                      <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm text-center my-auto">
+                    <div className={`relative bg-[#FFFDF0] dark:bg-[#042820] flex flex-col justify-between transition-colors duration-300 ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-5 p-4 sm:p-8' : 'px-2 xs:px-3 sm:px-6 pt-3 sm:pt-4 pb-2'}`}>
+                      <div className="relative rounded-[22px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-4 xs:p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm text-center my-auto">
                         
                         {/* Top Left Laurel */}
-                        <div className="absolute -top-3 -left-2 z-20 pointer-events-none">
-                          <LaurelBranch className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600" />
+                        <div className="absolute -top-2.5 -left-1.5 sm:-top-3 sm:-left-2 z-20 pointer-events-none">
+                          <LaurelBranch className="w-6 h-6 sm:w-10 sm:h-10 text-emerald-600" />
                         </div>
 
                         {/* Top Right Smiling Star */}
-                        <div className="absolute -top-4 -right-3 z-20 pointer-events-none animate-bounce" style={{ animationDuration: '3s' }}>
-                          <CuteSmilingStar className="w-9 h-9 sm:w-11 sm:h-11 drop-shadow-md" />
+                        <div className="absolute -top-3 -right-2 sm:-top-4 sm:-right-3 z-20 pointer-events-none animate-bounce" style={{ animationDuration: '3s' }}>
+                          <CuteSmilingStar className="w-7 h-7 sm:w-11 sm:h-11 drop-shadow-md" />
                         </div>
 
                         {/* Confetti Dots */}
-                        <div className="absolute top-10 left-3 w-2.5 h-2.5 rounded-full bg-rose-400/80 pointer-events-none" />
-                        <div className="absolute top-12 right-4 w-2.5 h-2.5 rounded-full bg-sky-400/80 pointer-events-none" />
-                        <div className="absolute bottom-8 left-3 text-xs select-none pointer-events-none">💚</div>
+                        <div className="absolute top-8 left-2 sm:top-10 sm:left-3 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-400/80 pointer-events-none" />
+                        <div className="absolute top-10 right-3 sm:top-12 sm:right-4 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-sky-400/80 pointer-events-none" />
+                        <div className="absolute bottom-6 left-2 sm:bottom-8 sm:left-3 text-[10px] sm:text-xs select-none pointer-events-none">💚</div>
 
                         {/* Bottom Flowers */}
-                        <div className="absolute -bottom-3 -left-3 z-20 pointer-events-none">
-                          <FlowerCluster className="w-9 h-9 sm:w-11 sm:h-11" />
+                        <div className="absolute -bottom-2 -left-2 sm:-bottom-3 sm:-left-3 z-20 pointer-events-none">
+                          <FlowerCluster className="w-7 h-7 sm:w-11 sm:h-11" />
                         </div>
-                        <div className="absolute -bottom-3 -right-3 z-20 pointer-events-none -scale-x-100">
-                          <FlowerCluster className="w-9 h-9 sm:w-11 sm:h-11" />
+                        <div className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 z-20 pointer-events-none -scale-x-100">
+                          <FlowerCluster className="w-7 h-7 sm:w-11 sm:h-11" />
                         </div>
 
-                        <p className="text-[11px] sm:text-xs font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest mb-1">
+                        <p className="text-[10px] sm:text-xs font-extrabold text-emerald-700 dark:text-emerald-400 uppercase tracking-widest mb-1">
                           NurQissa AI Bedtime Series
                         </p>
                         
-                        <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-amber-200 font-display leading-tight mb-3 px-2">
+                        <h2 className="text-lg xs:text-xl sm:text-3xl font-black text-slate-900 dark:text-amber-200 font-display leading-tight mb-2 sm:mb-3 px-1">
                           {title}
                         </h2>
 
-                        <div className="inline-block p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-amber-50/90 dark:bg-emerald-950/80 border border-amber-300 dark:border-emerald-700/60 mb-3 max-w-md mx-auto">
-                          <p className="text-[10px] sm:text-[11px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
+                        <div className="inline-block p-2 xs:p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-amber-50/90 dark:bg-emerald-950/80 border border-amber-300 dark:border-emerald-700/60 mb-2 sm:mb-3 max-w-md mx-auto">
+                          <p className="text-[9px] sm:text-[11px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
                             {locale === 'uz' ? "Maxsus bag'ishlov:" : "Special Dedication:"}
                           </p>
                           <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-emerald-100">
@@ -506,16 +506,16 @@ export default function BookReader({ story }: BookReaderProps) {
                           </p>
                         </div>
 
-                        <p className="text-xs sm:text-sm text-slate-700 dark:text-amber-100/90 italic leading-relaxed max-w-lg mx-auto mb-4 px-2">
+                        <p className="text-[11px] xs:text-xs sm:text-sm text-slate-700 dark:text-amber-100/90 italic leading-relaxed max-w-lg mx-auto mb-3 sm:mb-4 px-1">
                           "{prologue}"
                         </p>
 
                         <button
                           onClick={nextPage}
-                          className="w-full max-w-md mx-auto py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-sm sm:text-base shadow-lg shadow-amber-500/25 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2"
+                          className="w-full max-w-md mx-auto py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-xs xs:text-sm sm:text-base shadow-lg shadow-amber-500/25 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                         >
                           <span>{locale === 'uz' ? "Ertakni o'qishni boshlash" : "Start Reading Story"}</span>
-                          <ChevronRight className="w-5 h-5" />
+                          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
 
                       </div>
@@ -530,7 +530,7 @@ export default function BookReader({ story }: BookReaderProps) {
 
                     {/* Grassy Meadow Base in single-page mode */}
                     {readerMode === 'single' && (
-                      <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-6 py-3 flex items-center justify-center border-t border-amber-300/40">
+                      <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-center border-t border-amber-300/40">
                         <GoldenRosetteMedal pageNumber="⭐" />
                       </div>
                     )}
@@ -551,14 +551,14 @@ export default function BookReader({ story }: BookReaderProps) {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.98 }}
                       transition={{ duration: 0.3 }}
-                      className={`w-full ${readerMode === 'spread' ? 'grid grid-cols-1 md:grid-cols-12 min-h-[500px] md:min-h-[560px]' : 'flex flex-col'}`}
+                      className={`w-full ${readerMode === 'spread' ? 'grid grid-cols-1 md:grid-cols-12 min-h-[480px] md:min-h-[560px]' : 'flex flex-col'}`}
                     >
                       {/* STORY ILLUSTRATION: Left Page in spread mode, Top in single mode */}
-                      <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[380px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[330px] sm:h-[410px] md:h-[460px]'}`}>
+                      <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[300px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[250px] xs:h-[300px] sm:h-[400px] md:h-[460px]'}`}>
                         {!loadedImages[`page_${currentPageIndex}`] && (
                           <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
-                            <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
-                            <span className="text-xs font-bold font-serif">{locale === 'uz' ? `${currentPageIndex}-sahifa surati yuklanmoqda...` : `Loading Page ${currentPageIndex}...`}</span>
+                            <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-amber-400" />
+                            <span className="text-[11px] sm:text-xs font-bold font-serif">{locale === 'uz' ? `${currentPageIndex}-sahifa surati yuklanmoqda...` : `Loading Page ${currentPageIndex}...`}</span>
                           </div>
                         )}
                         <img
@@ -577,21 +577,21 @@ export default function BookReader({ story }: BookReaderProps) {
                         <HiddenObjectGame pageNumber={currentPageIndex} storyId={story.id} />
 
                         {/* AI Image Generation Overlay Button */}
-                        <div className="absolute top-3 right-3 z-30 opacity-90 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-30 opacity-90 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleGenerateAiImage(currentPageIndex)}
                             disabled={isGeneratingImage}
-                            className="px-2.5 py-1.5 rounded-xl bg-black/70 hover:bg-black/90 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[10px] sm:text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
+                            className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-black/70 hover:bg-black/90 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[9px] xs:text-[10px] sm:text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 disabled:opacity-50"
                             title={locale === 'uz' ? "Ushbu sahna uchun yangi AI rasm chizish" : "Generate new AI illustration"}
                           >
                             {isGeneratingImage ? (
                               <>
-                                <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                                <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin text-amber-400" />
                                 <span>{locale === 'uz' ? "Chizilmoqda..." : "Generating..."}</span>
                               </>
                             ) : (
                               <>
-                                <Wand2 className="w-3.5 h-3.5 text-amber-400" />
+                                <Wand2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400" />
                                 <span>AI DALL-E 3</span>
                               </>
                             )}
@@ -600,53 +600,52 @@ export default function BookReader({ story }: BookReaderProps) {
                       </div>
 
                       {/* STORY TEXT & FRAMED CARD: Right Page in spread mode, Bottom in single mode */}
-                      <div className={`relative bg-[#FFFDF0] dark:bg-[#042820] flex flex-col justify-between transition-colors duration-300 ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-5 p-4 sm:p-6 md:p-8' : 'px-3 sm:px-6 pt-4 pb-2'}`}>
+                      <div className={`relative bg-[#FFFDF0] dark:bg-[#042820] flex flex-col justify-between transition-colors duration-300 ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-5 p-3 xs:p-4 sm:p-6 md:p-8' : 'px-2 xs:px-3 sm:px-6 pt-3 sm:pt-4 pb-2'}`}>
                         
                         {/* The Framed Container with Dashed Embroidery */}
-                        <div className="relative rounded-[26px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm my-auto">
+                        <div className="relative rounded-[22px] sm:rounded-[32px] border-2 border-dashed border-emerald-500/70 dark:border-emerald-400/60 p-4 xs:p-5 sm:p-7 bg-[#FFFDF5]/85 dark:bg-emerald-950/40 shadow-sm my-auto">
                           
                           {/* Top Left: Laurel Sprig */}
-                          <div className="absolute -top-3 -left-2 z-20 pointer-events-none">
-                            <LaurelBranch className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-600" />
+                          <div className="absolute -top-2.5 -left-1.5 sm:-top-3 sm:-left-2 z-20 pointer-events-none">
+                            <LaurelBranch className="w-6 h-6 sm:w-10 sm:h-10 text-emerald-600" />
                           </div>
 
                           {/* Top Right: Smiling Star */}
-                          <div className="absolute -top-4 -right-3 z-20 pointer-events-none animate-bounce" style={{ animationDuration: '3s' }}>
-                            <CuteSmilingStar className="w-9 h-9 sm:w-11 sm:h-11 drop-shadow-md" />
+                          <div className="absolute -top-3 -right-2 sm:-top-4 sm:-right-3 z-20 pointer-events-none animate-bounce" style={{ animationDuration: '3s' }}>
+                            <CuteSmilingStar className="w-7 h-7 sm:w-11 sm:h-11 drop-shadow-md" />
                           </div>
 
                           {/* Playful Confetti Dots */}
-                          <div className="absolute top-10 left-3 w-2.5 h-2.5 rounded-full bg-rose-400/80 pointer-events-none" />
-                          <div className="absolute top-20 left-2 w-3 h-3 rounded-full bg-amber-400/80 pointer-events-none" />
-                          <div className="absolute top-12 right-4 w-2.5 h-2.5 rounded-full bg-sky-400/80 pointer-events-none" />
-                          <div className="absolute top-24 right-2 w-2 h-2 rounded-full bg-emerald-400/80 pointer-events-none" />
-                          <div className="absolute bottom-10 left-3 text-xs select-none pointer-events-none">💚</div>
+                          <div className="absolute top-8 left-2 sm:top-10 sm:left-3 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-rose-400/80 pointer-events-none" />
+                          <div className="absolute top-16 left-2 w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-amber-400/80 pointer-events-none" />
+                          <div className="absolute top-10 right-3 sm:top-12 sm:right-4 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-sky-400/80 pointer-events-none" />
+                          <div className="absolute bottom-8 left-2 sm:bottom-10 sm:left-3 text-[10px] sm:text-xs select-none pointer-events-none">💚</div>
 
                           {/* Bottom Left Flowers */}
-                          <div className="absolute -bottom-3 -left-3 z-20 pointer-events-none">
-                            <FlowerCluster className="w-9 h-9 sm:w-11 sm:h-11" />
+                          <div className="absolute -bottom-2 -left-2 sm:-bottom-3 sm:-left-3 z-20 pointer-events-none">
+                            <FlowerCluster className="w-7 h-7 sm:w-11 sm:h-11" />
                           </div>
 
                           {/* Bottom Right Flowers */}
-                          <div className="absolute -bottom-3 -right-3 z-20 pointer-events-none -scale-x-100">
-                            <FlowerCluster className="w-9 h-9 sm:w-11 sm:h-11" />
+                          <div className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 z-20 pointer-events-none -scale-x-100">
+                            <FlowerCluster className="w-7 h-7 sm:w-11 sm:h-11" />
                           </div>
 
                           {/* Dual-Tone Playful Title */}
-                          <div className="text-center space-y-0.5 mb-3 sm:mb-4 px-6">
-                            <h2 className="text-xl sm:text-2xl font-black text-emerald-800 dark:text-emerald-300 font-display tracking-tight">
+                          <div className="text-center space-y-0.5 mb-2 sm:mb-4 px-3 sm:px-6">
+                            <h2 className="text-lg xs:text-xl sm:text-2xl font-black text-emerald-800 dark:text-emerald-300 font-display tracking-tight">
                               {dualTitle.line1}
                             </h2>
                             {dualTitle.line2 && (
-                              <h3 className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 font-display tracking-tight">
+                              <h3 className="text-lg xs:text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 font-display tracking-tight">
                                 {dualTitle.line2}
                               </h3>
                             )}
                           </div>
 
                           {/* Story Narrative Text */}
-                          <div className="my-2 sm:my-4 px-2 sm:px-4">
-                            <p className="text-center text-slate-800 dark:text-[#FFFDF5] font-sans font-semibold text-base sm:text-lg md:text-xl leading-relaxed sm:leading-loose tracking-wide">
+                          <div className="my-1.5 sm:my-4 px-1 sm:px-4">
+                            <p className="text-center text-slate-800 dark:text-[#FFFDF5] font-sans font-semibold text-[14px] xs:text-[15px] sm:text-lg md:text-xl leading-relaxed sm:leading-loose tracking-wide">
                               {locale === 'uz' ? page.text_uz : page.text_en}
                             </p>
                           </div>
@@ -679,12 +678,12 @@ export default function BookReader({ story }: BookReaderProps) {
 
                       {/* In single-page mode: Grassy Meadow Base & Golden Rosette Medallion */}
                       {readerMode === 'single' && (
-                        <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between border-t border-amber-300/40">
+                        <div className="bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] dark:from-[#032b21] dark:via-[#064233] dark:to-[#095442] px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-1.5 border-t border-amber-300/40">
                           
                           {/* Prev Button */}
                           <button
                             onClick={prevPage}
-                            className="px-3 sm:px-4 py-2 rounded-xl bg-white/90 hover:bg-white text-emerald-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
+                            className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-white/90 hover:bg-white text-emerald-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
                           >
                             <ChevronLeft className="w-4 h-4 text-emerald-700" />
                             <span className="hidden sm:inline">{t.prevPage}</span>
@@ -696,7 +695,7 @@ export default function BookReader({ story }: BookReaderProps) {
                           {/* Next Button */}
                           <button
                             onClick={nextPage}
-                            className="px-4 sm:px-5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1"
+                            className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md hover:scale-105 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
                           >
                             <span>{currentPageIndex === totalPages ? t.reflectionTab : t.nextPage}</span>
                             <ChevronRight className="w-4 h-4 text-slate-900" />
