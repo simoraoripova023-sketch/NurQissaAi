@@ -11,7 +11,7 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='repla
 TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4')
 BASE_URL = f"https://api.telegram.org/bot{TOKEN}"
 ADMIN_CHAT_ID = 5636799086  # Owner's confidential Chat ID
-WEB_APP_URL = "https://nur-qissa-ai.vercel.app"
+WEB_APP_URL = "https://nur-qissa.uz"
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 FEEDBACKS_FILE = os.path.join(BASE_DIR, 'data', 'feedbacks.json')
