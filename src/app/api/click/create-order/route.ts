@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createOrder } from '@/lib/orderService';
 import { generateClickPaymentUrl, CLICK_CONFIG, CLICK_PLANS } from '@/lib/click';
 
+export async function GET() {
+  return NextResponse.json({
+    status: 'online',
+    service: 'Click Merchant Order Creator (nur-qissa.uz)',
+    plans: CLICK_PLANS,
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

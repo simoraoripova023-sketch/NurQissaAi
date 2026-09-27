@@ -14,6 +14,14 @@ async function parseBody(req: NextRequest) {
   return obj;
 }
 
+export async function GET() {
+  return NextResponse.json({
+    status: 'online',
+    service: 'Click Prepare Webhook endpoint (nur-qissa.uz)',
+    action: 0,
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await parseBody(req);
