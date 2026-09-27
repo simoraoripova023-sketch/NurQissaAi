@@ -130,11 +130,11 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="mailto:support@nurqissa.ai" 
+                  href="mailto:support@nur-qissa.uz" 
                   className="flex items-center gap-2 hover:text-amber-300 transition-colors group"
                 >
                   <Mail className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs">support@nurqissa.ai</span>
+                  <span className="text-xs">support@nur-qissa.uz</span>
                 </a>
               </li>
               <li>

@@ -1178,7 +1178,7 @@ export default function BookReader({ story }: BookReaderProps) {
 
           {/* Grassy Meadow Base with Star Rosette */}
           <div className="w-full pt-2 border-t-2 border-amber-300 flex items-center justify-between text-[11px] font-bold text-white bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] px-6 py-2.5 rounded-b-[24px]">
-            <span>NurQissa AI • nurqissa.ai</span>
+            <span>NurQissa • nur-qissa.uz</span>
             <GoldenRosetteMedal pageNumber="⭐" />
             <span>{story.pages.length} {locale === 'uz' ? "sahifali ertak" : "pages"}</span>
           </div>
@@ -1315,7 +1315,7 @@ export default function BookReader({ story }: BookReaderProps) {
 
           {/* Grassy Meadow Base with Crescent Rosette */}
           <div className="w-full pt-1.5 border-t border-emerald-300 flex items-center justify-between text-[11px] font-bold text-white bg-gradient-to-t from-[#438321] via-[#529929] to-[#5FA832] px-6 py-2.5 rounded-b-[24px]">
-            <span>NurQissa AI — nurqissa.ai</span>
+            <span>NurQissa — nur-qissa.uz</span>
             <GoldenRosetteMedal pageNumber="🌙" />
             <span>{locale === 'uz' ? "Mehr va ezgulik ulashishda davom eting! ✨" : "Spread love! ✨"}</span>
           </div>

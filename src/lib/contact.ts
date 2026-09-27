@@ -10,7 +10,7 @@ export const CONTACT_CONFIG = {
   telegramUsername: "@nurqissaaa_bot",
   instagram: "https://instagram.com/nurqissa.ai",
   instagramUsername: "@nurqissa.ai",
-  email: "support@nurqissa.ai",
+  email: "support@nur-qissa.uz",
 
   // Labels
   supportHoursUz: "24/7 Ota-onalar xizmatida",

@@ -2,7 +2,7 @@ const localtunnel = require('localtunnel');
 
 (async () => {
   try {
-    const tunnel = await localtunnel({ port: 3000, subdomain: 'nurqissa-ai-' + Math.floor(Math.random() * 10000) });
+    const tunnel = await localtunnel({ port: 3000, subdomain: 'nur-qissa-' + Math.floor(Math.random() * 10000) });
     console.log('PUBLIC_TUNNEL_URL=' + tunnel.url);
     
     tunnel.on('close', () => {

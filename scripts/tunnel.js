@@ -4,7 +4,7 @@ async function runTunnel() {
   while (true) {
     try {
       console.log('Tunnel ishga tushirilmoqda...');
-      const tunnel = await localtunnel({ port: 3000, subdomain: 'nurqissa-ai-demo' });
+      const tunnel = await localtunnel({ port: 3000, subdomain: 'nur-qissa-demo' });
       console.log('TUNNEL_ACTIVE_URL:', tunnel.url);
 
       await new Promise((resolve) => {
