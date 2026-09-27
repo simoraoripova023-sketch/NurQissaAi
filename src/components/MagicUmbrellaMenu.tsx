@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { 
   Sparkles, Home, PlusCircle, Target, Library, Trophy, Palette,
-  X, ChevronRight
+  X, ChevronRight, CreditCard
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
@@ -18,7 +18,7 @@ interface MagicUmbrellaMenuProps {
 
 export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuProps) {
   const pathname = usePathname();
-  const { locale, theme, stories, nurCoins } = useAppStore();
+  const { locale, theme, stories, nurCoins, setIsPricingModalOpen } = useAppStore();
   const t = translations[locale];
 
   const [isOpen, setIsOpen] = useState(false);
@@ -72,6 +72,14 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
       desc: locale === 'uz' ? 'Siz yaratgan ertaklar javoni' : 'Your saved storybooks shelf',
       icon: Library, 
       badge: stories.length > 0 ? stories.length : undefined,
+    },
+    { 
+      href: '#pricing', 
+      label: locale === 'uz' ? "Obuna va To'lov" : "Subscription & Payment", 
+      desc: locale === 'uz' ? "Karta orqali to'lov & VIP tariflar" : "Card payment & VIP plans",
+      icon: CreditCard, 
+      badge: '💳 To\'lov',
+      isSubscription: true,
     },
   ];
 
@@ -323,6 +331,41 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 const Icon = link.icon;
+
+                if (link.isSubscription) {
+                  return (
+                    <button
+                      key={link.label}
+                      type="button"
+                      onClick={() => {
+                        setIsOpen(false);
+                        setIsPricingModalOpen(true);
+                      }}
+                      className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-amber-400/25 via-orange-400/20 to-emerald-400/25 hover:from-amber-400/35 hover:to-orange-400/30 text-pine-900 dark:text-butter-100 border border-amber-400/50 shadow-xs cursor-pointer group transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-amber-400 text-pine-950 shadow-xs">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-xs sm:text-sm font-black leading-tight text-pine-950 dark:text-butter-100">
+                            {link.label}
+                          </span>
+                          <span className="text-[10px] font-medium leading-tight text-pine-700 dark:text-butter-300/80">
+                            {link.desc}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 text-[11px] font-black rounded-full bg-amber-400 text-pine-950 border border-amber-500/40">
+                          {link.badge}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-pine-400 dark:text-butter-300/60" />
+                      </div>
+                    </button>
+                  );
+                }
 
                 return (
                   <Link
