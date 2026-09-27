@@ -37,7 +37,7 @@ export default function MagicOwlAuthButton() {
         onHoverEnd={() => setIsHovered(false)}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.94 }}
-        className="relative flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-butter-200 hover:bg-butter-300 border-2 border-pine-800 text-pine-950 font-black text-xs sm:text-sm shadow-md cursor-pointer transition-all group focus:outline-none"
+        className="relative flex items-center gap-1.5 sm:gap-2 p-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-butter-200 hover:bg-butter-300 border-2 border-pine-800 text-pine-950 font-black text-xs sm:text-sm shadow-md cursor-pointer transition-all group focus:outline-none"
         title={currentUser ? currentUser.name : (locale === 'uz' ? "Dono Boyqushcha orqali ro'yxatdan o'tish" : "Fairy Owl Sign In")}
       >
         
@@ -100,7 +100,7 @@ export default function MagicOwlAuthButton() {
         </div>
 
         {/* Text Label */}
-        <div className="flex flex-col text-left pr-1">
+        <div className="hidden md:flex flex-col text-left pr-1">
           <span className="text-[11px] sm:text-xs font-black leading-tight text-pine-950">
             {currentUser ? currentUser.name : (locale === 'uz' ? "Ro'yxatdan o'tish" : "Sign Up")}
           </span>

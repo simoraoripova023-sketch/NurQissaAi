@@ -425,12 +425,12 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto pt-[env(safe-area-inset-top,12px)] pb-[env(safe-area-inset-bottom,12px)]">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="relative w-full max-w-md bg-[#FFFDF5] dark:bg-[#002621] border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-4 sm:p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[92vh] my-auto"
+        className="relative w-full max-w-md bg-[#FFFDF5] dark:bg-[#002621] border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-4 sm:p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[88dvh] sm:max-h-[92dvh] my-auto"
       >
         {/* Close Button */}
         <button
