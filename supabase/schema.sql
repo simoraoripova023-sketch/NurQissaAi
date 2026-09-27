@@ -36,12 +36,27 @@ CREATE TABLE IF NOT EXISTS profiles (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 4. Enable Row Level Security (RLS)
+-- 4. Orders & Click Merchant Transactions
+CREATE TABLE IF NOT EXISTS orders (
+  id VARCHAR(100) PRIMARY KEY,
+  plan_key VARCHAR(50) NOT NULL,
+  plan_name VARCHAR(255) NOT NULL,
+  amount NUMERIC NOT NULL,
+  status VARCHAR(50) DEFAULT 'pending', -- pending, prepared, paid, cancelled, rejected_underpaid
+  user_name VARCHAR(255),
+  user_phone VARCHAR(50),
+  click_trans_id VARCHAR(100),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 5. Enable Row Level Security (RLS)
 ALTER TABLE feedbacks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
--- 5. Open insert policies for public client usage
+-- 6. Open insert/select policies for client usage
 CREATE POLICY "Allow public insert to feedbacks" ON feedbacks FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public select on feedbacks" ON feedbacks FOR SELECT USING (true);
 
@@ -49,3 +64,5 @@ CREATE POLICY "Allow public insert to stories" ON stories FOR INSERT WITH CHECK 
 CREATE POLICY "Allow public select on stories" ON stories FOR SELECT USING (true);
 
 CREATE POLICY "Allow public all on profiles" ON profiles FOR ALL USING (true);
+CREATE POLICY "Allow public all on orders" ON orders FOR ALL USING (true);
+

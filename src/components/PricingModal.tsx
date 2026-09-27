@@ -5,7 +5,7 @@ import {
   X, Sparkles, Check, Crown, Star, Gem, ShieldCheck, 
   CreditCard, ArrowRight, Gift, Loader2, 
   Phone, Copy, CheckCircle2, AlertTriangle, QrCode, 
-  Smartphone, Wallet, Zap, ExternalLink
+  Smartphone, Wallet, Zap, ExternalLink, PlayCircle, ShieldAlert, CheckCircle
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { CONTACT_CONFIG } from '@/lib/contact';
@@ -28,7 +28,7 @@ export default function PricingModal() {
 
   const [activeTab, setActiveTab] = useState<'checkout' | 'plans'>('checkout');
   const [selectedPlan, setSelectedPlan] = useState<'pack3' | 'pack10' | 'vip'>('pack10');
-  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider>('uzum');
+  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider>('click');
   
   // Card & checkout states
   const [isCopied, setIsCopied] = useState(false);
@@ -38,6 +38,14 @@ export default function PricingModal() {
   const [paymentNote, setPaymentNote] = useState('');
   const [isSubmittingPaid, setIsSubmittingPaid] = useState(false);
   const [paidSubmitted, setPaidSubmitted] = useState(false);
+
+  // Click Merchant States
+  const [clickLoading, setClickLoading] = useState(false);
+  const [clickModalOpen, setClickModalOpen] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState<any>(null);
+  const [clickPaymentUrl, setClickPaymentUrl] = useState<string>('');
+  const [simulationResult, setSimulationResult] = useState<any>(null);
+  const [isSimulating, setIsSimulating] = useState(false);
 
   if (!isPricingModalOpen) return null;
 
@@ -93,10 +101,78 @@ export default function PricingModal() {
   };
 
   const providerNames: Record<PaymentProvider, string> = {
+    click: "🔵 Click Merchant (Avtomatik)",
     uzum: "💜 Uzum Bank (5% Keshbek)",
-    click: "🔵 Click Pass / Click Up",
     paynet: "🟢 Paynet / Payme QR Scanner",
     card: "💳 Bank Kartasi (Simora Oripova)"
+  };
+
+  // Start Click Payment flow
+  const handleStartClickPayment = async () => {
+    setClickLoading(true);
+    setSimulationResult(null);
+    try {
+      const res = await fetch('/api/click/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          planKey: selectedPlan,
+          userName: senderName.trim() || currentUser?.name || 'Mijoz',
+          userPhone: senderPhone.trim() || currentUser?.phone || '',
+        })
+      });
+      const data = await res.json();
+      if (data.order) {
+        setCurrentOrder(data.order);
+        setClickPaymentUrl(data.paymentUrl);
+        setClickModalOpen(true);
+      }
+    } catch (err) {
+      console.error('Click error:', err);
+    } finally {
+      setClickLoading(false);
+    }
+  };
+
+  // Simulate Click payment webhook for sandbox testing
+  const handleSimulatePayment = async (type: 'success' | 'underpaid') => {
+    if (!currentOrder) return;
+    setIsSimulating(true);
+    setSimulationResult(null);
+
+    try {
+      const res = await fetch('/api/click/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: currentOrder.id,
+          simulateType: type,
+          customAmount: type === 'underpaid' ? 10000 : currentOrder.amount,
+        })
+      });
+      const data = await res.json();
+      setSimulationResult(data);
+
+      if (data.success && type === 'success') {
+        confetti({
+          particleCount: 160,
+          spread: 100,
+          origin: { y: 0.5 },
+        });
+
+        if (selectedPlan === 'pack3') {
+          addStoryCredits(3);
+        } else if (selectedPlan === 'pack10') {
+          addStoryCredits(10);
+        } else if (selectedPlan === 'vip') {
+          setHasPaidSubscription(true);
+        }
+      }
+    } catch (err) {
+      console.error('Simulation error:', err);
+    } finally {
+      setIsSimulating(false);
+    }
   };
 
   const handleConfirmPaidSubmit = async (e: React.FormEvent) => {
@@ -162,11 +238,11 @@ export default function PricingModal() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-butter-400/20 border border-butter-300/40 text-butter-200 text-xs font-bold mb-2">
               <Gift className="w-3.5 h-3.5 text-butter-300" />
-              <span>{isUz ? "NurQissa AI — To'lov, Keshbek & Obuna" : "NurQissa AI — Billing & Cashback"}</span>
+              <span>{isUz ? "NurQissa — Click Merchant & To'lov Tizimi" : "NurQissa — Click Merchant & Billing"}</span>
             </div>
             
             <h2 className="text-xl sm:text-2xl md:text-3xl font-black font-display tracking-tight text-butter-200">
-              {isUz ? "Ertaklar Olami Obunasi & Tezkor To'lov" : "Storybook Subscription & Instant Pay"}
+              {isUz ? "Ertaklar Olami Obunasi & To'lov" : "Storybook Subscription & Checkout"}
             </h2>
 
             {/* Current Balance Status Bar */}
@@ -196,7 +272,7 @@ export default function PricingModal() {
               }`}
             >
               <Zap className="w-4 h-4 text-amber-950" />
-              <span>{isUz ? "⚡ Tezkor To'lov (Click, Uzum, Paynet)" : "⚡ Instant Checkout"}</span>
+              <span>{isUz ? "⚡ Click & Tezkor To'lov" : "⚡ Click & Instant Pay"}</span>
             </button>
 
             <button
@@ -217,7 +293,7 @@ export default function PricingModal() {
         <div className="p-4 sm:p-6 md:p-8 overflow-y-auto flex-1">
           
           {/* ========================================================================= */}
-          {/* TAB 1: TEZKOR TO'LOV TIZIMI (CLICK, UZUM KESHBEK, PAYNET QR, KARTA) */}
+          {/* TAB 1: TEZKOR TO'LOV TIZIMI (CLICK MERCHANT, UZUM, PAYNET, KARTA) */}
           {/* ========================================================================= */}
           {activeTab === 'checkout' && (
             <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
@@ -265,20 +341,42 @@ export default function PricingModal() {
                 </div>
               </div>
 
-              {/* 2. TO'LOV USULINI TANLASH (CLICK, UZUM BANK, PAYNET QR, KARTA) */}
+              {/* 2. TO'LOV USULINI TANLASH */}
               <div className="space-y-2.5 pt-1">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-black text-pine-900 dark:text-butter-200 uppercase tracking-wider">
                     {isUz ? "2. Qulay to'lov tizimini tanlang:" : "2. Choose Payment Method:"}
                   </label>
-                  <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    {isUz ? "Onlayn Tasdiqlash" : "Instant Verify"}
+                    {isUz ? "Avtomatik Click & Karta" : "Instant Verification"}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   
+                  {/* CLICK MERCHANT (ASOSIY / TAVSIYA) */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedProvider('click')}
+                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer relative flex flex-col justify-between ${
+                      selectedProvider === 'click'
+                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 shadow-md ring-2 ring-blue-400'
+                        : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950/60 hover:border-blue-300'
+                    }`}
+                  >
+                    <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded-md bg-blue-600 text-white text-[8px] font-black uppercase tracking-tight">
+                      Avtomat
+                    </div>
+                    <div className="w-8 h-8 rounded-xl bg-blue-600/10 text-blue-700 dark:text-blue-300 flex items-center justify-center mb-2">
+                      <Smartphone className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="font-black text-xs text-blue-950 dark:text-blue-200 block">Click Merchant</span>
+                      <span className="text-[10px] text-blue-700 dark:text-blue-300 font-semibold">1-Bosishda to'lov</span>
+                    </div>
+                  </button>
+
                   {/* UZUM BANK (KESHBEK BILAN) */}
                   <button
                     type="button"
@@ -298,25 +396,6 @@ export default function PricingModal() {
                     <div>
                       <span className="font-black text-xs text-purple-950 dark:text-purple-200 block">Uzum Bank</span>
                       <span className="text-[10px] text-purple-700 dark:text-purple-300 font-semibold">+1 Bonus Qissa</span>
-                    </div>
-                  </button>
-
-                  {/* CLICK PASS / CLICK UP */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProvider('click')}
-                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer relative flex flex-col justify-between ${
-                      selectedProvider === 'click'
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 shadow-md ring-2 ring-blue-400'
-                        : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950/60 hover:border-blue-300'
-                    }`}
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-blue-600/10 text-blue-700 dark:text-blue-300 flex items-center justify-center mb-2">
-                      <Smartphone className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="font-black text-xs text-blue-950 dark:text-blue-200 block">Click Pass</span>
-                      <span className="text-[10px] text-blue-700 dark:text-blue-300 font-semibold">Click Up / Karta</span>
                     </div>
                   </button>
 
@@ -361,6 +440,65 @@ export default function PricingModal() {
                 </div>
               </div>
 
+              {/* ===================================================================== */}
+              {/* CLICK MERCHANT DIRECT ACTION BOX */}
+              {/* ===================================================================== */}
+              {selectedProvider === 'click' && (
+                <div className="p-5 rounded-3xl bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-950 text-white border-2 border-blue-400/60 shadow-xl space-y-4 animate-fade-in">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-400/20 text-blue-200 text-[10px] font-bold border border-blue-300/30">
+                        <Zap className="w-3.5 h-3.5 text-blue-300" />
+                        <span>Rasmiy Click Merchant Protocol v1.0</span>
+                      </div>
+                      <h4 className="text-base sm:text-lg font-black text-white">
+                        Click orqali to'g'ridan-to'g'ri to'lash: {currentPlan.price} so'm
+                      </h4>
+                      <p className="text-xs text-blue-200/80 leading-relaxed max-w-lg">
+                        Mijoz summani o'zgartira olmaydi. To'lov 1 soniyada tasdiqlanadi va obuna avtomatik faollashtiriladi.
+                      </p>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className="text-[10px] uppercase font-bold text-blue-300 block">To'lov miqdori:</span>
+                      <span className="text-xl sm:text-2xl font-black text-amber-300">{currentPlan.price} UZS</span>
+                    </div>
+                  </div>
+
+                  {/* Click Payment Button */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      disabled={clickLoading}
+                      onClick={handleStartClickPayment}
+                      className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 hover:from-blue-600 hover:to-indigo-600 text-white font-black text-sm sm:text-base shadow-xl shadow-blue-900/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2.5 border-2 border-blue-300 cursor-pointer disabled:opacity-50"
+                    >
+                      {clickLoading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span>Buyurtma yaratilmoqda...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-5 h-5 text-amber-300 fill-amber-300" />
+                          <span>Click orqali to'lash ({currentPlan.price} so'm)</span>
+                          <ArrowRight className="w-5 h-5" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Sandbox notice */}
+                  <div className="p-3 rounded-xl bg-black/40 border border-blue-400/30 flex items-center justify-between text-[11px] text-blue-200">
+                    <span className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span><b>Sandbox & Test Mode:</b> Bank hisobisiz to'liq to'lov & audit sinovi integratsiya qilindi.</span>
+                    </span>
+                    <span className="font-mono text-[10px] text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-md">nur-qissa.uz</span>
+                  </div>
+                </div>
+              )}
+
               {/* UZUM BANK KESHBEK AKSIYA BANNERI */}
               {selectedProvider === 'uzum' && (
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white border-2 border-purple-400/50 shadow-lg flex items-center justify-between gap-4 animate-fade-in">
@@ -387,10 +525,8 @@ export default function PricingModal() {
               {selectedProvider === 'paynet' && (
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white border-2 border-emerald-400/50 shadow-lg space-y-3 animate-fade-in">
                   <div className="flex flex-col sm:flex-row items-center gap-4">
-                    {/* Visual QR Code Display */}
                     <div className="relative p-3 rounded-2xl bg-white shadow-xl flex items-center justify-center shrink-0">
                       <svg className="w-28 h-28 text-slate-900" viewBox="0 0 100 100" fill="currentColor">
-                        {/* Realistic SVG QR Pattern */}
                         <path d="M0,0 h30 v30 h-30 z M5,5 v20 h20 v-20 z M10,10 h10 v10 h-10 z" />
                         <path d="M70,0 h30 v30 h-30 z M75,5 v20 h20 v-20 z M80,10 h10 v10 h-10 z" />
                         <path d="M0,70 h30 v30 h-30 z M5,75 v20 h20 v-20 z M10,80 h10 v10 h-10 z" />
@@ -432,32 +568,11 @@ export default function PricingModal() {
                 </div>
               )}
 
-              {/* CLICK PASS BANNERI */}
-              {selectedProvider === 'click' && (
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900 to-indigo-950 text-white border-2 border-blue-400/50 shadow-lg flex items-center justify-between gap-4 animate-fade-in">
-                  <div className="space-y-1">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-400/30">
-                      <Zap className="w-3 h-3 text-blue-300" />
-                      <span>Click Pass / Click Up orqali</span>
-                    </div>
-                    <h4 className="text-sm font-black text-blue-100">
-                      Click ilovangizdan bir daqiqada o'tkazma qiling
-                    </h4>
-                    <p className="text-[11px] text-blue-200/80">
-                      Quyidagi Simora Oripova kartasiga Click ilovangizdan o'tkazma qilib, "To'lov qildim" tugmasini bosing.
-                    </p>
-                  </div>
-                  <div className="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-400/40 flex items-center justify-center shrink-0 text-blue-300">
-                    <Smartphone className="w-6 h-6" />
-                  </div>
-                </div>
-              )}
-
               {/* 3. REALISTIC BANK KARTA BLOKI (SIMORA ORIPOVA) */}
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-black text-pine-900 dark:text-butter-200 uppercase tracking-wider">
-                    {isUz ? "To'lov qabul qiluvchi hisob:" : "Recipient Bank Card:"}
+                    {isUz ? "Muqobil hisob (Karta orqali):" : "Alternative Direct Card:"}
                   </label>
                   <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5" />
@@ -467,19 +582,15 @@ export default function PricingModal() {
 
                 {/* VIP KARTA KO'RINIShI */}
                 <div className="relative w-full rounded-3xl p-5 sm:p-7 bg-gradient-to-br from-[#023B33] via-[#012A25] to-[#001714] border-2 border-amber-400/80 shadow-2xl text-white overflow-hidden">
-                  {/* Orqa fon nur effekti */}
                   <div className="absolute -top-16 -right-16 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
                   <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
 
-                  {/* Karta yuqori qatori: Oltin chip va tizim belgisi */}
                   <div className="flex items-center justify-between mb-5 relative z-10">
                     <div className="flex items-center gap-2">
-                      {/* Chip */}
                       <div className="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-300 via-amber-400 to-amber-200 border border-amber-500 shadow-inner flex items-center justify-center relative overflow-hidden">
                         <div className="w-full h-[1px] bg-amber-700/60 my-auto" />
                         <div className="absolute inset-x-2 inset-y-1 border border-amber-700/40 rounded-xs" />
                       </div>
-                      {/* To'lqin belgisi */}
                       <svg className="w-5 h-5 text-amber-300/80 transform rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M5 8.5a7 7 0 0 1 14 0" />
                         <path d="M8 11.5a3.5 3.5 0 0 1 8 0" />
@@ -491,7 +602,6 @@ export default function PricingModal() {
                     </div>
                   </div>
 
-                  {/* Karta raqami qatori & COPY TUGMASI */}
                   <div className="my-4 relative z-10">
                     <span className="text-[10px] font-bold text-amber-200/70 uppercase tracking-widest block mb-1.5">
                       {isUz ? "Karta raqami:" : "Card Number:"}
@@ -502,7 +612,6 @@ export default function PricingModal() {
                         {CARD_NUMBER}
                       </span>
 
-                      {/* COPY TUGMASI */}
                       <button
                         type="button"
                         onClick={handleCopyCard}
@@ -528,7 +637,6 @@ export default function PricingModal() {
                     </div>
                   </div>
 
-                  {/* Karta egasi ismi: Simora Oripova */}
                   <div className="flex items-end justify-between pt-3 border-t border-amber-400/20 relative z-10">
                     <div>
                       <span className="text-[9px] font-bold text-amber-200/60 uppercase tracking-widest block">
@@ -551,9 +659,7 @@ export default function PricingModal() {
                 </div>
               </div>
 
-              {/* ===================================================================== */}
-              {/* QAT'IY NAZORAT VA KAM TO'LASH BO'YICHA OGOHLANTIRISH BANNERI */}
-              {/* ===================================================================== */}
+              {/* QAT'IY NAZORAT BANNERI */}
               <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 dark:border-amber-400/30 flex items-start gap-3 text-left">
                 <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
@@ -563,35 +669,31 @@ export default function PricingModal() {
                   <p className="text-xs text-amber-950 dark:text-amber-100/90 leading-relaxed">
                     {isUz ? (
                       <>
-                        To'lov aynan belgilangan <b>{currentPlan.price} so'm</b> bo'lishi shart! Agar ko'rsatilgan summadan <b>kam to'lansa</b>, Telegram bot nazorati orqali obuna <b>avtomatik BEKOR QILINADI</b> va hisob faollashtirilmaydi.
+                        To'lov aynan belgilangan <b>{currentPlan.price} so'm</b> bo'lishi shart! Agar ko'rsatilgan summadan <b>kam to'lansa</b>, Click protokoli va Telegram bot nazorati orqali to'lov <b>avtomatik RAD ETILADI</b> va obuna berilmaydi.
                       </>
                     ) : (
                       <>
-                        The transfer must be exactly <b>{currentPlan.price} UZS</b>. If an underpayment occurs, the subscription will be <b>automatically revoked</b> by the audit bot.
+                        The transfer must be exactly <b>{currentPlan.price} UZS</b>. Underpayment is automatically rejected with error code -2.
                       </>
                     )}
                   </p>
                 </div>
               </div>
 
-              {/* ===================================================================== */}
-              {/* COPY BOSILGANDAN SO'NG YOKI TO'LOV TUGMASI */}
-              {/* ===================================================================== */}
-              {!paidSubmitted && (
+              {/* KARTA BILAN TO'LANGANDA CHEK TASDIQLASH */}
+              {!paidSubmitted && selectedProvider !== 'click' && (
                 <div className="pt-2 animate-fade-in space-y-4">
                   {!hasPaidClicked ? (
-                    /* TO'LOV QILDIM ASOSIY TUGMASI */
                     <button
                       type="button"
                       onClick={() => setHasPaidClicked(true)}
                       className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-white font-black text-sm sm:text-base shadow-xl shadow-emerald-700/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2.5 border-2 border-amber-300 cursor-pointer"
                     >
                       <Check className="w-5 h-5 text-amber-200" />
-                      <span>{isUz ? "To'lov qildim — Tasdiqlash" : "I Have Paid — Confirm"}</span>
+                      <span>{isUz ? "Karta orqali to'ladim — Tasdiqlash" : "I Paid via Card — Confirm"}</span>
                       <ArrowRight className="w-5 h-5 text-amber-200" />
                     </button>
                   ) : (
-                    /* TO'LOV QILGANDAN KEYINGI TELEFON VA ISM QOLDIRISH FORMASI */
                     <form
                       onSubmit={handleConfirmPaidSubmit}
                       className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-pine-950 border-2 border-emerald-500 shadow-xl space-y-4 animate-fade-in"
@@ -604,23 +706,6 @@ export default function PricingModal() {
                         <span className="text-xs font-black text-amber-600 dark:text-amber-400">
                           {currentPlan.price} so'm
                         </span>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-slate-50 dark:bg-pine-900 text-xs space-y-1 text-slate-700 dark:text-slate-300">
-                        <div className="flex justify-between">
-                          <span>To'lov usuli:</span>
-                          <span className="font-bold text-pine-950 dark:text-butter-100">{providerNames[selectedProvider]}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Tanlangan tarif:</span>
-                          <span className="font-bold text-pine-950 dark:text-butter-100">{currentPlan.name}</span>
-                        </div>
-                        {selectedProvider === 'uzum' && (
-                          <div className="flex justify-between text-purple-600 dark:text-purple-300 font-bold">
-                            <span>Keshbek sovg'asi:</span>
-                            <span>{currentPlan.cashbackUZS} so'm + 1 Qissa</span>
-                          </div>
-                        )}
                       </div>
 
                       <div className="space-y-3">
@@ -704,12 +789,6 @@ export default function PricingModal() {
                       ? `Rahmat! Simora Oripova hisobiga to'lov qilinganligi qayd etildi (${providerNames[selectedProvider]}). Bot hisobdagi ${currentPlan.price} so'm tushumni tekshirib, obunangizni to'liq tasdiqladi.`
                       : `Thank you! Your payment verification has been submitted to the audit bot.`}
                   </p>
-
-                  {selectedProvider === 'uzum' && (
-                    <div className="inline-block px-3 py-1 rounded-xl bg-purple-100 dark:bg-purple-900/50 border border-purple-400 text-purple-900 dark:text-purple-200 text-xs font-bold">
-                      🎉 Uzum Bank 5% keshbek va +1 ta qo'shimcha ertak balansingizga qo'shildi!
-                    </div>
-                  )}
 
                   <div className="pt-2">
                     <button
@@ -912,6 +991,156 @@ export default function PricingModal() {
         </div>
 
       </div>
+
+      {/* ========================================================================= */}
+      {/* CLICK MERCHANT SANDBOX & TESTING SIMULATOR MODAL */}
+      {/* ========================================================================= */}
+      {clickModalOpen && currentOrder && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-lg bg-white dark:bg-pine-950 rounded-3xl border-2 border-blue-500 shadow-2xl p-5 sm:p-7 space-y-5 text-slate-900 dark:text-white">
+            <button
+              onClick={() => setClickModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 dark:bg-pine-900 hover:bg-slate-200 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Click Header */}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-xl shadow-md">
+                C
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-blue-950 dark:text-blue-100 flex items-center gap-2">
+                  <span>Click Merchant To'lov</span>
+                  <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-300 text-[10px] font-bold">
+                    Sandbox Test
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Xizmat: <b>NurQissa (nur-qissa.uz)</b>
+                </p>
+              </div>
+            </div>
+
+            {/* Invoice Details */}
+            <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-pine-900/60 border border-blue-200 dark:border-pine-800 space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-slate-600 dark:text-slate-400">Buyurtma ID:</span>
+                <span className="font-mono font-bold text-blue-950 dark:text-blue-200">{currentOrder.id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600 dark:text-slate-400">Tanlangan tarif:</span>
+                <span className="font-bold">{currentOrder.planName}</span>
+              </div>
+              <div className="flex justify-between text-sm font-black pt-1 border-t border-blue-200/60 dark:border-pine-800">
+                <span className="text-slate-800 dark:text-butter-200">To'lov summasi:</span>
+                <span className="text-blue-700 dark:text-amber-300">{Number(currentOrder.amount).toLocaleString('uz-UZ')} so'm</span>
+              </div>
+            </div>
+
+            {/* Simulation feedback */}
+            {simulationResult && (
+              <div className={`p-4 rounded-2xl border-2 space-y-2 animate-fade-in text-xs ${
+                simulationResult.success 
+                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-900 dark:text-emerald-200' 
+                  : 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-900 dark:text-rose-200'
+              }`}>
+                <div className="flex items-center gap-2 font-black text-sm">
+                  {simulationResult.success ? (
+                    <>
+                      <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>Click to'lovi muvaffaqiyatli o'tdi!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
+                      <span>Kam to'lash aniqlandi va rad etildi!</span>
+                    </>
+                  )}
+                </div>
+                <p className="leading-relaxed">
+                  {simulationResult.message}
+                </p>
+                {simulationResult.prepareResult && (
+                  <div className="font-mono text-[11px] p-2 rounded-lg bg-black/10 dark:bg-black/30">
+                    Xatolik kodi: <b>{simulationResult.prepareResult.error}</b> ({simulationResult.prepareResult.error_note})
+                  </div>
+                )}
+                {simulationResult.success && (
+                  <div className="font-mono text-[11px] p-2 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                    ✓ Obunangiz faollashdi va Telegram botingizga rasmiy tasdiqnoma yetib bordi!
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Simulation Action Buttons */}
+            <div className="space-y-2.5 pt-1">
+              <span className="block text-[11px] font-bold uppercase text-slate-500 tracking-wider">
+                Bank hisobisiz tizimni sinash (Developer Simulator):
+              </span>
+
+              {/* 1. Simulate Success */}
+              <button
+                type="button"
+                disabled={isSimulating}
+                onClick={() => handleSimulatePayment('success')}
+                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isSimulating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                <span>1. To'liq to'lovni sinash ({Number(currentOrder.amount).toLocaleString('uz-UZ')} so'm tushdi)</span>
+              </button>
+
+              {/* 2. Simulate Underpayment (Fraud test) */}
+              <button
+                type="button"
+                disabled={isSimulating}
+                onClick={() => handleSimulatePayment('underpaid')}
+                className="w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isSimulating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <ShieldAlert className="w-4 h-4" />
+                )}
+                <span>2. Kam to'lash xatosini sinash (masalan 10 000 so'm yuborilsa)</span>
+              </button>
+
+              {/* 3. Live Click Redirect Link */}
+              <a
+                href={clickPaymentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-4 rounded-xl border border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-pine-900 text-blue-700 dark:text-blue-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
+              >
+                <span>Haqiqiy Click ilovasiga o'tish (my.click.uz)</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setClickModalOpen(false);
+                  if (simulationResult?.success) {
+                    setIsPricingModalOpen(false);
+                  }
+                }}
+                className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 underline cursor-pointer"
+              >
+                {simulationResult?.success ? "Tayyor, oynani yopish" : "Bekor qilish"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
