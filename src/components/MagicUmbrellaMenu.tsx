@@ -123,12 +123,12 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
         onHoverEnd={() => setIsHovered(false)}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.94 }}
-        className="relative flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-butter-200 hover:bg-butter-300 border-2 border-pine-800 text-pine-950 font-black text-xs sm:text-sm shadow-md cursor-pointer transition-all group focus:outline-none"
+        className="relative flex items-center gap-1 sm:gap-2 p-1 sm:px-3 sm:py-1.5 rounded-full bg-butter-200 hover:bg-butter-300 border-2 border-pine-800 text-pine-950 font-black text-xs sm:text-sm shadow-sm cursor-pointer transition-all group focus:outline-none shrink-0"
         title={locale === 'uz' ? "Sirli Soyabon — Bo'limlarni ochish uchun torting yoki bosing" : "Secret Umbrella — Click or pull to open"}
       >
         
         {/* Animated Fairytale Umbrella Icon Container */}
-        <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+        <div className="relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center shrink-0">
           
           {/* Glowing Ambient Halo */}
           <div className="absolute -inset-1 rounded-full bg-amber-300/40 blur-xs opacity-80 group-hover:opacity-100 transition-opacity" />

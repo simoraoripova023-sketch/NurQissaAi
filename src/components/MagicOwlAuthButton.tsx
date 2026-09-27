@@ -37,12 +37,12 @@ export default function MagicOwlAuthButton() {
         onHoverEnd={() => setIsHovered(false)}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.94 }}
-        className="relative flex items-center gap-1.5 sm:gap-2 p-1.5 sm:px-3.5 sm:py-1.5 rounded-full bg-butter-200 hover:bg-butter-300 border-2 border-pine-800 text-pine-950 font-black text-xs sm:text-sm shadow-md cursor-pointer transition-all group focus:outline-none"
+        className="relative flex items-center gap-1 sm:gap-2 p-1 sm:px-3.5 sm:py-1.5 rounded-full bg-butter-200 hover:bg-butter-300 border-2 border-pine-800 text-pine-950 font-black text-xs sm:text-sm shadow-sm cursor-pointer transition-all group focus:outline-none shrink-0"
         title={currentUser ? currentUser.name : (locale === 'uz' ? "Dono Boyqushcha orqali ro'yxatdan o'tish" : "Fairy Owl Sign In")}
       >
         
         {/* The Cute Bedtime Owl SVG */}
-        <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+        <div className="relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center shrink-0">
           
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* Owl Body */}
