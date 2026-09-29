@@ -44,8 +44,6 @@ export default function PricingModal() {
   const [clickModalOpen, setClickModalOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<any>(null);
   const [clickPaymentUrl, setClickPaymentUrl] = useState<string>('');
-  const [simulationResult, setSimulationResult] = useState<any>(null);
-  const [isSimulating, setIsSimulating] = useState(false);
 
   if (!isPricingModalOpen) return null;
 
@@ -110,7 +108,6 @@ export default function PricingModal() {
   // Start Click Payment flow
   const handleStartClickPayment = async () => {
     setClickLoading(true);
-    setSimulationResult(null);
     try {
       const res = await fetch('/api/click/create-order', {
         method: 'POST',
@@ -134,47 +131,6 @@ export default function PricingModal() {
     }
   };
 
-  // Simulate Click payment webhook for sandbox testing
-  const handleSimulatePayment = async (type: 'success' | 'underpaid') => {
-    if (!currentOrder) return;
-    setIsSimulating(true);
-    setSimulationResult(null);
-
-    try {
-      const res = await fetch('/api/click/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          orderId: currentOrder.id,
-          simulateType: type,
-          customAmount: type === 'underpaid' ? 10000 : currentOrder.amount,
-        })
-      });
-      const data = await res.json();
-      setSimulationResult(data);
-
-      if (data.success && type === 'success') {
-        confetti({
-          particleCount: 160,
-          spread: 100,
-          origin: { y: 0.5 },
-        });
-
-        if (selectedPlan === 'pack3') {
-          addStoryCredits(3);
-        } else if (selectedPlan === 'pack10') {
-          addStoryCredits(10);
-        } else if (selectedPlan === 'vip') {
-          setHasPaidSubscription(true);
-        }
-      }
-    } catch (err) {
-      console.error('Simulation error:', err);
-    } finally {
-      setIsSimulating(false);
-    }
-  };
-
   const handleConfirmPaidSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmittingPaid(true);
@@ -194,31 +150,19 @@ export default function PricingModal() {
           planName: currentPlan.name,
           provider: providerNames[selectedProvider],
           cashback: cashbackInfo,
-          message: `To'lov tizimi: ${providerNames[selectedProvider]} | Summa: ${currentPlan.price} so'm | Karta: ${CARD_NUMBER} (${CARD_HOLDER}) | Izoh: ${paymentNote.trim() || "Chek tasdiqlandi"}`
+          message: `To'lov tizimi: ${providerNames[selectedProvider]} | Summa: ${currentPlan.price} so'm | Karta: ${CARD_NUMBER} (${CARD_HOLDER}) | Izoh: ${paymentNote.trim() || "Mijoz to'lov chekini qoldirdi. Kartangizni tekshiring!"}`
         }),
-      }).catch(() => {});
-    } catch {}
+      });
+    } catch (err) {
+      console.error('Submit payment report error:', err);
+    }
 
     setTimeout(() => {
       setIsSubmittingPaid(false);
       setPaidSubmitted(true);
-
-      confetti({
-        particleCount: 160,
-        spread: 100,
-        origin: { y: 0.5 },
-      });
-
-      // Credit stories to user
-      const bonusForUzum = isUzum ? 1 : 0;
-      if (selectedPlan === 'pack3') {
-        addStoryCredits(3 + bonusForUzum);
-      } else if (selectedPlan === 'pack10') {
-        addStoryCredits(10 + bonusForUzum);
-      } else if (selectedPlan === 'vip') {
-        setHasPaidSubscription(true);
-      }
-    }, 1000);
+      // NOTE: Manual payments do NOT grant credits automatically.
+      // Admin verifies bank receipt and activates subscription.
+    }, 800);
   };
 
   return (
@@ -781,13 +725,13 @@ export default function PricingModal() {
                   </div>
                   
                   <h4 className="text-lg font-black text-emerald-950 dark:text-emerald-200">
-                    {isUz ? "To'lov ma'lumotlari bot nazoratiga yuborildi!" : "Payment confirmation sent to bot!"}
+                    {isUz ? "To'lov arizasi qabul qilindi!" : "Payment verification submitted!"}
                   </h4>
 
                   <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
                     {isUz 
-                      ? `Rahmat! Simora Oripova hisobiga to'lov qilinganligi qayd etildi (${providerNames[selectedProvider]}). Bot hisobdagi ${currentPlan.price} so'm tushumni tekshirib, obunangizni to'liq tasdiqladi.`
-                      : `Thank you! Your payment verification has been submitted to the audit bot.`}
+                      ? `Rahmat! ${providerNames[selectedProvider]} orqali to'lov arizangiz qabul qilindi. Administratorimiz kartaga ${currentPlan.price} so'm mablag' tushganini tekshirib (5–15 daqiqa ichida) limitingizni ochadi yoki @nurqissaaa_bot orqali siz bilan bog'lanadi.`
+                      : `Thank you! Your payment verification has been submitted. Our administrator will verify the receipt within 5-15 minutes and activate your credits.`}
                   </p>
 
                   <div className="pt-2">
@@ -796,7 +740,7 @@ export default function PricingModal() {
                       onClick={() => setIsPricingModalOpen(false)}
                       className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md transition-all cursor-pointer"
                     >
-                      {isUz ? "Tushunarli, ertaklarga o'tish" : "Continue to Stories"}
+                      {isUz ? "Tushunarli, oynani yopish" : "Close Window"}
                     </button>
                   </div>
                 </div>
@@ -1039,102 +983,35 @@ export default function PricingModal() {
               </div>
             </div>
 
-            {/* Simulation feedback */}
-            {simulationResult && (
-              <div className={`p-4 rounded-2xl border-2 space-y-2 animate-fade-in text-xs ${
-                simulationResult.success 
-                  ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-900 dark:text-emerald-200' 
-                  : 'bg-rose-50 dark:bg-rose-950/40 border-rose-500 text-rose-900 dark:text-rose-200'
-              }`}>
-                <div className="flex items-center gap-2 font-black text-sm">
-                  {simulationResult.success ? (
-                    <>
-                      <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                      <span>Click to'lovi muvaffaqiyatli o'tdi!</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
-                      <span>Kam to'lash aniqlandi va rad etildi!</span>
-                    </>
-                  )}
+            {/* Live Click Payment Instructions */}
+            <div className="space-y-3 pt-2">
+              <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-pine-900/50 border border-blue-200 dark:border-pine-800 text-left space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                <div className="flex items-center gap-1.5 font-black text-blue-950 dark:text-blue-200">
+                  <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <span>Xavfsiz rasmiy Click to'lovi</span>
                 </div>
-                <p className="leading-relaxed">
-                  {simulationResult.message}
+                <p className="text-[11px] leading-relaxed">
+                  Tugmani bosganingizda rasmiy <b>my.click.uz</b> to'lov sahifasiga o'tasiz. To'lov muvaffaqiyatli yakunlangach, balansingiz avtomatik ravishda to'ldiriladi va rasmiy kvitansiya taqdim etiladi.
                 </p>
-                {simulationResult.prepareResult && (
-                  <div className="font-mono text-[11px] p-2 rounded-lg bg-black/10 dark:bg-black/30">
-                    Xatolik kodi: <b>{simulationResult.prepareResult.error}</b> ({simulationResult.prepareResult.error_note})
-                  </div>
-                )}
-                {simulationResult.success && (
-                  <div className="font-mono text-[11px] p-2 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
-                    ✓ Obunangiz faollashdi va Telegram botingizga rasmiy tasdiqnoma yetib bordi!
-                  </div>
-                )}
               </div>
-            )}
 
-            {/* Simulation Action Buttons */}
-            <div className="space-y-2.5 pt-1">
-              <span className="block text-[11px] font-bold uppercase text-slate-500 tracking-wider">
-                Bank hisobisiz tizimni sinash (Developer Simulator):
-              </span>
-
-              {/* 1. Simulate Success */}
-              <button
-                type="button"
-                disabled={isSimulating}
-                onClick={() => handleSimulatePayment('success')}
-                className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                {isSimulating ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Check className="w-4 h-4" />
-                )}
-                <span>1. To'liq to'lovni sinash ({Number(currentOrder.amount).toLocaleString('uz-UZ')} so'm tushdi)</span>
-              </button>
-
-              {/* 2. Simulate Underpayment (Fraud test) */}
-              <button
-                type="button"
-                disabled={isSimulating}
-                onClick={() => handleSimulatePayment('underpaid')}
-                className="w-full py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                {isSimulating ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <ShieldAlert className="w-4 h-4" />
-                )}
-                <span>2. Kam to'lash xatosini sinash (masalan 10 000 so'm yuborilsa)</span>
-              </button>
-
-              {/* 3. Live Click Redirect Link */}
+              {/* Direct Click Redirect Link */}
               <a
                 href={clickPaymentUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 px-4 rounded-xl border border-blue-300 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-pine-900 text-blue-700 dark:text-blue-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
+                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-sm shadow-xl shadow-blue-700/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer text-center"
               >
-                <span>Haqiqiy Click ilovasiga o'tish (my.click.uz)</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Click ilovasi orqali to'lash ({Number(currentOrder.amount).toLocaleString('uz-UZ')} so'm)</span>
+                <ExternalLink className="w-4 h-4" />
               </a>
             </div>
 
             <div className="pt-2 text-center">
               <button
                 type="button"
-                onClick={() => {
-                  setClickModalOpen(false);
-                  if (simulationResult?.success) {
-                    setIsPricingModalOpen(false);
-                  }
-                }}
+                onClick={() => setClickModalOpen(false)}
                 className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 underline cursor-pointer"
               >
-                {simulationResult?.success ? "Tayyor, oynani yopish" : "Bekor qilish"}
+                Bekor qilish
               </button>
             </div>
           </div>

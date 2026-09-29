@@ -11,6 +11,13 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    // In production, block all unauthorized simulations
+    if (process.env.NODE_ENV === 'production' && req.headers.get('x-admin-secret') !== process.env.ADMIN_SECRET_KEY) {
+      return NextResponse.json({
+        error: "Simulyatsiya faqat rivojlantirish (dev) rejimida mavjud.",
+      }, { status: 403 });
+    }
+
     const body = await req.json();
     const { orderId, simulateType = 'success', customAmount } = body;
 
