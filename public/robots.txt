@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nur-qissa.uz/sitemap.xml

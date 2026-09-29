@@ -42,3 +42,6 @@ next-env.d.ts
 supabase/.temp/
 data/admin_chats.json
 data/feedbacks.json
+data/voice_samples/
+data/telegram_audios/
+*.png.tmp

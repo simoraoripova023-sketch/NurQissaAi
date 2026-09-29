@@ -57,7 +57,7 @@ export async function createOrder(params: {
       user_phone: order.userPhone,
       created_at: order.created_at,
       updated_at: order.updated_at,
-    }]).catch(() => {});
+    }]);
   } catch {}
 
   return order;
@@ -109,7 +109,7 @@ export async function updateOrder(orderId: string, updates: Partial<Order>): Pro
       status: updated.status,
       click_trans_id: updated.clickTransId,
       updated_at: updated.updated_at,
-    }).eq('id', orderId).catch(() => {});
+    }).eq('id', orderId);
   } catch {}
 
   return updated;
