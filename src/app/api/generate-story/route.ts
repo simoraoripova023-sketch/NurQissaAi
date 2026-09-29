@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChildProfile, StoryBook } from '@/lib/types';
 import { getOpenAiApiKey, getGeminiApiKey } from '@/lib/serverKeys';
+import { generateDynamicIslamicStory } from '@/lib/storyFallbackEngine';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -184,41 +185,52 @@ async function generateStoryWithAi(profile: ChildProfile, masterAnchor: string, 
     const chosenStyle = profile.illustration_style || 'pixar_3d';
     const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
 
-    const systemPrompt = `You are a world-class Islamic children's storytelling pedagogue and art director for the "NurQissa AI" platform.
-Generate an authentic, highly personalized, heartwarming ${targetPageCount}-page Islamic storybook in rich literary Uzbek (main) and English (translation), strictly grounded in authentic Islamic children's literature (drawing directly from masterworks like "Payg'ambarimiz nima qilgan bo'lardilar", "Zahro va yo'qolgan mushukcha", "Zakariyo va kechagi taom", "Imron va xafa bo'lgan o'yinchoqlar", "Aqilli bola Yusuf", "Allohning chin do'sti").
+    const systemPrompt = `You are a master Islamic children's author and pedagogue for the "NurQissa AI" platform.
+Your mission is to craft an authentic, heartwarming, deeply meaningful ${targetPageCount}-page children's story in rich literary Uzbek (primary) and English (secondary).
+Strictly draw from the proven narrative models of classical and modern Islamic children's masterworks:
+- "Payg'ambarimiz sallallohu alayhi vasallam nima qilgan bo'lardilar" (Mo'tabar Xamrayeva)
+- "Zahro va yo'qolgan mushukcha" (Ummu Zahro)
+- "Onajon bugun nima ovqat yeymiz" (Ummu Zakariyya)
+- "Imron va xafa bo'lgan o'yinchoqlar" (Umida Bahodir qizi)
+- "Aqilli bola Yusuf" & "Bolalar uchun 40 Hadis hikoyalari"
 
-TARGET CHILD PROFILE & CHARACTER ANCHOR:
+TARGET CHILD & STORY CONTEXT:
 - Child Name: "${childName}"
 - Gender: "${isBoy ? 'o\'g\'il bola' : 'qiz bola'}"
 - Age: ${age} yosh
 - Total Pages: Exactly ${targetPageCount} pages (numbered 1 to ${targetPageCount})
-- Reading Occasion: "${readingTime}"
+- Reading Context: "${readingTime}"
 - Today's Activity: "${activity}"
-- Mood: "${mood}"
-- Companion Animal: "${animal}"
-- Palette / Theme: "${color}"
+- Child Mood: "${mood}"
+- Companion: "${animal}"
 - Setting: "${setting}"
-- Core Moral Virtue: "${virtue}" (Islomiy fazilat: Sabr, Shukr, Saxovat, Mehr-oqibat, Ota-onani e'zozlash, Rostgo'ylik, Odob-axloq, Poklik va tartib, Isrof qilmaslik, Jonzotlarga shafqat, Muhtojlarga ehson).
+- Core Moral Virtue: "${virtue}" (Islomiy fazilatlar: Shukronalik, Taom odobi, Poklik va tartib, Jonzotlarga shafqat, Isrofga yo'l qo'ymaslik, Saxovat va muhtojlarga ehson, Ota-onani e'zozlash, Qalb sakinati va namoz).
 - LOCKED CHARACTER VISUAL ANCHOR: "${masterAnchor}"
 
-PEDAGOGICAL STORY ARC ARCHETYPE (Follow this proven structure from Payg'ambarimiz nima qilgan bo'lardilar, Zahro, Zakariyo & Imron):
-1. REALISTIC CHILD SITUATION: Start with a relatable childhood moment (e.g. playing happily with toys/companion, dinnertime with family, encountering a weak creature/kitten, hesitation or momentary complaint/messiness).
-2. TENDER PARENTAL WISDOM & SUNNAH QUESTION: Loving mother/father/grandparent gently teaches the wisdom, asking: «Payg'ambarimiz sallallohu alayhi vasallam bu vaziyatda nima qilgan bo'lardilar?» (e.g. teaching gratitude for home/food, remembering less fortunate children, kindness to animals, avoiding isrof/waste, Quranic ayat like «Agar shukr qilsangiz, albatta, sizga ziyoda qilurman» [Ibrohim, 7] or Prophetic Hadiths).
-3. INNER REALIZATION & POSITIVE ACTION: The child realizes the blessing, corrects the mistake (e.g. happily helping the kitten/animal, tidying room, sorting out unused toys/clothes to donate to needy neighbor children, eating with "Bismillah" and "Alhamdulillah", warmly hugging parents).
-4. SAKINAT & BEDTIME DUA: Peaceful feeling of Barakah in the family, concluding with sincere bedtime Dua and sweet dreams under Allah's protection.
+MANDATORY NARRATIVE & LITERARY QUALITY RULES:
+1. RICH DEPTH & LENGTH (NO SUPERFICIAL 1-SENTENCE PAGES):
+   - Every single page MUST contain 3 to 5 richly developed sentences (minimum 50-70 words per page in Uzbek).
+   - Weave in sensory descriptions: the warm aroma of home cooking, the amber twilight light, the trembling whimper of a cold kitten, the colorful scattered blocks on the carpet, the soft whisper of evening prayer.
+2. NATURAL DIALOGUE & RESPECTFUL UZBEK SPEECH:
+   - Dialogue is MANDATORY on most pages.
+   - Use warm Uzbek affectionate terms: «Ko'zimning oqi», «Jon bolam», «Onajon», «Dadajon», «Buvijon».
+   - Use proper quotes («...») for speech.
+3. THE PROPHETIC SUNNAH PEDAGOGICAL FORMULA:
+   - Start with a realistic childhood friction: reluctance to clean up, wanting a new snack instead of wholesome food, noticing an animal in need, or hesitation.
+   - The loving parent or elder gently guides with the central question:
+     «Payg'ambarimiz sallallohu alayhi vasallam bu vaziyatda nima qilgan bo'lardilar?»
+   - Cite an authentic Sunnah or Hadith (e.g. mercy to the deer/kitten, not criticizing food, tidiness being half of faith, sharing what you love).
+4. INNER EMOTIONAL TRANSFORMATION (REALIZATION):
+   - The child reflects deeply: «Men xatoyimni tushundim...», «Kichkina yaxshilik ham kim uchundir eng katta yordam bo'lishi mumkin».
+   - Concrete positive action: tidying up, sharing food or toys with a needy neighbor, embracing mother with «Alhamdulillah».
+5. SAKINAT & SINCERE BEDTIME DUA:
+   - Conclude with genuine spiritual peace (Sakinat), cupping hands for Dua with parents, and drifting to sleep under the watchful care of angels.
+6. ZERO MYTHOLOGY: Strictly NO magic wands, wizards, witches, fairies, or mythological spells.
 
 CRITICAL IMAGE PROMPT CONSISTENCY INSTRUCTION:
-For EVERY page, you MUST generate an "image_prompt" in ENGLISH following this exact 4-part formula:
-Formula: [LOCKED CHARACTER ANCHOR] + [EXACT SCENE PHYSICAL ACTION & EMOTION] + [ENVIRONMENT & ATMOSPHERE] + [LIGHTING & 3D PIXAR RENDER STYLE]
-Examples:
-- "${masterAnchor} is sitting at a cozy wooden dining table with loving mother wearing soft beige hijab, smiling with large brown sparkling eyes over a traditional ceramic bowl of warm pilaf and fresh fruit basket, warm golden sunlight through window, framed Arabic calligraphy on wall, 3D Pixar animation storybook masterpiece, vivid colors, 8k render"
-- "${masterAnchor} is kneeling on a soft bedroom carpet happily organizing colorful toy blocks and cars into neat storage boxes, bedroom with neat book shelves and soft ambient glow, 3D Pixar animation style, vivid colors, 8k render, masterpiece"
-
-AUTHENTIC ISLAMIC LITERATURE RULES:
-1. HADITH & PROPHETIC SUNNAH: Weave authentic Hadiths naturally into dialogue (e.g., «Tabassum qilish ham sadaqadir», «Poklik iymondandir», «Ota-onaga yaxshilik qilish eng ulug' amallardandir»).
-2. DUA & SUNNAH HABITS: Opening with "Bismillahir Rohmanir Rohiym", praising Allah with "Alhamdulillah", bedtime prayer with open palms («Bismika Allohumma amutu va ahya»), and Dua for parents.
-3. ZERO MYTHOLOGY: Absolutely NO magic wands, spells, fairies, witches, or wizards.
-4. RICH PEDAGOGICAL TONE: Pure, warm, and inspiring bedtime language in literary Uzbek.
+For EVERY page, you MUST generate an "image_prompt" in ENGLISH following this exact formula:
+Formula: [LOCKED CHARACTER ANCHOR] + [PRECISE SCENE ACTION & EXPRESSION] + [ENVIRONMENT & OBJECTS] + [LIGHTING & 3D PIXAR RENDER STYLE]
+Example: "${masterAnchor} is sitting at a low wooden dining table holding hands with smiling mother wearing pastel hijab, looking remorseful yet enlightened over a steaming bowl of soup, warm golden sunset light, traditional Uzbek home interior, 3D Pixar animation storybook masterpiece, 8k render"
 
 Output Valid JSON ONLY with this exact schema:
 {
@@ -260,25 +272,12 @@ Output Valid JSON ONLY with this exact schema:
       ],
       "explanation_uz": "...",
       "explanation_en": "..."
-    },
-    {
-      "id": "q2",
-      "question_uz": "...",
-      "question_en": "...",
-      "options": [
-        { "id": "o1", "text_uz": "...", "text_en": "...", "isCorrect": true },
-        { "id": "o2", "text_uz": "...", "text_en": "...", "isCorrect": false },
-        { "id": "o3", "text_uz": "...", "text_en": "...", "isCorrect": false }
-      ],
-      "explanation_uz": "...",
-      "explanation_en": "..."
     }
   ]
 }`;
 
-    // 1. Try OpenAI GPT-4o-mini
+    // 1. Try OpenAI GPT-4o-mini if key exists
     const openAiKey = getOpenAiApiKey();
-
     if (openAiKey) {
       try {
         const oaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -310,13 +309,13 @@ Output Valid JSON ONLY with this exact schema:
       }
     }
 
-    // 2. Try Google Gemini models
+    // 2. Try Google Gemini models (prioritizing 200 OK models)
     const geminiKey = getGeminiApiKey();
     const modelsToTry = [
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-      'gemini-1.5-pro'
+      'gemini-3.5-flash',
+      'gemini-3.1-flash-lite',
+      'gemini-flash-latest',
+      'gemini-3.8-flash'
     ];
 
     let resultText = '';
@@ -331,7 +330,7 @@ Output Valid JSON ONLY with this exact schema:
             generationConfig: {
               responseMimeType: 'application/json',
               temperature: 0.72,
-              maxOutputTokens: 6500,
+              maxOutputTokens: 7500,
             }
           })
         });
@@ -340,6 +339,9 @@ Output Valid JSON ONLY with this exact schema:
           const data = await response.json();
           resultText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
           if (resultText) break;
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          console.warn(`Gemini ${model} returned ${response.status}:`, errData?.error?.message?.slice(0, 100));
         }
       } catch (err) {
         console.warn(`Gemini model ${model} notice:`, err);
@@ -452,157 +454,19 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 3. Fallback: High-Quality Programmatic Islamic Tale with 100% newly generated AI scene images
-    const animalEn = translateAnimalToEnglish(animal);
-    const colorEn = translateColorToEnglish(color);
-
-    const rawFallbackPages = [
-      {
-        page_number: 1,
-        text_uz: `Oqshom shafag'i olamga oltin nurlarini sochar edi. ${childName} o'zining sevimli ${animal}i bilan birga xonadonida o'tirib, osmondagi yulduzlarni tomosha qilardi. Uning qalbida go'zal ibratli ertak tinglash ishtiyoqi yonardi.`,
-        text_en: `As the golden evening arrived, ${childName} sat peacefully with their beloved ${animal}, gazing at the first twinkling stars.`,
-        scene_summary: `${childName}ning oqshomgi xotirjamligi va tafakkuri`,
-        scene_prompt: `${characterPersona}, sitting cozily beside ${animalEn} looking at twilight stars through the window, warm golden sunset rays, peaceful cozy room with soft patterned rug, soft ambient glow`
-      },
-      {
-        page_number: 2,
-        text_uz: `Shu payt xonaga mehribon buvijonisi va ota-onasi kirib keldilar. Ular ${childName}ning yoniga o'tirib, mehr bilan peshonasidan o'pdilar: "Ko'zlarimizning nuri, bilasanmi, chinakam baxt — har bir ne'mat uchun Allohga shukr qilish va yaxshilik ulashishdadir", dedilar.`,
-        text_en: `Loving family joined ${childName}, sharing gentle words of wisdom: "True happiness comes from gratitude and sharing goodness."`,
-        scene_summary: `Oila mehri va nuryuzli buvijonisining o'giti`,
-        scene_prompt: `${characterPersona}, sitting affectionately beside loving smiling grandmother and parents, grandmother gently touching child's shoulder, smiling warmly, warm tea cups on low table, cozy living room`
-      },
-      {
-        page_number: 3,
-        text_uz: `${childName} o'zining sevimli ${animal}ini quchoqlab, samimiy jilmaydi. U bugun o'rgangan go'zal fazilatga amal qilishga qaror qildi: "Bismillahir Rohmanir Rohiym!" deb, eng sevimli narsasini oilasi va yaqinlari bilan baham ko'rdi.`,
-        text_en: `With a joyful smile, ${childName} whispered "Bismillah" and happily shared what they loved most with family.`,
-        scene_summary: `Bismillah bilan ezgulik va saxovat ko'rsatish`,
-        scene_prompt: `${characterPersona}, happily sharing sweet fruits and treats with family members, cheerful joyful smile, holding hands out politely, bright warm inviting Islamic arch decor room`
-      },
-      {
-        page_number: 4,
-        text_uz: `Birdan butun xona go'yo nurga to'ldi! ${childName}ning yaxshi amali tufayli ${animal} ham quvonchdan sakrab ketdi. Har bir yaxshi amal qalbga xotirjamlik va baraka olib kelishini ${childName} dildan his qildi.`,
-        text_en: `The room sparkled with warmth. Doing good brought instant peace and light to everyone's heart.`,
-        scene_summary: `Ezgulikning nurli barakasi va qalb sakinatlari`,
-        scene_prompt: `${characterPersona}, standing happily with open joyful arms in a bright room illuminated with soft glowing golden magical sparkles, cute ${animalEn} jumping playfully in excitement, pure happiness and radiant warm light`
-      },
-      {
-        page_number: 5,
-        text_uz: `Kechki dasturxonda butun oila jam bo'ldi. ${childName} odob bilan taom yeb, "Alhamdulillah, bizga bergan barcha shirin ne'matlaringga shukur, Yo Robbim!" dedi. Ota-onasi uning odobidan cheksiz faxrlandilar.`,
-        text_en: `At dinnertime, ${childName} politely said 'Alhamdulillah', filling parents with immense pride and joy.`,
-        scene_summary: `Shukronalik dasturxoni va go'zal odob`,
-        scene_prompt: `${characterPersona}, sitting politely with parents at dinner table filled with fresh bread and tea, holding hands in gratitude prayer, smiling proudly, warm cozy dining room lanterns`
-      },
-      {
-        page_number: 6,
-        text_uz: `Oqshom tushib, osmon hilol oy va son-sanoqsiz yulduzlar bilan bezandi. ${childName} xonasini ozoda qilib, yotishga tayyorlandi. Uning qalbi cheksiz oromga to'lgan edi.`,
-        text_en: `Outside the window, a bright crescent moon smiled as ${childName} prepared for cozy bedtime.`,
-        scene_summary: `Orombaxsh oqshom sukunati va xona ozodaligi`,
-        scene_prompt: `${characterPersona}, tidying up storybooks in a neat clean bedroom, glowing crescent moon and stars outside large window, serene calming bedtime ambient lighting`
-      },
-      {
-        page_number: 7,
-        text_uz: `Yotishdan oldin ${childName} jajji kaftlarini ochib, ixlos bilan duo qildi: "Ey mehribon Allohim! Ota-onamni, oilamni asragin. Menga go'zal xulq va sabr bergin. Omin!". Buvijonisi unga shirin fotiha berdi.`,
-        text_en: `Raising hands in sincere prayer, ${childName} asked Allah to bless parents, family, and keep their heart pure.`,
-        scene_summary: `${childName}ning samimiy oqshomgi duosi`,
-        scene_prompt: `${characterPersona}, kneeling on a soft prayer carpet with cupped open hands making heartfelt bedtime Dua prayer, soft divine golden moonlight, calm tranquil spiritual atmosphere`
-      },
-      {
-        page_number: 8,
-        text_uz: `${childName} yostig'iga bosh qo'yib, jilmaygancha shirin uyquga ketdi. U shirin tushlar ko'rib, farishtalar panohida orom oldi. Xayrli tun, aziz ${childName}!`,
-        text_en: `Resting upon soft pillows, ${childName} drifted into the sweetest peaceful sleep. Good night, little champion!`,
-        scene_summary: `Shirin tushlar va farishtalar panohidagi uyqu`,
-        scene_prompt: `${characterPersona}, sleeping soundly under a cozy soft blanket with a gentle innocent smile, ${animalEn} curled up peacefully beside bed, gentle soothing star night lamp, fairytale bedtime serenity`
-      }
-    ];
-
-    const fallbackCoverPrompt = `${characterPersona}, together with companion ${animalEn} in cozy warm glowing ${colorEn} room, gentle ambient sunlight, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
-    const fallbackCoverUrl = createAiImageUrl(fallbackCoverPrompt, storyId, 0, chosenStyle);
-    const coverImageUrl = await generateDallEImage(fallbackCoverPrompt, fallbackCoverUrl);
-
-    const selectedPages = rawFallbackPages.slice(0, targetPageCount).map((p, idx) => {
-      const prompt = `${p.scene_prompt}, ${colorEn}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
-      return {
-        ...p,
-        page_number: idx + 1,
-        image_prompt: prompt,
-        image_url: createAiImageUrl(prompt, storyId, idx + 1, chosenStyle),
-      };
-    });
-
-    const fallbackStory: StoryBook = {
-      id: storyId,
-      created_at: new Date().toISOString(),
-      child_profile: profile,
-      title_uz: `${childName} va Nurli Hikmat Sayohati`,
-      title_en: `${childName} and the Radiant Journey`,
-      prologue_uz: `Erka farzandimiz — ${childName}ning sevimli ${animal}i bilan birgalikdagi ibratli va sehrli oqshom sarguzashti...`,
-      prologue_en: `A heartwarming bedtime journey of young ${childName} learning noble moral virtues with family...`,
-      cover_image_url: coverImageUrl,
-      theme_color: isBoy ? "#013E37" : "#D97706",
-      pages: selectedPages,
-      reflection: {
-        todays_lesson_uz: "Yaxshilik qilish va ota-onaga mehr ulashish qalbimizni nurga to'ldiradi.",
-        todays_lesson_en: "Practicing kindness and loving our parents fills our lives with radiant light.",
-        little_dua_uz: `Yo Robbim! ${childName}ga go'zal odob, mustahkam sog'lik va qanoatli qalb ato etgin. Omin!`,
-        little_dua_en: `O Allah! Bless ${childName} with beautiful manners, good health and peace. Ameen!`,
-        arabic_dua: "رَبِّ هَبْ لِي مِنَ الصَّالِحِينَ",
-        discussion_questions_uz: [
-          `${childName} bugun qanday yaxshilik qildi?`,
-          `Bugun sen qaysi yaxshi ishing bilan ota-onangga quvonch ulashding?`,
-          `Ertaga ertalab uyg'onganimizda qanday yaxshi amal qilamiz?`
-        ],
-        discussion_questions_en: [
-          `What noble action did ${childName} perform?`,
-          `What good deed brought joy to your parents today?`,
-          `What kind deed will you do tomorrow morning?`
-        ],
-        good_deed_task_uz: `Ertaga ertalab yaqinlaringizga tabassum bilan "Assalomu alaykum!" deb quvonch ulashing.`,
-        good_deed_task_en: `Greet your family tomorrow morning with a cheerful "Assalamu Alaykum!"`
-      },
-      quiz: [
-        {
-          id: "q1",
-          question_uz: `${childName} qissada qanday go'zal amal ko'rsatdi?`,
-          question_en: `What noble act did ${childName} practice?`,
-          options: [
-            { id: "o1", text_uz: "Yaxshilik ulashdi va 'Alhamdulillah' deb shukr qildi", text_en: "Shared goodness and praised Allah with Alhamdulillah", isCorrect: true },
-            { id: "o2", text_uz: "Faqat o'zi o'ynadi", text_en: "Only played alone", isCorrect: false },
-            { id: "o3", text_uz: "Hech kimga quloq solmadi", text_en: "Did not listen to anyone", isCorrect: false }
-          ],
-          explanation_uz: `Ofarin! ${childName} yaxshilik ulashib, doimo shukronalik keltirdi.`,
-          explanation_en: `Well done! ${childName} practiced generosity and heartfelt gratitude.`
-        },
-        {
-          id: "q2",
-          question_uz: "Yaxshi ish qilishdan oldin qaysi muborak so'z aytiladi?",
-          question_en: "Which blessed word is said before starting good deeds?",
-          options: [
-            { id: "o1", text_uz: "Bismillahir Rohmanir Rohiym", text_en: "Bismillahir Rahmanir Raheem", isCorrect: true },
-            { id: "o2", text_uz: "Rahmat", text_en: "Thank you", isCorrect: false },
-            { id: "o3", text_uz: "Xayr", text_en: "Goodbye", isCorrect: false }
-          ],
-          explanation_uz: "To'g'ri! Har bir ezgu amal 'Bismillah' bilan boshlanadi.",
-          explanation_en: "Correct! Every noble deed begins with Bismillah."
-        },
-        {
-          id: "q3",
-          question_uz: `${childName} yotishdan oldin nimani ado etdi?`,
-          question_en: `What did ${childName} do before going to sleep?`,
-          options: [
-            { id: "o1", text_uz: "Allohga duo qildi va shukr aytdi", text_en: "Made bedtime dua and gave thanks", isCorrect: true },
-            { id: "o2", text_uz: "Televizor ko'rdi", text_en: "Watched TV", isCorrect: false },
-            { id: "o3", text_uz: "Yig'ladi", text_en: "Cried", isCorrect: false }
-          ],
-          explanation_uz: "Barakalla! Yotishdan oldin duo qilish qalbga orom beradi.",
-          explanation_en: "Splendid! Bedtime prayer brings serenity to the heart."
-        }
-      ]
-    };
+    // 3. Fallback: Multi-Archetype Islamic Tale Generator directly powered by literature
+    const chosenStylePrompt = STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d;
+    const dynamicIslamicFallback = generateDynamicIslamicStory(
+      profile,
+      characterPersona,
+      chosenStylePrompt,
+      NEGATIVE_ENHANCERS
+    );
 
     return NextResponse.json({
       success: true,
-      source: 'dynamic-core',
-      story: fallbackStory,
+      source: 'islamic-literature-archetype-engine',
+      story: dynamicIslamicFallback,
     });
   } catch (error: any) {
     console.error("Story generation API error:", error);

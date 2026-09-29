@@ -91,6 +91,8 @@ export interface QuizQuestion {
 export interface StoryReflection {
   todays_lesson_uz: string;
   todays_lesson_en: string;
+  hadith_sharif_uz?: string;
+  hadith_sharif_en?: string;
   little_dua_uz: string;
   little_dua_en: string;
   arabic_dua?: string;
