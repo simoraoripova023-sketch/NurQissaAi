@@ -96,6 +96,7 @@ export default function PricingModal() {
       console.error("Copy failed", err);
     }
     setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2500);
   };
 
   const providerNames: Record<PaymentProvider, string> = {
