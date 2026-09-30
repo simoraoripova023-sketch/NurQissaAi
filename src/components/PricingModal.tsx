@@ -28,7 +28,7 @@ export default function PricingModal() {
 
   const [activeTab, setActiveTab] = useState<'checkout' | 'plans'>('checkout');
   const [selectedPlan, setSelectedPlan] = useState<'pack3' | 'pack10' | 'vip'>('pack10');
-  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider>('click');
+  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider>('card');
   
   // Card & checkout states
   const [isCopied, setIsCopied] = useState(false);
@@ -387,19 +387,22 @@ export default function PricingModal() {
               {/* ===================================================================== */}
               {/* CLICK MERCHANT DIRECT ACTION BOX */}
               {/* ===================================================================== */}
+              {/* ===================================================================== */}
+              {/* CLICK ORQALI TO'LOV */}
+              {/* ===================================================================== */}
               {selectedProvider === 'click' && (
                 <div className="p-5 rounded-3xl bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-950 text-white border-2 border-blue-400/60 shadow-xl space-y-4 animate-fade-in">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div className="space-y-1">
                       <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-400/20 text-blue-200 text-[10px] font-bold border border-blue-300/30">
-                        <Zap className="w-3.5 h-3.5 text-blue-300" />
-                        <span>Rasmiy Click Merchant Protocol v1.0</span>
+                        <Smartphone className="w-3.5 h-3.5 text-blue-300" />
+                        <span>Click orqali to'lov</span>
                       </div>
                       <h4 className="text-base sm:text-lg font-black text-white">
-                        Click orqali to'g'ridan-to'g'ri to'lash: {currentPlan.price} so'm
+                        Click orqali to'lash: {currentPlan.price} so'm
                       </h4>
                       <p className="text-xs text-blue-200/80 leading-relaxed max-w-lg">
-                        Mijoz summani o'zgartira olmaydi. To'lov 1 soniyada tasdiqlanadi va obuna avtomatik faollashtiriladi.
+                        Click ilovasini ochib, «Kartaga o'tkazish» (P2P) bo'limi orqali quyidagi rasmiy Simora Oripova kartasiga to'lov qiling va pastda chekni tasdiqlang.
                       </p>
                     </div>
 
@@ -409,36 +412,31 @@ export default function PricingModal() {
                     </div>
                   </div>
 
-                  {/* Click Payment Button */}
-                  <div className="pt-2">
+                  {/* Karta nusxalash va Click ilovasiga o'tish */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                     <button
                       type="button"
-                      disabled={clickLoading}
-                      onClick={handleStartClickPayment}
-                      className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600 hover:from-blue-600 hover:to-indigo-600 text-white font-black text-sm sm:text-base shadow-xl shadow-blue-900/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2.5 border-2 border-blue-300 cursor-pointer disabled:opacity-50"
+                      onClick={handleCopyCard}
+                      className="py-3 px-4 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
                     >
-                      {clickLoading ? (
-                        <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          <span>Buyurtma yaratilmoqda...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="w-5 h-5 text-amber-300 fill-amber-300" />
-                          <span>Click orqali to'lash ({currentPlan.price} so'm)</span>
-                          <ArrowRight className="w-5 h-5" />
-                        </>
-                      )}
+                      {isCopied ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+                      <span>{isCopied ? "Karta nusxalandi!" : "Karta raqamidan nusxa olish"}</span>
                     </button>
+
+                    <a
+                      href="https://my.click.uz"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-blue-300/40 text-blue-100 text-xs font-black flex items-center justify-center gap-2 transition-all text-center"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span>Click ilovasini ochish (my.click.uz)</span>
+                    </a>
                   </div>
 
-                  {/* Sandbox notice */}
-                  <div className="p-3 rounded-xl bg-black/40 border border-blue-400/30 flex items-center justify-between text-[11px] text-blue-200">
-                    <span className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span><b>Sandbox & Test Mode:</b> Bank hisobisiz to'liq to'lov & audit sinovi integratsiya qilindi.</span>
-                    </span>
-                    <span className="font-mono text-[10px] text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-md">nur-qissa.uz</span>
+                  <div className="p-3 rounded-xl bg-black/40 border border-blue-400/30 flex items-center gap-2 text-[11px] text-blue-200">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span><b>Rasmiy hisob:</b> Simora Oripova (9860 0803 1682 3584). To'lov 100% to'g'ri hisobga yo'naltirilgan.</span>
                   </div>
                 </div>
               )}
@@ -467,46 +465,43 @@ export default function PricingModal() {
 
               {/* PAYNET / PAYME QR SKANER BANNERI */}
               {selectedProvider === 'paynet' && (
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white border-2 border-emerald-400/50 shadow-lg space-y-3 animate-fade-in">
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white border-2 border-emerald-400/50 shadow-lg space-y-3 animate-fade-in">
                   <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <div className="relative p-3 rounded-2xl bg-white shadow-xl flex items-center justify-center shrink-0">
-                      <svg className="w-28 h-28 text-slate-900" viewBox="0 0 100 100" fill="currentColor">
-                        <path d="M0,0 h30 v30 h-30 z M5,5 v20 h20 v-20 z M10,10 h10 v10 h-10 z" />
-                        <path d="M70,0 h30 v30 h-30 z M75,5 v20 h20 v-20 z M80,10 h10 v10 h-10 z" />
-                        <path d="M0,70 h30 v30 h-30 z M5,75 v20 h20 v-20 z M10,80 h10 v10 h-10 z" />
-                        <circle cx="50" cy="50" r="14" fill="#059669" />
-                        <rect x="36" y="10" width="8" height="8" />
-                        <rect x="48" y="10" width="8" height="8" />
-                        <rect x="36" y="24" width="8" height="8" />
-                        <rect x="56" y="24" width="8" height="8" />
-                        <rect x="10" y="36" width="8" height="8" />
-                        <rect x="24" y="36" width="8" height="8" />
-                        <rect x="36" y="70" width="8" height="8" />
-                        <rect x="48" y="70" width="8" height="8" />
-                        <rect x="70" y="36" width="8" height="8" />
-                        <rect x="84" y="36" width="8" height="8" />
-                        <rect x="70" y="56" width="8" height="8" />
-                        <rect x="84" y="70" width="8" height="8" />
-                        <rect x="70" y="84" width="8" height="8" />
-                      </svg>
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span className="text-[10px] font-black text-white bg-emerald-600 px-1.5 py-0.5 rounded-sm shadow-sm">
-                          PAYNET
-                        </span>
-                      </div>
+                    <div className="relative p-2.5 rounded-2xl bg-white shadow-xl flex flex-col items-center justify-center shrink-0">
+                      {/* REAL SCANNABLE QR CODE DIRECTLY TO SIMORA ORIPOVA'S CARD */}
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(CARD_RAW)}&margin=10`}
+                        alt="Simora Oripova Card QR Code"
+                        className="w-28 h-28 sm:w-32 sm:h-32 object-contain rounded-xl"
+                        loading="lazy"
+                      />
+                      <span className="text-[10px] font-black text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded-md mt-1 border border-emerald-300">
+                        SIMORA ORIPOVA
+                      </span>
                     </div>
 
                     <div className="space-y-1.5 text-center sm:text-left">
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
                         <QrCode className="w-3 h-3 text-emerald-300" />
-                        <span>Kamera orqali to'lov</span>
+                        <span>Kamera & Bank ilovalari orqali skanerlash</span>
                       </div>
                       <h4 className="text-sm font-black text-emerald-100">
-                        Paynet yoki Payme ilovangiz orqali QR-kodni skaner qiling!
+                        Payme, Click yoki telefon kamerangiz orqali QR-kodni skanerlang!
                       </h4>
                       <p className="text-[11px] text-emerald-200/80 leading-relaxed">
-                        Ilovangizdagi "QR to'lov / Skaner" bo'limini ochib ushbu kodga qarating yoki pastdagi karta raqamidan nusxa oling.
+                        QR-kod to'g'ridan-to'g'ri <b>Simora Oripova (9860 0803 1682 3584)</b> kartasiga biriktirilgan. Kamerangizni ushbu kodga qaratsangiz karta raqami darhol nusxalanadi va ilovada to'lov ochiladi.
                       </p>
+                      
+                      <div className="pt-1 flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                        <button
+                          type="button"
+                          onClick={handleCopyCard}
+                          className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>{isCopied ? "Nusxalandi!" : "Karta raqamidan nusxa olish"}</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

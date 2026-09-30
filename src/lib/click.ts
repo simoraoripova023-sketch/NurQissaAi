@@ -41,10 +41,13 @@ export const CLICK_PLANS: Record<string, ClickPlan> = {
 };
 
 export const CLICK_CONFIG = {
-  serviceId: process.env.CLICK_SERVICE_ID || '32849', // Default test service ID
-  merchantId: process.env.CLICK_MERCHANT_ID || '24519', // Default test merchant ID
-  secretKey: process.env.CLICK_SECRET_KEY || 'NUR_QISSA_CLICK_SECRET_KEY_DEV_2026',
-  isSandbox: process.env.CLICK_SANDBOX !== 'false',
+  // Service ID va Merchant ID faqat sizning rasmiy Click shartnomangizdan olinishi kerak.
+  // 32849 raqami begona korxona ("Zamin Farm") hisobi bo'lganligi sababli butunlay olib tashlandi!
+  serviceId: process.env.CLICK_SERVICE_ID || '', 
+  merchantId: process.env.CLICK_MERCHANT_ID || '', 
+  secretKey: process.env.CLICK_SECRET_KEY || '',
+  isConfigured: !!(process.env.CLICK_SERVICE_ID && process.env.CLICK_MERCHANT_ID),
+  isSandbox: process.env.CLICK_SANDBOX === 'true',
   baseUrl: 'https://my.click.uz/services/pay',
   productionDomain: 'https://nur-qissa.uz',
 };

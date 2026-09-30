@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     const clickTransId = `click_sim_${Date.now()}`;
-    const serviceId = '32849';
+    const serviceId = process.env.CLICK_SERVICE_ID || 'nur_qissa_sim';
     const signTime = new Date().toISOString();
 
     if (simulateType === 'underpaid') {

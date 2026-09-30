@@ -22,6 +22,15 @@ export async function POST(req: NextRequest) {
       userPhone,
     });
 
+    if (!CLICK_CONFIG.isConfigured) {
+      return NextResponse.json({
+        success: false,
+        error: "Click Merchant hisobi hali ulanmagan. Iltimos, Simora Oripova kartasiga to'g'ridan-to'g'ri to'lov qiling.",
+        isConfigured: false,
+        order,
+      }, { status: 400 });
+    }
+
     const paymentUrl = generateClickPaymentUrl({
       amount: order.amount,
       orderId: order.id,
