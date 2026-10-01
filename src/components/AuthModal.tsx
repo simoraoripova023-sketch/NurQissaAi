@@ -306,7 +306,6 @@ export default function AuthModal() {
       return;
     } catch (err: any) {
       setIsGoogleLoading(false);
-      setErrorMsg(err?.message || (locale === 'uz' ? "Google tizimiga ulanishda xatolik" : "Google login failed"));
       setGoogleName(parentName || '');
       setGoogleChildName(childName || '');
       setAuthStep('google');
@@ -377,7 +376,6 @@ export default function AuthModal() {
         return;
       } catch (err: any) {
         setIsGithubLoading(false);
-        setErrorMsg(err?.message || (locale === 'uz' ? "GitHub tizimiga ulanishda xatolik" : "GitHub login failed"));
         setGithubUsername(parentName || '');
         setGithubChildName(childName || '');
         setAuthStep('github');
