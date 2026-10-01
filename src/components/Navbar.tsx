@@ -36,11 +36,12 @@ export default function Navbar() {
               
               {/* Main Brand Logo */}
               <Link href="/" className="flex items-center gap-1.5 sm:gap-2.5 group shrink-0" style={{ flexShrink: 0 }}>
-                <div className="relative w-7 h-7 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl bg-butter-200 border-2 border-pine-800 p-[2px] shadow-sm transition-transform duration-300 group-hover:scale-105 shrink-0">
-                  <div className="w-full h-full bg-pine-800 rounded-[6px] sm:rounded-[12px] flex items-center justify-center relative overflow-hidden">
-                    <Moon className="w-3.5 h-3.5 sm:w-6 sm:h-6 text-butter-200 fill-butter-200/40 transform -rotate-12 transition-transform group-hover:rotate-0 duration-300" />
-                    <Sparkles className="w-2 h-2 sm:w-3.5 sm:h-3.5 text-butter-300 absolute top-0.5 right-0.5 sm:top-1 sm:right-1 animate-pulse" />
-                  </div>
+                <div className="relative w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-2xl bg-butter-200 border-2 border-pine-800 p-[1.5px] shadow-sm transition-transform duration-300 group-hover:scale-105 shrink-0 overflow-hidden">
+                  <img 
+                    src="/logo.png" 
+                    alt="NurQissa AI Logo" 
+                    className="w-full h-full object-cover rounded-[5px] sm:rounded-[11px]" 
+                  />
                 </div>
                 <div className="flex flex-col shrink-0" style={{ flexShrink: 0 }}>
                   <div className="flex items-center gap-0.5 sm:gap-1">

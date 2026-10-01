@@ -656,13 +656,19 @@ export default function AuthModal() {
             </button>
 
             <div className="text-center space-y-2">
-              <div className="w-14 h-14 rounded-2xl bg-white dark:bg-pine-900 border-2 border-slate-200 dark:border-butter-300 mx-auto flex items-center justify-center shadow-md p-2">
-                <svg className="w-8 h-8 shrink-0" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                </svg>
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-pine-800 dark:border-butter-300 shadow-md p-[2px] bg-butter-200 shrink-0">
+                  <img src="/logo.png" alt="NurQissa AI" className="w-full h-full object-cover rounded-[12px]" />
+                </div>
+                <div className="w-5 h-[2px] bg-slate-300 dark:bg-pine-700 rounded-full" />
+                <div className="w-12 h-12 rounded-2xl bg-white dark:bg-pine-900 border-2 border-slate-200 dark:border-butter-300 flex items-center justify-center shadow-md p-2.5 shrink-0">
+                  <svg className="w-7 h-7 shrink-0" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                  </svg>
+                </div>
               </div>
 
               <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-butter-200 text-pine-900 text-[11px] font-black border border-pine-800">
@@ -671,7 +677,7 @@ export default function AuthModal() {
               </div>
 
               <h2 className="text-xl font-black text-pine-900 dark:text-butter-200 font-display">
-                {locale === 'uz' ? "Google Hisobingiz Bilan Kirish" : "Sign In with Google"}
+                {locale === 'uz' ? "NurQissa AI • Google Bilan Kirish" : "NurQissa AI • Sign In with Google"}
               </h2>
 
               <p className="text-xs text-pine-700/80 dark:text-butter-300/80 font-medium max-w-xs mx-auto">
@@ -772,14 +778,28 @@ export default function AuthModal() {
         ) : (
           /* STEP 1: Registration / Login Form */
           <>
-            {/* Top Header Badge */}
-            <div className="text-center space-y-2 mb-5">
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-butter-200 text-pine-900 text-xs font-black border border-pine-800">
+            {/* Top Brand Logo & Header Badge */}
+            <div className="text-center space-y-2 mb-4">
+              <div className="flex items-center justify-center gap-2.5 mb-1">
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 border-pine-800 dark:border-butter-300 shadow-md p-[2px] bg-butter-200 shrink-0">
+                  <img src="/logo.png" alt="NurQissa AI" className="w-full h-full object-cover rounded-[12px]" />
+                </div>
+                <div className="text-left">
+                  <span className="text-lg sm:text-xl font-black text-pine-900 dark:text-butter-200 font-display block leading-none">
+                    NurQissa<span className="text-butter-500 dark:text-butter-300 font-bold text-sm">AI</span>
+                  </span>
+                  <span className="text-[10px] font-bold text-pine-700/70 dark:text-butter-300/70 block mt-0.5">
+                    {locale === 'uz' ? "Sehrli & Ibratli Ertaklar" : "Bedtime Storybooks"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-butter-200 text-pine-900 text-xs font-black border border-pine-800">
                 <Sparkles className="w-3.5 h-3.5 text-pine-800" />
                 <span>{locale === 'uz' ? "+50 Nur Tangasi Sovg'a! 🌟" : "+50 Nur Coins Welcome Gift! 🌟"}</span>
               </div>
 
-              <h2 className="text-2xl font-black text-pine-900 dark:text-butter-200 font-display">
+              <h2 className="text-xl sm:text-2xl font-black text-pine-900 dark:text-butter-200 font-display">
                 {authMode === 'signup' 
                   ? (locale === 'uz' ? "Ro'yxatdan O'tish" : "Create an Account")
                   : (locale === 'uz' ? "Tizimga Kirish" : "Welcome Back")}
