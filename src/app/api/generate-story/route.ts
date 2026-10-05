@@ -68,21 +68,26 @@ async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<
   const apiKey = getOpenAiApiKey();
 
   if (apiKey) {
-    const modelsToTry = ['gpt-image-1-mini', 'gpt-image-1', 'gpt-image-1.5'];
+    const modelsToTry = ['dall-e-3', 'dall-e-2'];
     for (const model of modelsToTry) {
       try {
+        const bodyPayload: Record<string, any> = {
+          model: model,
+          prompt: prompt.slice(0, 950),
+          n: 1,
+          size: model === 'dall-e-3' ? '1024x1024' : '512x512',
+        };
+        if (model === 'dall-e-3') {
+          bodyPayload.quality = 'standard';
+        }
+
         const res = await fetch('https://api.openai.com/v1/images/generations', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({
-            model: model,
-            prompt: prompt.slice(0, 950),
-            n: 1,
-            size: '1024x1024'
-          })
+          body: JSON.stringify(bodyPayload)
         });
 
         if (res.ok) {
@@ -309,13 +314,12 @@ Output Valid JSON ONLY with this exact schema:
       }
     }
 
-    // 2. Try Google Gemini models (prioritizing 200 OK models)
+    // 2. Try Google Gemini models
     const geminiKey = getGeminiApiKey();
     const modelsToTry = [
-      'gemini-3.5-flash',
-      'gemini-3.1-flash-lite',
-      'gemini-flash-latest',
-      'gemini-3.8-flash'
+      'gemini-1.5-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-pro'
     ];
 
     let resultText = '';

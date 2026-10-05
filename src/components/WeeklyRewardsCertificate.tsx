@@ -21,7 +21,8 @@ export default function WeeklyRewardsCertificate() {
     dailyMissions, 
     childProfile, 
     currentUser,
-    updateChildProfile 
+    updateChildProfile,
+    setIsNurShopOpen
   } = useAppStore();
 
   const isUz = locale === 'uz';
@@ -130,6 +131,14 @@ export default function WeeklyRewardsCertificate() {
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>{copiedLink ? (isUz ? "Havola Nusxalandi! ✓" : "Link Copied! ✓") : (isUz ? "Ulashish" : "Share")}</span>
+          </button>
+
+          <button
+            onClick={() => setIsNurShopOpen(true)}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-105 text-slate-950 text-xs font-black shadow-md hover:scale-105 transition-all border border-amber-300 cursor-pointer"
+          >
+            <span>🛍️</span>
+            <span>{isUz ? "Nur Do'koni" : "NurCoins Shop"}</span>
           </button>
 
           <button

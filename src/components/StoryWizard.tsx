@@ -78,20 +78,34 @@ export default function StoryWizard() {
     setIsGenerating(true);
     setGenerationStep(0);
 
-    for (let i = 0; i < generationSteps.length; i++) {
-      setGenerationStep(i);
-      await new Promise((resolve) => setTimeout(resolve, 1100));
-    }
+    // Start generation API request immediately in parallel
+    const storyPromise = fetch('/api/generate-story', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(childProfile),
+    });
+
+    // Animate through initial steps smoothly while the AI generates the story
+    const stepInterval = setInterval(() => {
+      setGenerationStep((prev) => {
+        // Keep at step 3 (0-indexed: 0, 1, 2, 3) until API completes
+        if (prev < generationSteps.length - 2) {
+          return prev + 1;
+        }
+        return prev;
+      });
+    }, 1200);
 
     try {
-      const res = await fetch('/api/generate-story', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(childProfile),
-      });
+      const res = await storyPromise;
+      clearInterval(stepInterval);
 
       const data = await res.json();
       if (data.success && data.story) {
+        // Show the final completion step
+        setGenerationStep(generationSteps.length - 1);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         useAppStore.getState().useStoryCredit();
 
         confetti({
@@ -107,6 +121,7 @@ export default function StoryWizard() {
         throw new Error(data.error || 'Generation failed');
       }
     } catch (err) {
+      clearInterval(stepInterval);
       console.error(err);
       alert(locale === 'uz' ? "Ertak yaratishda xatolik yuz berdi. Qayta urinib ko'ring." : "Error generating story. Please try again.");
       setIsGenerating(false);

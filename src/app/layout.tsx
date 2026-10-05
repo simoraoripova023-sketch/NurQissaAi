@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import HardcoverOrderModal from "@/components/HardcoverOrderModal";
 import PricingModal from "@/components/PricingModal";
 import FloatingContactSupport from "@/components/FloatingContactSupport";
+import NurShopModal from "@/components/NurShopModal";
 import ThemeProvider from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
@@ -12,6 +13,16 @@ export const metadata: Metadata = {
   description: "Bolangiz surati va qiziqishlariga asoslangan, mehr, sabr, saxovat va shukronalik kabi oliyjanob qadriyatlarni singdiruvchi shaxsiylashtirilgan ertak kitoblar platformasi.",
   keywords: ["ertak", "bolalar uchun ertaklar", "AI storybook", "Islamic bedtime stories", "personalized story", "NurQissa", "bolalar kitobi", "uzbek ertaklar"],
   authors: [{ name: "NurQissa AI Team" }],
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'NurQissa AI',
+  },
+  icons: {
+    icon: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: "NurQissa AI - Sehrli & Ibratli Ertaklar",
     description: "Farzandingiz bosh qahramon bo'lgan 3D Pixar uslubidagi shaxsiylashtirilgan ertak kitoblari.",
@@ -54,6 +65,7 @@ export default function RootLayout({
           <Footer />
           <HardcoverOrderModal />
           <PricingModal />
+          <NurShopModal />
           <FloatingContactSupport />
         </ThemeProvider>
       </body>

@@ -7,8 +7,8 @@ import {
 } from './click';
 import { getOrder, updateOrder } from './orderService';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4';
-const ADMIN_CHAT_ID = process.env.ADMIN_TELEGRAM_ID || '5636799086';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const ADMIN_CHAT_ID = process.env.ADMIN_TELEGRAM_ID;
 
 async function sendTelegramAlert(text: string) {
   if (!BOT_TOKEN || !ADMIN_CHAT_ID) return;

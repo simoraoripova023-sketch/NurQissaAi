@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { 
   Sparkles, Home, PlusCircle, Target, Library, Trophy, Palette,
-  X, ChevronRight, CreditCard
+  X, ChevronRight, CreditCard, Gift
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
@@ -18,7 +18,7 @@ interface MagicUmbrellaMenuProps {
 
 export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuProps) {
   const pathname = usePathname();
-  const { locale, theme, stories, nurCoins, setIsPricingModalOpen } = useAppStore();
+  const { locale, theme, stories, nurCoins, setIsPricingModalOpen, setIsNurShopOpen } = useAppStore();
   const t = translations[locale];
 
   const [isOpen, setIsOpen] = useState(false);
@@ -72,6 +72,14 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
       desc: locale === 'uz' ? 'Siz yaratgan ertaklar javoni' : 'Your saved storybooks shelf',
       icon: Library, 
       badge: stories.length > 0 ? stories.length : undefined,
+    },
+    { 
+      href: '#shop', 
+      label: locale === 'uz' ? "Nur Do'koni" : "NurCoins Shop", 
+      desc: locale === 'uz' ? "Tangalarga sovg'alar va bo'yash rasmlari" : "Redeem coins for rewards",
+      icon: Gift, 
+      badge: '🛍️ Do\'kon',
+      isShop: true,
     },
     { 
       href: '#pricing', 
@@ -346,6 +354,40 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-amber-400 text-pine-950 shadow-xs">
                           <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-xs sm:text-sm font-black leading-tight text-pine-950 dark:text-butter-100">
+                            {link.label}
+                          </span>
+                          <span className="text-[10px] font-medium leading-tight text-pine-700 dark:text-butter-300/80">
+                            {link.desc}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 text-[11px] font-black rounded-full bg-amber-400 text-pine-950 border border-amber-500/40">
+                          {link.badge}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-pine-400 dark:text-butter-300/60" />
+                      </div>
+                    </button>
+                  );
+                }
+
+                if ((link as any).isShop) {
+                  return (
+                    <button
+                      key={link.href}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setIsNurShopOpen(true);
+                      }}
+                      className="flex items-center justify-between p-3 rounded-2xl transition-all group bg-gradient-to-r from-amber-400/20 to-orange-400/20 hover:from-amber-400/30 hover:to-orange-400/30 border border-amber-400/50 shadow-sm w-full text-left cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-sm">
+                          🛍️
                         </div>
                         <div className="flex flex-col text-left">
                           <span className="text-xs sm:text-sm font-black leading-tight text-pine-950 dark:text-butter-100">

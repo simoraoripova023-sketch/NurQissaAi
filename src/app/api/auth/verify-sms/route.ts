@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanDigits = phone.replace(/\D/g, '');
-    const verification = verifyOTPCode(cleanDigits, code);
+    const verification = await verifyOTPCode(cleanDigits, code);
 
     if (!verification.valid) {
       return NextResponse.json(

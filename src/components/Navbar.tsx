@@ -17,7 +17,8 @@ export default function Navbar() {
   const { 
     locale, setLocale, nurCoins, theme, toggleTheme, 
     setIsAuthModalOpen, currentUser,
-    freeStoriesLeft, hasPaidSubscription, setIsPricingModalOpen
+    freeStoriesLeft, hasPaidSubscription, setIsPricingModalOpen,
+    setIsNurShopOpen
   } = useAppStore();
   const t = translations[locale];
 
@@ -91,16 +92,18 @@ export default function Navbar() {
                 )}
               </button>
 
-              {/* Nur Coins Pill */}
-              <Link
-                href="/missions"
+              {/* Nur Coins Pill -> Opens Nur Do'koni */}
+              <button
+                type="button"
+                onClick={() => setIsNurShopOpen(true)}
                 style={{ whiteSpace: 'nowrap', flexShrink: 0 }}
-                className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full bg-butter-200 hover:bg-butter-300 border-2 border-pine-800/60 text-pine-900 text-xs font-black shadow-sm hover:scale-105 transition-all shrink-0 whitespace-nowrap"
-                title={t.nurCoins}
+                className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full bg-butter-200 hover:bg-butter-300 border-2 border-pine-800/60 text-pine-900 text-xs font-black shadow-sm hover:scale-105 transition-all shrink-0 whitespace-nowrap cursor-pointer"
+                title={locale === 'uz' ? "Nur Do'koni (Tangalarni sarflash)" : "NurCoins Shop"}
               >
                 <span className="text-xs">🌟</span>
                 <span className="tabular-nums font-black leading-none">{nurCoins}</span>
-              </Link>
+                <span className="text-[10px] opacity-75 hidden sm:inline">{locale === 'uz' ? "Do'kon" : "Shop"}</span>
+              </button>
 
               {/* Dedicated Night / Day Mode Toggle */}
               <button

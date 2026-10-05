@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
 
     const typeTitle = emojiMap[type] || '📩 YANGI MUROJAAT';
     const isPayment = type === 'karta_tolov' || type === 'tolov_nazorati';
+    const isOrder = type === 'buyurtma';
 
     let tgMessage = '';
 
@@ -98,6 +99,18 @@ export async function POST(req: NextRequest) {
         `2️⃣ Agar tushgan mablag' aytilgan <b>${amount || "summa"}</b>dan <b>KAM BO'LSA</b>:\n` +
         `   ❌ <b>OBUNANI DARHOL BEKOR QILING</b> yoki to'liq qolgan summani to'lashni talab qiling!\n` +
         `3️⃣ Agar to'liq to'langan bo'lsa: obunani faol qoldiring.`
+      );
+    } else if (isOrder) {
+      tgMessage = (
+        `📚 <b>YANGI QATTIQ MUQOVALI KITOB BUYURTMASI (NurQissa AI)</b>\n\n` +
+        `👤 <b>Buyurtmachi:</b> ${newFeedback.name}\n` +
+        `📞 <b>Aloqa telefoni:</b> <code>${newFeedback.contact}</code>\n` +
+        `🕒 <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
+        `📦 <b>Buyurtma tafsilotlari:</b>\n<i>${newFeedback.message}</i>\n\n` +
+        `🚚 <b>Navbatdagi harakat:</b>\n` +
+        `1️⃣ Mijoz bilan telefon orqali bog'laning.\n` +
+        `2️⃣ Yetkazib berish manzilini aniqlashtiring.\n` +
+        `3️⃣ Kitobni bosmaxonaga chop etishga yuboring.`
       );
     } else {
       tgMessage = (

@@ -1,9 +1,19 @@
 import os
 import requests
 
-api_key = os.environ.get('ELEVENLABS_API_KEY', 'sk_36cc88373abb9fb6f6054b7144e8485d98857eff66fe51f6')
+api_key = os.environ.get('ELEVENLABS_API_KEY')
+if not api_key:
+    # Try reading from .env.local
+    env_path = os.path.join(os.path.dirname(__file__), '..', '.env.local')
+    if os.path.exists(env_path):
+        with open(env_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith('ELEVENLABS_API_KEY='):
+                    api_key = line.split('=', 1)[1].strip()
+                    break
+
 headers = {
-    'xi-api-key': api_key
+    'xi-api-key': api_key or ''
 }
 
 # Check user subscription / quota info

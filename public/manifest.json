@@ -1,0 +1,26 @@
+{
+  "name": "NurQissa AI - Bolalar uchun Ibratli Ertaklar",
+  "short_name": "NurQissa",
+  "description": "Farzandingiz bosh qahramon bo'lgan sehrli va ibratli ertaklar platformasi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFDF5",
+  "theme_color": "#013E37",
+  "orientation": "portrait",
+  "lang": "uz",
+  "categories": ["books", "education", "kids", "lifestyle"],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

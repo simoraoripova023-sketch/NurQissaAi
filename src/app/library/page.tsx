@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
   BookOpen, Plus, Heart, Trash2, Sparkles, Volume2, 
-  Search, ArrowRight, Printer, Star
+  Search, ArrowRight, Printer, Star, FileDown
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
@@ -173,6 +173,15 @@ export default function LibraryPage() {
                     >
                       <BookOpen className="w-3.5 h-3.5" />
                       <span>{t.readStory}</span>
+                    </Link>
+
+                    {/* One-Click PDF Storybook Download / Print */}
+                    <Link
+                      href={`/story/${story.id}?print=true`}
+                      className="p-2.5 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/80 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-xs font-bold transition-all flex items-center justify-center"
+                      title={locale === 'uz' ? "PDF yuklab olish / Chop etish" : "Download PDF / Print Book"}
+                    >
+                      <FileDown className="w-4 h-4 text-emerald-700 dark:text-emerald-300" />
                     </Link>
 
                     <button

@@ -95,6 +95,12 @@ interface AppState {
   loginUser: (data: { name: string; phone: string; childName?: string }) => void;
   logoutUser: () => void;
 
+  // Nur Do'koni (Gamification Virtual Shop)
+  isNurShopOpen: boolean;
+  setIsNurShopOpen: (open: boolean) => void;
+  unlockedShopItems: string[];
+  buyShopItem: (itemId: string, cost: number) => boolean;
+
   // Paid System & Story Credit Limits (Freemium: 2 Free Stories)
   freeStoriesLeft: number;
   hasPaidSubscription: boolean;
@@ -357,6 +363,21 @@ export const useAppStore = create<AppState>()(
           isPricingModalOpen: false,
         })),
 
+      // Nur Do'koni
+      isNurShopOpen: false,
+      setIsNurShopOpen: (isNurShopOpen) => set({ isNurShopOpen }),
+      unlockedShopItems: [],
+      buyShopItem: (itemId: string, cost: number) => {
+        const { nurCoins, unlockedShopItems } = get();
+        if (unlockedShopItems.includes(itemId)) return true;
+        if (nurCoins < cost) return false;
+        set({
+          nurCoins: nurCoins - cost,
+          unlockedShopItems: [...unlockedShopItems, itemId],
+        });
+        return true;
+      },
+
       setHasPaidSubscription: (val) =>
         set(() => ({
           hasPaidSubscription: val,
@@ -381,6 +402,7 @@ export const useAppStore = create<AppState>()(
         currentUser: state.currentUser,
         freeStoriesLeft: state.freeStoriesLeft,
         hasPaidSubscription: state.hasPaidSubscription,
+        unlockedShopItems: state.unlockedShopItems,
       }),
     }
   )

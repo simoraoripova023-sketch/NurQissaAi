@@ -42,22 +42,27 @@ export async function GET(req: NextRequest) {
     const apiKey = getOpenAiApiKey();
 
     if (apiKey) {
-      const modelsToTry = ['gpt-image-1-mini', 'gpt-image-1', 'gpt-image-1.5'];
+      const modelsToTry = ['dall-e-3', 'dall-e-2'];
       
       for (const model of modelsToTry) {
         try {
+          const bodyPayload: Record<string, any> = {
+            model: model,
+            prompt: fullPrompt.slice(0, 950),
+            n: 1,
+            size: model === 'dall-e-3' ? '1024x1024' : '512x512',
+          };
+          if (model === 'dall-e-3') {
+            bodyPayload.quality = 'standard';
+          }
+
           const res = await fetch('https://api.openai.com/v1/images/generations', {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-              model: model,
-              prompt: fullPrompt.slice(0, 950),
-              n: 1,
-              size: '1024x1024'
-            })
+            body: JSON.stringify(bodyPayload)
           });
 
           if (res.ok) {
@@ -96,6 +101,26 @@ export async function GET(req: NextRequest) {
           console.warn(`Error generating image with ${model}:`, err);
         }
       }
+    }
+
+    // Secondary AI Fallback: Pollinations AI Flux Generator
+    try {
+      const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt.slice(0, 600))}?width=1024&height=1024&model=flux&nologo=true`;
+      const pollinationsRes = await fetch(pollinationsUrl, { signal: AbortSignal.timeout(12000) });
+      if (pollinationsRes.ok) {
+        const imgBuf = Buffer.from(await pollinationsRes.arrayBuffer());
+        if (imgBuf.length > 5000) {
+          imageCache.set(cacheKey, { buffer: imgBuf, contentType: 'image/jpeg' });
+          return new NextResponse(new Uint8Array(imgBuf), {
+            headers: {
+              'Content-Type': 'image/jpeg',
+              'Cache-Control': 'public, max-age=86400, immutable',
+            },
+          });
+        }
+      }
+    } catch (pollinationsErr) {
+      console.warn('Pollinations AI image fallback notice:', pollinationsErr);
     }
 
     // Fallback: Return a warm glowing bedtime scene placeholder

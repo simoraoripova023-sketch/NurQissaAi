@@ -30,6 +30,15 @@ export async function sendSMSVerification(phoneDigits: string, code: string, par
   otpStore.set(cleanPhone, { code, expiresAt });
   otpStore.set(fullPhone, { code, expiresAt });
 
+  // Sync with Supabase for persistent serverless reliability
+  try {
+    const { supabase } = await import('@/lib/supabase');
+    await supabase.from('otps').upsert([
+      { phone: cleanPhone, code, expires_at: expiresAt },
+      { phone: fullPhone, code, expires_at: expiresAt },
+    ]);
+  } catch {}
+
   let sentViaEskiz = false;
   let eskizError: string | null = null;
 
@@ -108,9 +117,9 @@ export async function sendSMSVerification(phoneDigits: string, code: string, par
 }
 
 /**
- * Validates the entered OTP code
+ * Validates the entered OTP code (checks in-memory store and Supabase database)
  */
-export function verifyOTPCode(phoneDigits: string, inputCode: string): { valid: boolean; message: string } {
+export async function verifyOTPCode(phoneDigits: string, inputCode: string): Promise<{ valid: boolean; message: string }> {
   const cleanPhone = phoneDigits.replace(/\D/g, '');
   const fullPhone = cleanPhone.startsWith('998') ? cleanPhone : `998${cleanPhone}`;
 
@@ -119,7 +128,26 @@ export function verifyOTPCode(phoneDigits: string, inputCode: string): { valid: 
     return { valid: true, message: "Kod tasdiqlandi!" };
   }
 
-  const stored = otpStore.get(cleanPhone) || otpStore.get(fullPhone);
+  let stored = otpStore.get(cleanPhone) || otpStore.get(fullPhone);
+
+  // If not found in memory (e.g. serverless cold start), check Supabase
+  if (!stored) {
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      const { data } = await supabase
+        .from('otps')
+        .select('*')
+        .or(`phone.eq.${cleanPhone},phone.eq.${fullPhone}`)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data && data.code && data.expires_at) {
+        stored = { code: data.code, expiresAt: Number(data.expires_at) };
+      }
+    } catch {}
+  }
+
   if (!stored) {
     return { valid: false, message: "Tasdiqlash kodi topilmadi yoki muddati o'tgan. Iltimos, qayta kod so'rang." };
   }
@@ -127,6 +155,10 @@ export function verifyOTPCode(phoneDigits: string, inputCode: string): { valid: 
   if (Date.now() > stored.expiresAt) {
     otpStore.delete(cleanPhone);
     otpStore.delete(fullPhone);
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      await supabase.from('otps').delete().or(`phone.eq.${cleanPhone},phone.eq.${fullPhone}`);
+    } catch {}
     return { valid: false, message: "Kodni amal qilish muddati (5 daqiqa) tugagan. Yangi kod so'rang." };
   }
 
@@ -137,5 +169,9 @@ export function verifyOTPCode(phoneDigits: string, inputCode: string): { valid: 
   // Clear upon successful verification
   otpStore.delete(cleanPhone);
   otpStore.delete(fullPhone);
+  try {
+    const { supabase } = await import('@/lib/supabase');
+    await supabase.from('otps').delete().or(`phone.eq.${cleanPhone},phone.eq.${fullPhone}`);
+  } catch {}
   return { valid: true, message: "Telefon raqamingiz muvaffaqiyatli tasdiqlandi!" };
 }

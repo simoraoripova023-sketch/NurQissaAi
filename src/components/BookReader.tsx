@@ -194,6 +194,16 @@ export default function BookReader({ story }: BookReaderProps) {
     }
   }, [currentPageIndex]);
 
+  // Auto-detect ?print=true from URL to open PDF book modal
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('print') === 'true') {
+        setIsBookPrintModalOpen(true);
+      }
+    }
+  }, []);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -259,6 +269,16 @@ export default function BookReader({ story }: BookReaderProps) {
       ? (story.id === 'aqilli-bola-yusuf' ? '/stories/yusuf/nurqissa_full.mp3' : story.pages[0]?.audio_url)
       : currentPageIndex <= totalPages 
       ? story.pages[currentPageIndex - 1]?.audio_url
+      : undefined;
+
+  const nextPageIndex = currentPageIndex + 1;
+  const nextSpeechText = 
+    nextPageIndex <= totalPages 
+      ? (locale === 'uz' ? story.pages[nextPageIndex - 1]?.text_uz : story.pages[nextPageIndex - 1]?.text_en)
+      : undefined;
+  const nextAudioUrl = 
+    nextPageIndex <= totalPages 
+      ? story.pages[nextPageIndex - 1]?.audio_url
       : undefined;
 
   return (
@@ -815,7 +835,9 @@ export default function BookReader({ story }: BookReaderProps) {
           <div className="my-6">
             <AudioNarrationBar
               currentText={currentSpeechText}
+              nextText={nextSpeechText}
               audioUrl={currentAudioUrl}
+              nextAudioUrl={nextAudioUrl}
               currentPage={currentPageIndex === 0 ? 1 : currentPageIndex > totalPages ? totalPages : currentPageIndex}
               totalPages={totalPages}
             />

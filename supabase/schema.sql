@@ -50,13 +50,22 @@ CREATE TABLE IF NOT EXISTS orders (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 5. Enable Row Level Security (RLS)
+-- 5. OTP verification codes for serverless auth
+CREATE TABLE IF NOT EXISTS otps (
+  phone VARCHAR(50) PRIMARY KEY,
+  code VARCHAR(10) NOT NULL,
+  expires_at BIGINT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 6. Enable Row Level Security (RLS)
 ALTER TABLE feedbacks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE stories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE otps ENABLE ROW LEVEL SECURITY;
 
--- 6. Open insert/select policies for client usage
+-- 7. Open insert/select policies for client usage
 CREATE POLICY "Allow public insert to feedbacks" ON feedbacks FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public select on feedbacks" ON feedbacks FOR SELECT USING (true);
 
@@ -65,4 +74,5 @@ CREATE POLICY "Allow public select on stories" ON stories FOR SELECT USING (true
 
 CREATE POLICY "Allow public all on profiles" ON profiles FOR ALL USING (true);
 CREATE POLICY "Allow public all on orders" ON orders FOR ALL USING (true);
+CREATE POLICY "Allow public all on otps" ON otps FOR ALL USING (true);
 

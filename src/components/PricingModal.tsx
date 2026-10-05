@@ -22,9 +22,9 @@ export default function PricingModal() {
     locale 
   } = useAppStore();
 
-  const CARD_NUMBER = "9860 0803 1682 3584";
-  const CARD_RAW = "9860080316823584";
-  const CARD_HOLDER = "Simora Oripova";
+  const CARD_NUMBER = process.env.NEXT_PUBLIC_PAYMENT_CARD_NUMBER || "9860 0803 1682 3584";
+  const CARD_RAW = CARD_NUMBER.replace(/\s+/g, '');
+  const CARD_HOLDER = process.env.NEXT_PUBLIC_PAYMENT_CARD_HOLDER || "Simora Oripova";
 
   const [activeTab, setActiveTab] = useState<'checkout' | 'plans'>('checkout');
   const [selectedPlan, setSelectedPlan] = useState<'pack3' | 'pack10' | 'vip'>('pack10');
