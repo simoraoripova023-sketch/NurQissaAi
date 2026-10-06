@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, Sparkles, Check, Crown, Star, Gem, ShieldCheck, 
   CreditCard, ArrowRight, Gift, Loader2, 
   Phone, Copy, CheckCircle2, AlertTriangle, QrCode, 
-  Smartphone, Wallet, Zap, ExternalLink, PlayCircle, ShieldAlert, CheckCircle
+  Smartphone, Wallet, Zap, ExternalLink, PlayCircle, ShieldAlert, CheckCircle, RefreshCw
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { CONTACT_CONFIG } from '@/lib/contact';
@@ -39,13 +39,17 @@ export default function PricingModal() {
   const [isSubmittingPaid, setIsSubmittingPaid] = useState(false);
   const [paidSubmitted, setPaidSubmitted] = useState(false);
 
+  // Anti-fraud Order & Real-Time Verification States
+  const [activeOrder, setActiveOrder] = useState<any>(null);
+  const [isVerifyingStatus, setIsVerifyingStatus] = useState(false);
+  const [verificationFailed, setVerificationFailed] = useState<string | null>(null);
+  const [isSuccessPaid, setIsSuccessPaid] = useState(false);
+
   // Click Merchant States
   const [clickLoading, setClickLoading] = useState(false);
   const [clickModalOpen, setClickModalOpen] = useState(false);
   const [currentOrder, setCurrentOrder] = useState<any>(null);
   const [clickPaymentUrl, setClickPaymentUrl] = useState<string>('');
-
-  if (!isPricingModalOpen) return null;
 
   const isUz = locale === 'uz';
 
@@ -78,6 +82,63 @@ export default function PricingModal() {
 
   const currentPlan = planDetails[selectedPlan];
 
+  // Initialize or update authenticated order on plan change
+  useEffect(() => {
+    if (!isPricingModalOpen) return;
+    let isMounted = true;
+    fetch('/api/payment/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        planKey: selectedPlan,
+        userName: senderName.trim() || currentUser?.name || 'Mijoz',
+        userPhone: senderPhone.trim() || currentUser?.phone || '',
+        provider: selectedProvider,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data?.order) {
+          setActiveOrder(data.order);
+        }
+      })
+      .catch((err) => console.error('Error creating order:', err));
+
+    return () => { isMounted = false; };
+  }, [selectedPlan, isPricingModalOpen, selectedProvider]);
+
+  // Real-time polling: automatically activates when owner approves from Telegram
+  useEffect(() => {
+    if (!isVerifyingStatus || !activeOrder?.id) return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/payment/check-status?orderId=${activeOrder.id}`);
+        const data = await res.json();
+        if (data?.order?.isPaid) {
+          clearInterval(interval);
+          setIsVerifyingStatus(false);
+          setIsSuccessPaid(true);
+          confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+          if (activeOrder.planKey === 'vip') {
+            setHasPaidSubscription(true);
+          } else {
+            addStoryCredits(activeOrder.storiesGranted || (selectedPlan === 'pack3' ? 3 : 10));
+          }
+        } else if (data?.order?.isRejected) {
+          clearInterval(interval);
+          setIsVerifyingStatus(false);
+          setVerificationFailed(
+            "To'lov summasi to'liq tushmagani yoki tarifga mos kelmagani sababli buyurtma rad etildi. Iltimos adminga murojaat qiling."
+          );
+        }
+      } catch (err) {
+        console.error('Check status error:', err);
+      }
+    }, 2500);
+
+    return () => clearInterval(interval);
+  }, [isVerifyingStatus, activeOrder?.id, activeOrder?.planKey, activeOrder?.storiesGranted, selectedPlan, addStoryCredits, setHasPaidSubscription]);
+
   const handleCopyCard = async () => {
     try {
       if (navigator?.clipboard?.writeText) {
@@ -100,71 +161,52 @@ export default function PricingModal() {
   };
 
   const providerNames: Record<PaymentProvider, string> = {
-    click: "🔵 Click Merchant (Avtomatik)",
+    click: "🔵 Click (Ilova / P2P)",
     uzum: "💜 Uzum Bank (5% Keshbek)",
-    paynet: "🟢 Paynet / Payme QR Scanner",
+    paynet: "🟢 Paynet / Smart QR",
     card: "💳 Bank Kartasi (Simora Oripova)"
-  };
-
-  // Start Click Payment flow
-  const handleStartClickPayment = async () => {
-    setClickLoading(true);
-    try {
-      const res = await fetch('/api/click/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          planKey: selectedPlan,
-          userName: senderName.trim() || currentUser?.name || 'Mijoz',
-          userPhone: senderPhone.trim() || currentUser?.phone || '',
-        })
-      });
-      const data = await res.json();
-      if (data.order) {
-        setCurrentOrder(data.order);
-        setClickPaymentUrl(data.paymentUrl);
-        setClickModalOpen(true);
-      }
-    } catch (err) {
-      console.error('Click error:', err);
-    } finally {
-      setClickLoading(false);
-    }
   };
 
   const handleConfirmPaidSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!activeOrder?.id) return;
     setIsSubmittingPaid(true);
-
-    const isUzum = selectedProvider === 'uzum';
-    const cashbackInfo = isUzum ? `5% Keshbek (${currentPlan.cashbackUZS} so'm) + 1 ta Bonus Qissa` : '';
+    setVerificationFailed(null);
 
     try {
-      await fetch('/api/feedback', {
+      const res = await fetch('/api/payment/submit-receipt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: 'tolov_nazorati',
-          name: senderName.trim() || currentUser?.name || 'Hurmatli Ota-ona',
-          contact: senderPhone.trim() || currentUser?.phone || 'Telefon kiritilmadi',
-          amount: `${currentPlan.price} so'm`,
-          planName: currentPlan.name,
-          provider: providerNames[selectedProvider],
-          cashback: cashbackInfo,
-          message: `To'lov tizimi: ${providerNames[selectedProvider]} | Summa: ${currentPlan.price} so'm | Karta: ${CARD_NUMBER} (${CARD_HOLDER}) | Izoh: ${paymentNote.trim() || "Mijoz to'lov chekini qoldirdi. Kartangizni tekshiring!"}`
+          orderId: activeOrder.id,
+          userName: senderName.trim() || currentUser?.name || 'Mijoz',
+          userPhone: senderPhone.trim() || currentUser?.phone || '',
+          provider: selectedProvider,
+          receiptNote: paymentNote.trim() || `${providerNames[selectedProvider]} orqali to'lov cheki yuborildi`,
         }),
       });
+      const data = await res.json();
+      if (data.alreadyPaid) {
+        setIsSuccessPaid(true);
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+        if (activeOrder.planKey === 'vip') {
+          setHasPaidSubscription(true);
+        } else {
+          addStoryCredits(activeOrder.storiesGranted || (selectedPlan === 'pack3' ? 3 : 10));
+        }
+        return;
+      }
+
+      setPaidSubmitted(true);
+      setIsVerifyingStatus(true);
     } catch (err) {
       console.error('Submit payment report error:', err);
-    }
-
-    setTimeout(() => {
+    } finally {
       setIsSubmittingPaid(false);
-      setPaidSubmitted(true);
-      // NOTE: Manual payments do NOT grant credits automatically.
-      // Admin verifies bank receipt and activates subscription.
-    }, 800);
+    }
   };
+
+  if (!isPricingModalOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in pt-[env(safe-area-inset-top,16px)] pb-[env(safe-area-inset-bottom,16px)]">
@@ -386,8 +428,30 @@ export default function PricingModal() {
               </div>
 
               {/* ===================================================================== */}
-              {/* CLICK MERCHANT DIRECT ACTION BOX */}
+              {/* ANTI-FRAUD VERIFIED ORDER BADGE */}
               {/* ===================================================================== */}
+              {activeOrder && (
+                <div className="p-3 sm:p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 dark:border-amber-400/30 flex items-center justify-between text-xs animate-fade-in">
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] uppercase font-black text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Xavfsiz Buyurtma ID:</span>
+                    </span>
+                    <span className="font-mono font-black text-xs sm:text-sm text-pine-950 dark:text-butter-100 select-all">
+                      #{activeOrder.id}
+                    </span>
+                  </div>
+                  <div className="text-right space-y-0.5">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">
+                      Biriktirilgan tarif:
+                    </span>
+                    <span className="font-black text-xs sm:text-sm text-emerald-700 dark:text-amber-300">
+                      {currentPlan.name} ({currentPlan.stories} ta qissa)
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* ===================================================================== */}
               {/* CLICK ORQALI TO'LOV */}
               {/* ===================================================================== */}
@@ -403,7 +467,7 @@ export default function PricingModal() {
                         Click orqali to'lash: {currentPlan.price} so'm
                       </h4>
                       <p className="text-xs text-blue-200/80 leading-relaxed max-w-lg">
-                        Click ilovasini ochib, «Kartaga o'tkazish» (P2P) bo'limi orqali quyidagi rasmiy Simora Oripova kartasiga to'lov qiling va pastda chekni tasdiqlang.
+                        Click ilovangiz orqali Simora Oripova kartasiga o'tkazing va quyida chekni tasdiqlang.
                       </p>
                     </div>
 
@@ -413,7 +477,6 @@ export default function PricingModal() {
                     </div>
                   </div>
 
-                  {/* Karta nusxalash va Click ilovasiga o'tish */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                     <button
                       type="button"
@@ -444,53 +507,76 @@ export default function PricingModal() {
 
               {/* UZUM BANK KESHBEK AKSIYA BANNERI */}
               {selectedProvider === 'uzum' && (
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white border-2 border-purple-400/50 shadow-lg flex items-center justify-between gap-4 animate-fade-in">
-                  <div className="space-y-1">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/30 text-purple-200 text-[10px] font-bold border border-purple-300/30">
-                      <Sparkles className="w-3 h-3 text-purple-300" />
-                      <span>Uzum Bank bilan maxsus imtiyoz!</span>
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white border-2 border-purple-400/50 shadow-lg space-y-3 animate-fade-in">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/30 text-purple-200 text-[10px] font-bold border border-purple-300/30">
+                        <Sparkles className="w-3 h-3 text-purple-300" />
+                        <span>Uzum Bank bilan maxsus imtiyoz!</span>
+                      </div>
+                      <h4 className="text-sm font-black text-purple-100">
+                        Uzum orqali to'lang — {currentPlan.cashbackUZS} so'm Keshbek & +1 ta Bonus Qissa!
+                      </h4>
+                      <p className="text-[11px] text-purple-200/80">
+                        Uzum Bank ilovangiz orqali Simora Oripova kartasiga to'lov qiling va qo'shimcha sovg'a oling.
+                      </p>
                     </div>
-                    <h4 className="text-sm font-black text-purple-100">
-                      Uzum orqali to'lang — {currentPlan.cashbackUZS} so'm Keshbek & +1 ta Bonus Qissa!
-                    </h4>
-                    <p className="text-[11px] text-purple-200/80">
-                      Uzum Bank ilovangiz orqali Simora Oripova kartasiga to'lov qiling va qo'shimcha sovg'a oling.
-                    </p>
+                    <div className="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-400/40 flex flex-col items-center justify-center text-center shrink-0">
+                      <span className="text-xs font-black text-purple-200">5%</span>
+                      <span className="text-[8px] font-bold uppercase text-purple-300">Keshbek</span>
+                    </div>
                   </div>
-                  <div className="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-400/40 flex flex-col items-center justify-center text-center shrink-0">
-                    <span className="text-xs font-black text-purple-200">5%</span>
-                    <span className="text-[8px] font-bold uppercase text-purple-300">Keshbek</span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleCopyCard}
+                      className="py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
+                    >
+                      {isCopied ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+                      <span>{isCopied ? "Nusxalandi!" : "Karta raqamini nusxalash"}</span>
+                    </button>
+
+                    <a
+                      href="https://uzumbank.uz"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-purple-300/40 text-purple-100 text-xs font-black flex items-center justify-center gap-2 transition-all text-center"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      <span>Uzum Bank ilovasi</span>
+                    </a>
                   </div>
                 </div>
               )}
 
-              {/* PAYNET / PAYME QR SKANER BANNERI */}
+              {/* PAYNET / PAYME SMART QR SKANER BANNERI */}
               {selectedProvider === 'paynet' && (
                 <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white border-2 border-emerald-400/50 shadow-lg space-y-3 animate-fade-in">
                   <div className="flex flex-col sm:flex-row items-center gap-4">
                     <div className="relative p-2.5 rounded-2xl bg-white shadow-xl flex flex-col items-center justify-center shrink-0">
-                      {/* REAL SCANNABLE QR CODE DIRECTLY TO SIMORA ORIPOVA'S CARD */}
+                      {/* SMART SCANNABLE QR CODE LINKED TO TELEGRAM BOT ORDER */}
                       <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(CARD_RAW)}&margin=10`}
-                        alt="Simora Oripova Card QR Code"
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(`https://t.me/nurqissaaa_bot?start=pay_${activeOrder?.id || 'order'}`)}&margin=10`}
+                        alt="Smart Payment QR Code"
                         className="w-28 h-28 sm:w-32 sm:h-32 object-contain rounded-xl"
                         loading="lazy"
                       />
-                      <span className="text-[10px] font-black text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded-md mt-1 border border-emerald-300">
-                        SIMORA ORIPOVA
+                      <span className="text-[9px] font-black text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded-md mt-1 border border-emerald-300 font-mono">
+                        #{activeOrder?.id || 'ORDER'}
                       </span>
                     </div>
 
                     <div className="space-y-1.5 text-center sm:text-left">
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
                         <QrCode className="w-3 h-3 text-emerald-300" />
-                        <span>Kamera & Bank ilovalari orqali skanerlash</span>
+                        <span>Kamera orqali Aqlli QR Skaner</span>
                       </div>
                       <h4 className="text-sm font-black text-emerald-100">
-                        Payme, Click yoki telefon kamerangiz orqali QR-kodni skanerlang!
+                        Telefon kamerangizni QR-kodga qarating!
                       </h4>
                       <p className="text-[11px] text-emerald-200/80 leading-relaxed">
-                        QR-kod to'g'ridan-to'g'ri <b>Simora Oripova (9860 0803 1682 3584)</b> kartasiga biriktirilgan. Kamerangizni ushbu kodga qaratsangiz karta raqami darhol nusxalanadi va ilovada to'lov ochiladi.
+                        Kamerangizni ushbu kodga qaratsangiz, to'lov arizangiz avtomatik ravishda <b>@nurqissaaa_bot</b> Telegram botimizda ochiladi va chekingiz 1 soniyada tasdiqlanadi.
                       </p>
                       
                       <div className="pt-1 flex flex-wrap items-center gap-2 justify-center sm:justify-start">
@@ -500,8 +586,18 @@ export default function PricingModal() {
                           className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
                         >
                           <Copy className="w-3.5 h-3.5" />
-                          <span>{isCopied ? "Nusxalandi!" : "Karta raqamidan nusxa olish"}</span>
+                          <span>{isCopied ? "Nusxalandi!" : "Karta raqamini nusxalash"}</span>
                         </button>
+
+                        <a
+                          href="https://payme.uz"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-emerald-400/40 text-emerald-100 text-[11px] font-black inline-flex items-center gap-1.5 transition-all text-center"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span>Payme ilovasi</span>
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -604,24 +700,38 @@ export default function PricingModal() {
                 <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <h5 className="text-xs font-black text-amber-900 dark:text-amber-200 uppercase tracking-wide">
-                    {isUz ? "Qat'iy Nazorat & Bot Auditi Qoidasi:" : "Strict Payment Verification Rule:"}
+                    {isUz ? "Qat'iy Nazorat & Anti-Firibgarlik Qoidasi:" : "Strict Verification & Anti-Fraud Rule:"}
                   </h5>
                   <p className="text-xs text-amber-950 dark:text-amber-100/90 leading-relaxed">
                     {isUz ? (
                       <>
-                        To'lov aynan belgilangan <b>{currentPlan.price} so'm</b> bo'lishi shart! Agar ko'rsatilgan summadan <b>kam to'lansa</b>, Click protokoli va Telegram bot nazorati orqali to'lov <b>avtomatik RAD ETILADI</b> va obuna berilmaydi.
+                        To'lov aynan belgilangan <b>{currentPlan.price} so'm</b> bo'lishi shart! Agar ko'rsatilgan summadan <b>kam to'lansa yoki soxta ariza berilsa</b>, tizim va Telegram bot nazorati orqali buyurtma <b>avtomatik RAD ETILADI</b> va hisobga hech qanday ertak qo'shilmaydi.
                       </>
                     ) : (
                       <>
-                        The transfer must be exactly <b>{currentPlan.price} UZS</b>. Underpayment is automatically rejected with error code -2.
+                        The transfer must be exactly <b>{currentPlan.price} UZS</b>. Underpayment is automatically rejected and will not grant credits.
                       </>
                     )}
                   </p>
                 </div>
               </div>
 
-              {/* KARTA BILAN TO'LANGANDA CHEK TASDIQLASH */}
-              {!paidSubmitted && selectedProvider !== 'click' && (
+              {/* XATOLIK BO'LGANDA XABAR */}
+              {verificationFailed && (
+                <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border-2 border-rose-500 text-rose-900 dark:text-rose-200 text-xs font-bold flex items-center justify-between gap-3 animate-fade-in">
+                  <span>⚠️ {verificationFailed}</span>
+                  <button
+                    type="button"
+                    onClick={() => { setVerificationFailed(null); setPaidSubmitted(false); }}
+                    className="px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] shrink-0 cursor-pointer"
+                  >
+                    Qayta urinish
+                  </button>
+                </div>
+              )}
+
+              {/* KARTA / CLICK / UZUM BILAN TO'LANGANDA CHEK TASDIQLASH */}
+              {!paidSubmitted && !isSuccessPaid && (
                 <div className="pt-2 animate-fade-in space-y-4">
                   {!hasPaidClicked ? (
                     <button
@@ -630,7 +740,7 @@ export default function PricingModal() {
                       className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-500 hover:from-emerald-500 hover:to-amber-400 text-white font-black text-sm sm:text-base shadow-xl shadow-emerald-700/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2.5 border-2 border-amber-300 cursor-pointer"
                     >
                       <Check className="w-5 h-5 text-amber-200" />
-                      <span>{isUz ? "Karta orqali to'ladim — Tasdiqlash" : "I Paid via Card — Confirm"}</span>
+                      <span>{isUz ? "To'lovni bajardim — 1-Bosishda Tasdiqlash" : "I Made Payment — Confirm"}</span>
                       <ArrowRight className="w-5 h-5 text-amber-200" />
                     </button>
                   ) : (
@@ -641,7 +751,7 @@ export default function PricingModal() {
                       <div className="flex items-center justify-between border-b border-slate-200 dark:border-pine-800 pb-2.5">
                         <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-black text-sm">
                           <ShieldCheck className="w-5 h-5 text-emerald-500" />
-                          <span>{isUz ? "To'lovni Botga Yuborish" : "Submit Payment Audit"}</span>
+                          <span>{isUz ? "To'lov Ma'lumotlarini Yuborish" : "Submit Payment Audit"}</span>
                         </div>
                         <span className="text-xs font-black text-amber-600 dark:text-amber-400">
                           {currentPlan.price} so'm
@@ -665,7 +775,7 @@ export default function PricingModal() {
 
                         <div>
                           <label className="block text-[11px] font-bold text-pine-900 dark:text-butter-200 mb-1">
-                            {isUz ? "Telefon raqamingiz (chekingiz uchun):" : "Your Phone Number:"}
+                            {isUz ? "Telefon raqamingiz (to'lov chekingiz uchun):" : "Your Phone Number:"}
                           </label>
                           <input
                             type="text"
@@ -679,11 +789,11 @@ export default function PricingModal() {
 
                         <div>
                           <label className="block text-[11px] font-bold text-pine-900 dark:text-butter-200 mb-1">
-                            {isUz ? "Chek ma'lumoti yoki qo'shimcha izoh (ixtiyoriy):" : "Transaction Note (Optional):"}
+                            {isUz ? "Chek tranzaksiya kodi yoki izoh (ixtiyoriy):" : "Transaction Note / Receipt (Optional):"}
                           </label>
                           <input
                             type="text"
-                            placeholder={isUz ? "Masalan: Click orqali soat 14:30 da o'tkazildi" : "e.g. Paid via Click at 14:30"}
+                            placeholder={isUz ? "Masalan: Click tranzaksiya #382910 yoki soat 14:30 da o'tkazildi" : "e.g. Paid at 14:30"}
                             value={paymentNote}
                             onChange={(e) => setPaymentNote(e.target.value)}
                             className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-pine-700 bg-white dark:bg-pine-900 text-xs font-medium text-slate-900 dark:text-butter-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -713,30 +823,81 @@ export default function PricingModal() {
                 </div>
               )}
 
-              {/* TO'LOV MUVAFFAQIYATLI TASDIQLANGANDA */}
-              {paidSubmitted && (
-                <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-pine-950 dark:to-emerald-950 border-2 border-emerald-500 shadow-xl text-center space-y-3 animate-fade-in">
+              {/* TO'LOV TEKSHIRILMOQDA (REAL-TIME LIVE WAITING) */}
+              {paidSubmitted && !isSuccessPaid && (
+                <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-50 to-emerald-50 dark:from-pine-950 dark:to-emerald-950 border-2 border-emerald-500 shadow-xl text-center space-y-4 animate-fade-in">
                   <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/60 border-2 border-emerald-500 mx-auto flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="w-8 h-8" />
+                    <RefreshCw className="w-7 h-7 animate-spin" />
                   </div>
                   
-                  <h4 className="text-lg font-black text-emerald-950 dark:text-emerald-200">
-                    {isUz ? "To'lov arizasi qabul qilindi!" : "Payment verification submitted!"}
-                  </h4>
+                  <div className="space-y-1">
+                    <h4 className="text-lg font-black text-emerald-950 dark:text-emerald-200">
+                      {isUz ? "To'lovingiz tekshirilmoqda..." : "Payment under verification..."}
+                    </h4>
+                    <p className="text-xs font-mono font-bold text-amber-700 dark:text-amber-400">
+                      Buyurtma kodi: #{activeOrder?.id}
+                    </p>
+                  </div>
 
                   <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
                     {isUz 
-                      ? `Rahmat! ${providerNames[selectedProvider]} orqali to'lov arizangiz qabul qilindi. Administratorimiz kartaga ${currentPlan.price} so'm mablag' tushganini tekshirib (5–15 daqiqa ichida) limitingizni ochadi yoki @nurqissaaa_bot orqali siz bilan bog'lanadi.`
-                      : `Thank you! Your payment verification has been submitted. Our administrator will verify the receipt within 5-15 minutes and activate your credits.`}
+                      ? "Arizangiz Telegram botimizga yuborildi. Administrator kartaga to'lov kelganini tasdiqlashi bilan, ushbu sahifangiz avtomatik yangilanadi va ertaklar balansingizga qo'shiladi (kutib o'tirish shart emas)!"
+                      : "Your payment verification has been submitted to Telegram bot. Once verified, this screen will instantly unlock your stories!"}
+                  </p>
+
+                  <div className="pt-1 flex items-center justify-center gap-3">
+                    <a
+                      href={`https://t.me/nurqissaaa_bot?start=pay_${activeOrder?.id || ''}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black shadow-md inline-flex items-center gap-1.5 transition-all"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Chekni Botga yuborish (@nurqissaaa_bot)</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsPricingModalOpen(false)}
+                      className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-pine-800 dark:hover:bg-pine-700 text-slate-800 dark:text-butter-200 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      {isUz ? "Yopish" : "Close"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* TO'LOV MUVAFFAQIYATLI BO'LGANDA (100% SUCCESS) */}
+              {isSuccessPaid && (
+                <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-600 to-emerald-700 text-white border-2 border-amber-300 shadow-2xl text-center space-y-4 animate-fade-in">
+                  <div className="w-16 h-16 rounded-full bg-white text-emerald-600 mx-auto flex items-center justify-center shadow-lg">
+                    <CheckCircle className="w-10 h-10" />
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <h3 className="text-xl sm:text-2xl font-black font-display text-amber-200">
+                      {isUz ? "Tabriklaymiz! To'lov Tasdiqlandi! 🎉" : "Congratulations! Payment Approved! 🎉"}
+                    </h3>
+                    <p className="text-sm font-bold text-white/90">
+                      {activeOrder?.planKey === 'vip' 
+                        ? "VIP Cheksiz Obuna hisobingizga muvaffaqiyatli biriktirildi!"
+                        : `${activeOrder?.storiesGranted || currentPlan.stories} ta yangi ertak hisobingizga qo'shildi!`}
+                    </p>
+                  </div>
+
+                  <p className="text-xs text-white/80 max-w-md mx-auto leading-relaxed">
+                    {isUz 
+                      ? "Endi siz bolangiz uchun ajoyib qahramonlik ertaklarini xohlagancha yaratishingiz va tinglashingiz mumkin."
+                      : "You can now create personalized bedtime moral stories with full access."}
                   </p>
 
                   <div className="pt-2">
                     <button
                       type="button"
                       onClick={() => setIsPricingModalOpen(false)}
-                      className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md transition-all cursor-pointer"
+                      className="py-3 px-8 rounded-2xl bg-amber-400 hover:bg-amber-300 text-pine-950 text-sm font-black shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer"
                     >
-                      {isUz ? "Tushunarli, oynani yopish" : "Close Window"}
+                      {isUz ? "Ertaklar Yaratishni Boshlash 🚀" : "Start Creating Stories 🚀"}
                     </button>
                   </div>
                 </div>

@@ -1,13 +1,17 @@
+import crypto from 'crypto';
 import { CLICK_PLANS, ClickPlan } from './click';
 
 export interface Order {
   id: string;
-  planKey: string;
+  planKey: 'pack3' | 'pack10' | 'vip';
   planName: string;
   amount: number;
-  status: 'pending' | 'prepared' | 'paid' | 'cancelled' | 'rejected_underpaid';
+  storiesGranted: number;
+  status: 'pending' | 'prepared' | 'verifying' | 'paid' | 'cancelled' | 'rejected_underpaid';
   userName?: string;
   userPhone?: string;
+  provider?: string;
+  receiptNote?: string;
   clickTransId?: string;
   clickPrepareId?: string;
   created_at: string;
@@ -22,22 +26,46 @@ declare global {
 const ordersStore = globalThis.__nurqissa_orders_store ?? new Map<string, Order>();
 globalThis.__nurqissa_orders_store = ordersStore;
 
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4';
+
+/**
+ * Generate cryptographic secret signature for order actions (prevents forged approvals)
+ */
+export function generateOrderSecret(orderId: string): string {
+  return crypto.createHmac('sha256', BOT_TOKEN).update(orderId).digest('hex').slice(0, 16);
+}
+
+export function verifyOrderSecret(orderId: string, signature: string): boolean {
+  if (!orderId || !signature) return false;
+  const expected = generateOrderSecret(orderId);
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+}
+
 export async function createOrder(params: {
   planKey: string;
   userName?: string;
   userPhone?: string;
+  provider?: string;
 }): Promise<Order> {
-  const plan = CLICK_PLANS[params.planKey] || CLICK_PLANS.pack10;
-  const orderId = `nq_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`;
+  // Anti-fraud: strictly validate that only authentic plans are allowed
+  const validKey = (params.planKey === 'pack3' || params.planKey === 'vip') ? params.planKey : 'pack10';
+  const plan = CLICK_PLANS[validKey] || CLICK_PLANS.pack10;
+  
+  // Format readable unique ID: NQ-29K-xxxx or NQ-69K-xxxx or NQ-VIP-xxxx
+  const prefix = validKey === 'pack3' ? 'NQ-29K' : validKey === 'vip' ? 'NQ-VIP' : 'NQ-69K';
+  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+  const orderId = `${prefix}-${Date.now().toString().slice(-4)}${randomSuffix}`;
 
   const order: Order = {
     id: orderId,
-    planKey: plan.id,
+    planKey: validKey,
     planName: plan.nameUz,
     amount: plan.price,
+    storiesGranted: plan.stories,
     status: 'pending',
     userName: params.userName || 'Mijoz',
     userPhone: params.userPhone || "Ko'rsatilmadi",
+    provider: params.provider || 'card',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
@@ -64,6 +92,7 @@ export async function createOrder(params: {
 }
 
 export async function getOrder(orderId: string): Promise<Order | null> {
+  if (!orderId) return null;
   const cached = ordersStore.get(orderId);
   if (cached) return cached;
 
@@ -73,9 +102,10 @@ export async function getOrder(orderId: string): Promise<Order | null> {
     if (data) {
       const order: Order = {
         id: data.id,
-        planKey: data.plan_key,
+        planKey: data.plan_key as any,
         planName: data.plan_name,
         amount: Number(data.amount),
+        storiesGranted: data.plan_key === 'pack3' ? 3 : data.plan_key === 'vip' ? 999 : 10,
         status: data.status,
         userName: data.user_name,
         userPhone: data.user_phone,
@@ -114,3 +144,4 @@ export async function updateOrder(orderId: string, updates: Partial<Order>): Pro
 
   return updated;
 }
+
