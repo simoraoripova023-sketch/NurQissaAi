@@ -25,10 +25,11 @@ export default function PricingModal() {
   const CARD_NUMBER = process.env.NEXT_PUBLIC_PAYMENT_CARD_NUMBER || "9860 0803 1682 3584";
   const CARD_RAW = CARD_NUMBER.replace(/\s+/g, '');
   const CARD_HOLDER = process.env.NEXT_PUBLIC_PAYMENT_CARD_HOLDER || "Simora Oripova";
+  const PAYNET_BUSINESS_URL = "https://app.paynet.uz/qr-online/00020101021140440012qr-online.uz01186r2covoUU7ztMySiv10202115204531153038605802UZ5910AO'PAYNET'6008Tashkent610610002164280002uz0106PAYNET0208Toshkent80520012qr-online.uz03097120207070419marketing@paynet.uz6304984F";
 
   const [activeTab, setActiveTab] = useState<'checkout' | 'plans'>('checkout');
   const [selectedPlan, setSelectedPlan] = useState<'pack3' | 'pack10' | 'vip'>('pack10');
-  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider>('card');
+  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider>('paynet');
   
   // Card & checkout states
   const [isCopied, setIsCopied] = useState(false);
@@ -161,9 +162,9 @@ export default function PricingModal() {
   };
 
   const providerNames: Record<PaymentProvider, string> = {
+    paynet: "🟢 Paynet Business (Rasmiy QR)",
     click: "🔵 Click (Ilova / P2P)",
     uzum: "💜 Uzum Bank (5% Keshbek)",
-    paynet: "🟢 Paynet / Smart QR",
     card: "💳 Bank Kartasi (Simora Oripova)"
   };
 
@@ -550,56 +551,64 @@ export default function PricingModal() {
                 </div>
               )}
 
-              {/* PAYNET / PAYME SMART QR SKANER BANNERI */}
+              {/* PAYNET BUSINESS RASMIY QR-ONLINE (MILLIY QR) */}
               {selectedProvider === 'paynet' && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white border-2 border-emerald-400/50 shadow-lg space-y-3 animate-fade-in">
-                  <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <div className="relative p-2.5 rounded-2xl bg-white shadow-xl flex flex-col items-center justify-center shrink-0">
-                      {/* SMART SCANNABLE QR CODE LINKED TO TELEGRAM BOT ORDER */}
+                <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-br from-emerald-950 via-teal-950 to-pine-950 text-white border-2 border-emerald-400/80 shadow-2xl space-y-4 animate-fade-in">
+                  <div className="flex flex-col sm:flex-row items-center gap-5">
+                    
+                    {/* Official Paynet QR Code */}
+                    <div className="relative p-3 rounded-2xl bg-white shadow-2xl flex flex-col items-center justify-center shrink-0 border-2 border-emerald-400">
                       <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(`https://t.me/nurqissaaa_bot?start=pay_${activeOrder?.id || 'order'}`)}&margin=10`}
-                        alt="Smart Payment QR Code"
-                        className="w-28 h-28 sm:w-32 sm:h-32 object-contain rounded-xl"
-                        loading="lazy"
+                        src="/images/paynet-qr.png"
+                        alt="Paynet Business QR Code"
+                        className="w-36 h-36 sm:w-40 sm:h-40 object-contain rounded-xl"
                       />
-                      <span className="text-[9px] font-black text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded-md mt-1 border border-emerald-300 font-mono">
-                        #{activeOrder?.id || 'ORDER'}
+                      <span className="text-[10px] font-black text-emerald-950 bg-emerald-100 px-2.5 py-0.5 rounded-md mt-1.5 border border-emerald-300 font-mono tracking-tight">
+                        AO PAYNET • MILLIY QR
                       </span>
                     </div>
 
-                    <div className="space-y-1.5 text-center sm:text-left">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
-                        <QrCode className="w-3 h-3 text-emerald-300" />
-                        <span>Kamera orqali Aqlli QR Skaner</span>
+                    <div className="space-y-2 text-center sm:text-left flex-1">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-bold border border-emerald-300/30">
+                        <QrCode className="w-3.5 h-3.5 text-emerald-300" />
+                        <span>Rasmiy Paynet Business • Milliy QR-Online</span>
                       </div>
-                      <h4 className="text-sm font-black text-emerald-100">
-                        Telefon kamerangizni QR-kodga qarating!
+
+                      <h4 className="text-base sm:text-lg font-black text-white leading-tight">
+                        Paynet, Click, Payme yoki kamerangiz orqali to'lang!
                       </h4>
-                      <p className="text-[11px] text-emerald-200/80 leading-relaxed">
-                        Kamerangizni ushbu kodga qaratsangiz, to'lov arizangiz avtomatik ravishda <b>@nurqissaaa_bot</b> Telegram botimizda ochiladi va chekingiz 1 soniyada tasdiqlanadi.
+
+                      <p className="text-xs text-emerald-200/90 leading-relaxed">
+                        Ushbu QR-kod <b>Markaziy Bankning rasmiy Milliy QR standarti</b> hisoblanadi. Paynet, Click, Payme yoki Uzum ilovalaridagi QR-skaner orqali to'g'ridan-to'g'ri to'lash mumkin!
                       </p>
                       
-                      <div className="pt-1 flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                      <div className="pt-2 flex flex-wrap items-center gap-2.5 justify-center sm:justify-start">
+                        {/* 1-click Paynet App/Web Button */}
+                        <a
+                          href={PAYNET_BUSINESS_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-pine-950 text-xs font-black inline-flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all text-center"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          <span>Paynet orqali to'lash ({currentPlan.price} so'm)</span>
+                        </a>
+
                         <button
                           type="button"
                           onClick={handleCopyCard}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-black inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                          className="py-2.5 px-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-emerald-400/40 text-emerald-100 text-xs font-black inline-flex items-center gap-1.5 transition-all cursor-pointer"
                         >
                           <Copy className="w-3.5 h-3.5" />
                           <span>{isCopied ? "Nusxalandi!" : "Karta raqamini nusxalash"}</span>
                         </button>
-
-                        <a
-                          href="https://payme.uz"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-emerald-400/40 text-emerald-100 text-[11px] font-black inline-flex items-center gap-1.5 transition-all text-center"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          <span>Payme ilovasi</span>
-                        </a>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-black/40 border border-emerald-400/30 flex items-center gap-2 text-[11px] text-emerald-200">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span><b>Rasmiy korxona:</b> Simora Oripova (AO PAYNET). Barcha kartalar (Uzcard, Humo, Visa) orqali to'lov qabul qilinadi.</span>
                   </div>
                 </div>
               )}
