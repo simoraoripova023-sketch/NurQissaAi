@@ -2,7 +2,7 @@ import requests
 import json
 import os
 
-api_key = os.environ.get('ELEVENLABS_API_KEY', 'sk_a2f342ffaaf5d1c4a6c0c1585187cfd7baeca773a9de137b')
+api_key = os.environ.get('ELEVENLABS_API_KEY', '')
 headers = {
     'xi-api-key': api_key,
     'Content-Type': 'application/json'
