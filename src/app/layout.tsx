@@ -7,6 +7,8 @@ import PricingModal from "@/components/PricingModal";
 import FloatingContactSupport from "@/components/FloatingContactSupport";
 import NurShopModal from "@/components/NurShopModal";
 import ThemeProvider from "@/components/ThemeProvider";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 
 export const metadata: Metadata = {
   title: "NurQissa AI - Farzandingiz Bosh Qahramon Bo'lgan Sehrli & Ibratli Ertaklar",
@@ -67,6 +69,8 @@ export default function RootLayout({
           <PricingModal />
           <NurShopModal />
           <FloatingContactSupport />
+          <ServiceWorkerRegister />
+          <PwaInstallPrompt />
         </ThemeProvider>
       </body>
     </html>
