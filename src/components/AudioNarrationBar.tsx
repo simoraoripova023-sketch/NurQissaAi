@@ -44,6 +44,7 @@ export default function AudioNarrationBar({
           body: JSON.stringify({
             text: nextText,
             voiceId: selectedVoice,
+            locale,
           }),
         });
         if (res.ok) {
@@ -117,9 +118,16 @@ export default function AudioNarrationBar({
       if (locale === 'uz') {
         utterance.lang = 'uz-UZ';
         const uzVoice = voices.find(v => v.lang.startsWith('uz') || v.lang.startsWith('tr')) 
-          || voices.find(v => v.name.toLowerCase().includes('uzbek') || v.name.toLowerCase().includes('turkish'))
-          || voices[0];
-        if (uzVoice) utterance.voice = uzVoice;
+          || voices.find(v => v.name.toLowerCase().includes('uzbek') || v.name.toLowerCase().includes('turkish'));
+        if (uzVoice) {
+          utterance.voice = uzVoice;
+        } else {
+          // Do not read Uzbek text with an English accent
+          console.warn("Brauzerda mahalliy o'zbek tili ovozi topilmadi");
+          setIsLoadingAudio(false);
+          setIsPlayingAudio(false);
+          return;
+        }
       } else {
         utterance.lang = 'en-US';
         const enVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
@@ -181,6 +189,7 @@ export default function AudioNarrationBar({
         body: JSON.stringify({
           text,
           voiceId: selectedVoice,
+          locale,
         }),
       });
 
