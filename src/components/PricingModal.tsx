@@ -260,7 +260,7 @@ export default function PricingModal() {
               }`}
             >
               <Zap className="w-4 h-4 text-amber-950" />
-              <span>{isUz ? "⚡ Click & Tezkor To'lov" : "⚡ Click & Instant Pay"}</span>
+              <span>{isUz ? "⚡ Yagona To'lov (QR & Ilova)" : "⚡ Universal Payment"}</span>
             </button>
 
             <button
@@ -329,379 +329,121 @@ export default function PricingModal() {
                 </div>
               </div>
 
-              {/* 2. TO'LOV USULINI TANLASH */}
-              <div className="space-y-2.5 pt-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-black text-pine-900 dark:text-butter-200 uppercase tracking-wider">
-                    {isUz ? "2. Qulay to'lov tizimini tanlang:" : "2. Choose Payment Method:"}
+              {/* ===================================================================== */}
+              {/* 2. YAGONA TO'LOV TIZIMI (MILLIY QR & BARCHA BANK ILovalari) */}
+              {/* ===================================================================== */}
+              <div className="space-y-3.5 pt-1 animate-fade-in">
+                
+                {/* Header with supported app badges */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <label className="text-xs font-black text-pine-900 dark:text-butter-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <span>{isUz ? "2. Yagona To'lov Tizimi (Istalgan ilovadan):" : "2. Universal Payment (From Any App):"}</span>
                   </label>
-                  <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    {isUz ? "Avtomatik Click & Karta" : "Instant Verification"}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                   
-                  {/* CLICK MERCHANT (ASOSIY / TAVSIYA) */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProvider('click')}
-                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer relative flex flex-col justify-between ${
-                      selectedProvider === 'click'
-                        ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 shadow-md ring-2 ring-blue-400'
-                        : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950/60 hover:border-blue-300'
-                    }`}
-                  >
-                    <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded-md bg-blue-600 text-white text-[8px] font-black uppercase tracking-tight">
-                      Avtomat
-                    </div>
-                    <div className="w-8 h-8 rounded-xl bg-blue-600/10 text-blue-700 dark:text-blue-300 flex items-center justify-center mb-2">
-                      <Smartphone className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="font-black text-xs text-blue-950 dark:text-blue-200 block">Click Merchant</span>
-                      <span className="text-[10px] text-blue-700 dark:text-blue-300 font-semibold">1-Bosishda to'lov</span>
-                    </div>
-                  </button>
-
-                  {/* UZUM BANK (KESHBEK BILAN) */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProvider('uzum')}
-                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
-                      selectedProvider === 'uzum'
-                        ? 'border-purple-600 bg-purple-50 dark:bg-purple-950/40 shadow-md ring-2 ring-purple-400'
-                        : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950/60 hover:border-purple-300'
-                    }`}
-                  >
-                    <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded-md bg-purple-600 text-white text-[8px] font-black uppercase tracking-tight">
-                      5% Keshbek
-                    </div>
-                    <div className="w-8 h-8 rounded-xl bg-purple-600/10 text-purple-700 dark:text-purple-300 flex items-center justify-center mb-2">
-                      <Wallet className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="font-black text-xs text-purple-950 dark:text-purple-200 block">Uzum Bank</span>
-                      <span className="text-[10px] text-purple-700 dark:text-purple-300 font-semibold">+1 Bonus Qissa</span>
-                    </div>
-                  </button>
-
-                  {/* PAYNET / PAYME QR SCANNER */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProvider('paynet')}
-                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer relative flex flex-col justify-between ${
-                      selectedProvider === 'paynet'
-                        ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 shadow-md ring-2 ring-emerald-400'
-                        : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950/60 hover:border-emerald-300'
-                    }`}
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mb-2">
-                      <QrCode className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="font-black text-xs text-emerald-950 dark:text-emerald-200 block">Paynet / QR</span>
-                      <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold">Kamera Skaneri</span>
-                    </div>
-                  </button>
-
-                  {/* BANK KARTASI (SIMORA ORIPOVA) */}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedProvider('card')}
-                    className={`p-3 rounded-2xl border-2 text-left transition-all cursor-pointer relative flex flex-col justify-between ${
-                      selectedProvider === 'card'
-                        ? 'border-amber-500 bg-amber-50 dark:bg-pine-900 shadow-md ring-2 ring-amber-400'
-                        : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950/60 hover:border-amber-300'
-                    }`}
-                  >
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300 flex items-center justify-center mb-2">
-                      <CreditCard className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="font-black text-xs text-pine-950 dark:text-butter-200 block">Karta Raqam</span>
-                      <span className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold">Simora Oripova</span>
-                    </div>
-                  </button>
-
-                </div>
-              </div>
-
-              {/* ===================================================================== */}
-              {/* ANTI-FRAUD VERIFIED ORDER BADGE */}
-              {/* ===================================================================== */}
-              {activeOrder && (
-                <div className="p-3 sm:p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 dark:border-amber-400/30 flex items-center justify-between text-xs animate-fade-in">
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] uppercase font-black text-amber-700 dark:text-amber-400 flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Xavfsiz Buyurtma ID:</span>
+                  {/* Logos: Click, Payme, Uzum, Paynet */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-md bg-blue-600/10 text-blue-700 dark:text-blue-300 text-[10px] font-black border border-blue-400/30">
+                      Click
                     </span>
-                    <span className="font-mono font-black text-xs sm:text-sm text-pine-950 dark:text-butter-100 select-all">
-                      #{activeOrder.id}
+                    <span className="px-2 py-0.5 rounded-md bg-emerald-600/10 text-emerald-700 dark:text-emerald-300 text-[10px] font-black border border-emerald-400/30">
+                      Payme
                     </span>
-                  </div>
-                  <div className="text-right space-y-0.5">
-                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 block">
-                      Biriktirilgan tarif:
+                    <span className="px-2 py-0.5 rounded-md bg-purple-600/10 text-purple-700 dark:text-purple-300 text-[10px] font-black border border-purple-400/30">
+                      Uzum
                     </span>
-                    <span className="font-black text-xs sm:text-sm text-emerald-700 dark:text-amber-300">
-                      {currentPlan.name} ({currentPlan.stories} ta qissa)
+                    <span className="px-2 py-0.5 rounded-md bg-teal-600/10 text-teal-700 dark:text-teal-300 text-[10px] font-black border border-teal-400/30">
+                      Paynet
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-amber-600/10 text-amber-700 dark:text-amber-300 text-[10px] font-black border border-amber-400/30">
+                      Humo / Uzcard
                     </span>
                   </div>
                 </div>
-              )}
 
-              {/* ===================================================================== */}
-              {/* CLICK ORQALI TO'LOV */}
-              {/* ===================================================================== */}
-              {selectedProvider === 'click' && (
-                <div className="p-5 rounded-3xl bg-gradient-to-br from-blue-900 via-indigo-900 to-blue-950 text-white border-2 border-blue-400/60 shadow-xl space-y-4 animate-fade-in">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="space-y-1">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-400/20 text-blue-200 text-[10px] font-bold border border-blue-300/30">
-                        <Smartphone className="w-3.5 h-3.5 text-blue-300" />
-                        <span>Click orqali to'lov</span>
-                      </div>
-                      <h4 className="text-base sm:text-lg font-black text-white">
-                        Click orqali to'lash: {currentPlan.price} so'm
-                      </h4>
-                      <p className="text-xs text-blue-200/80 leading-relaxed max-w-lg">
-                        Click ilovangiz orqali Simora Oripova kartasiga o'tkazing va quyida chekni tasdiqlang.
-                      </p>
-                    </div>
+                {/* THE UNIFIED MASTER PAYMENT CARD */}
+                <div className="relative rounded-3xl p-5 sm:p-7 bg-gradient-to-br from-[#012E27] via-[#01241F] to-[#001411] border-2 border-emerald-400/80 shadow-2xl text-white overflow-hidden space-y-5">
+                  <div className="absolute -top-16 -right-16 w-52 h-52 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -bottom-16 -left-16 w-52 h-52 bg-amber-400/15 rounded-full blur-3xl pointer-events-none" />
 
-                    <div className="text-right shrink-0">
-                      <span className="text-[10px] uppercase font-bold text-blue-300 block">To'lov miqdori:</span>
-                      <span className="text-xl sm:text-2xl font-black text-amber-300">{currentPlan.price} UZS</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                    <button
-                      type="button"
-                      onClick={handleCopyCard}
-                      className="py-3 px-4 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
-                    >
-                      {isCopied ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-                      <span>{isCopied ? "Karta nusxalandi!" : "Karta raqamidan nusxa olish"}</span>
-                    </button>
-
-                    <a
-                      href="https://my.click.uz"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-blue-300/40 text-blue-100 text-xs font-black flex items-center justify-center gap-2 transition-all text-center"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      <span>Click ilovasini ochish (my.click.uz)</span>
-                    </a>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-black/40 border border-blue-400/30 flex items-center gap-2 text-[11px] text-blue-200">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span><b>Rasmiy hisob:</b> Simora Oripova (9860 0803 1682 3584). To'lov 100% to'g'ri hisobga yo'naltirilgan.</span>
-                  </div>
-                </div>
-              )}
-
-              {/* UZUM BANK KESHBEK AKSIYA BANNERI */}
-              {selectedProvider === 'uzum' && (
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 text-white border-2 border-purple-400/50 shadow-lg space-y-3 animate-fade-in">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/30 text-purple-200 text-[10px] font-bold border border-purple-300/30">
-                        <Sparkles className="w-3 h-3 text-purple-300" />
-                        <span>Uzum Bank bilan maxsus imtiyoz!</span>
-                      </div>
-                      <h4 className="text-sm font-black text-purple-100">
-                        Uzum orqali to'lang — {currentPlan.cashbackUZS} so'm Keshbek & +1 ta Bonus Qissa!
-                      </h4>
-                      <p className="text-[11px] text-purple-200/80">
-                        Uzum Bank ilovangiz orqali Simora Oripova kartasiga to'lov qiling va qo'shimcha sovg'a oling.
-                      </p>
-                    </div>
-                    <div className="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-400/40 flex flex-col items-center justify-center text-center shrink-0">
-                      <span className="text-xs font-black text-purple-200">5%</span>
-                      <span className="text-[8px] font-bold uppercase text-purple-300">Keshbek</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={handleCopyCard}
-                      className="py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-black flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
-                    >
-                      {isCopied ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-                      <span>{isCopied ? "Nusxalandi!" : "Karta raqamini nusxalash"}</span>
-                    </button>
-
-                    <a
-                      href="https://uzumbank.uz"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-purple-300/40 text-purple-100 text-xs font-black flex items-center justify-center gap-2 transition-all text-center"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      <span>Uzum Bank ilovasi</span>
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              {/* PAYNET BUSINESS RASMIY QR-ONLINE (MILLIY QR) */}
-              {selectedProvider === 'paynet' && (
-                <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-br from-emerald-950 via-teal-950 to-pine-950 text-white border-2 border-emerald-400/80 shadow-2xl space-y-4 animate-fade-in">
-                  <div className="flex flex-col sm:flex-row items-center gap-5">
+                  {/* QR and Details Layout */}
+                  <div className="relative z-10 flex flex-col md:flex-row items-center gap-5 sm:gap-7">
                     
-                    {/* Official Paynet QR Code */}
-                    <div className="relative p-3 rounded-2xl bg-white shadow-2xl flex flex-col items-center justify-center shrink-0 border-2 border-emerald-400">
+                    {/* The Official Milliy QR Code Image */}
+                    <div className="relative p-3.5 rounded-2xl bg-white shadow-2xl flex flex-col items-center justify-center shrink-0 border-2 border-emerald-400">
                       <img 
                         src="/images/paynet-qr.png"
-                        alt="Paynet Business QR Code"
-                        className="w-36 h-36 sm:w-40 sm:h-40 object-contain rounded-xl"
+                        alt="Rasmiy Milliy QR Code"
+                        className="w-36 h-36 sm:w-44 sm:h-44 object-contain rounded-xl"
                       />
-                      <span className="text-[10px] font-black text-emerald-950 bg-emerald-100 px-2.5 py-0.5 rounded-md mt-1.5 border border-emerald-300 font-mono tracking-tight">
+                      <span className="text-[10px] font-black text-emerald-950 bg-emerald-100 px-2.5 py-0.5 rounded-md mt-2 border border-emerald-300 font-mono tracking-tight text-center">
                         AO PAYNET • MILLIY QR
                       </span>
                     </div>
 
-                    <div className="space-y-2 text-center sm:text-left flex-1">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-bold border border-emerald-300/30">
-                        <QrCode className="w-3.5 h-3.5 text-emerald-300" />
-                        <span>Rasmiy Paynet Business • Milliy QR-Online</span>
+                    {/* Explanations & Direct Action Buttons */}
+                    <div className="space-y-3 text-center md:text-left flex-1">
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-400/20 text-emerald-300 text-[10px] font-bold border border-emerald-300/30 mb-1.5">
+                          <QrCode className="w-3.5 h-3.5 text-emerald-300" />
+                          <span>Markaziy Bankning Rasmiy Milliy QR Standarti</span>
+                        </div>
+                        <h3 className="text-base sm:text-xl font-black text-white leading-tight">
+                          Paynet, Click, Payme yoki Uzum orqali to'lang
+                        </h3>
+                        <p className="text-xs text-emerald-200/90 leading-relaxed mt-1">
+                          Ushbu QR-kodni telefon kamerangiz yoki <b>istalgan bank ilovasi</b> (Paynet, Click, Payme, Uzum) orqali skanerlang — barchasi bir xilda 100% taniydi!
+                        </p>
                       </div>
 
-                      <h4 className="text-base sm:text-lg font-black text-white leading-tight">
-                        Paynet, Click, Payme yoki kamerangiz orqali to'lang!
-                      </h4>
-
-                      <p className="text-xs text-emerald-200/90 leading-relaxed">
-                        Ushbu QR-kod <b>Markaziy Bankning rasmiy Milliy QR standarti</b> hisoblanadi. Paynet, Click, Payme yoki Uzum ilovalaridagi QR-skaner orqali to'g'ridan-to'g'ri to'lash mumkin!
-                      </p>
-                      
-                      <div className="pt-2 flex flex-wrap items-center gap-2.5 justify-center sm:justify-start">
-                        {/* 1-click Paynet App/Web Button */}
+                      {/* Primary Quick Buttons */}
+                      <div className="pt-1 flex flex-wrap items-center gap-2.5 justify-center md:justify-start">
+                        {/* 1-Click Paynet App/Web for Phone users */}
                         <a
                           href={PAYNET_BUSINESS_URL}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-pine-950 text-xs font-black inline-flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all text-center"
+                          className="py-3 px-5 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:from-emerald-300 hover:to-teal-300 text-pine-950 text-xs sm:text-sm font-black inline-flex items-center gap-2 shadow-xl hover:scale-105 active:scale-95 transition-all text-center"
                         >
                           <ExternalLink className="w-4 h-4" />
-                          <span>Paynet orqali to'lash ({currentPlan.price} so'm)</span>
+                          <span>Ilovada to'lash ({currentPlan.price} so'm)</span>
                         </a>
 
+                        {/* Direct Card Copy Button */}
                         <button
                           type="button"
                           onClick={handleCopyCard}
-                          className="py-2.5 px-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-emerald-400/40 text-emerald-100 text-xs font-black inline-flex items-center gap-1.5 transition-all cursor-pointer"
+                          className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-emerald-400/40 text-emerald-100 text-xs font-black inline-flex items-center gap-2 transition-all cursor-pointer"
                         >
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>{isCopied ? "Nusxalandi!" : "Karta raqamini nusxalash"}</span>
+                          {isCopied ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+                          <span>{isCopied ? "Karta nusxalandi!" : "Karta raqamini nusxalash"}</span>
                         </button>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="p-3 rounded-xl bg-black/40 border border-emerald-400/30 flex items-center gap-2 text-[11px] text-emerald-200">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span><b>Rasmiy korxona:</b> Simora Oripova (AO PAYNET). Barcha kartalar (Uzcard, Humo, Visa) orqali to'lov qabul qilinadi.</span>
-                  </div>
-                </div>
-              )}
-
-              {/* 3. REALISTIC BANK KARTA BLOKI (SIMORA ORIPOVA) */}
-              <div className="space-y-2 pt-1">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-black text-pine-900 dark:text-butter-200 uppercase tracking-wider">
-                    {isUz ? "Muqobil hisob (Karta orqali):" : "Alternative Direct Card:"}
-                  </label>
-                  <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    {isUz ? "Simora Oripova (Rasmiy hisob)" : "Verified Account"}
-                  </span>
-                </div>
-
-                {/* VIP KARTA KO'RINIShI */}
-                <div className="relative w-full rounded-3xl p-5 sm:p-7 bg-gradient-to-br from-[#023B33] via-[#012A25] to-[#001714] border-2 border-amber-400/80 shadow-2xl text-white overflow-hidden">
-                  <div className="absolute -top-16 -right-16 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
-                  <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
-
-                  <div className="flex items-center justify-between mb-5 relative z-10">
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-300 via-amber-400 to-amber-200 border border-amber-500 shadow-inner flex items-center justify-center relative overflow-hidden">
-                        <div className="w-full h-[1px] bg-amber-700/60 my-auto" />
-                        <div className="absolute inset-x-2 inset-y-1 border border-amber-700/40 rounded-xs" />
+                      {/* Card Details snippet */}
+                      <div className="pt-1 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-emerald-200/80 justify-center md:justify-start">
+                        <span>💳 <b>Karta:</b> <span className="font-mono text-white select-all">{CARD_NUMBER}</span></span>
+                        <span>👤 <b>Egasi:</b> <span className="text-white uppercase">{CARD_HOLDER}</span></span>
                       </div>
-                      <svg className="w-5 h-5 text-amber-300/80 transform rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 8.5a7 7 0 0 1 14 0" />
-                        <path d="M8 11.5a3.5 3.5 0 0 1 8 0" />
-                      </svg>
                     </div>
 
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 border border-amber-400/40 backdrop-blur-sm">
-                      <span className="text-[11px] font-black tracking-wider text-amber-300">HUMO / UZCARD</span>
-                    </div>
                   </div>
 
-                  <div className="my-4 relative z-10">
-                    <span className="text-[10px] font-bold text-amber-200/70 uppercase tracking-widest block mb-1.5">
-                      {isUz ? "Karta raqami:" : "Card Number:"}
-                    </span>
-                    
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 p-3 rounded-2xl bg-black/50 border border-amber-400/40 backdrop-blur-md">
-                      <span className="font-mono font-black text-lg sm:text-xl md:text-2xl tracking-wider text-amber-200 drop-shadow-sm select-all">
-                        {CARD_NUMBER}
-                      </span>
-
-                      <button
-                        type="button"
-                        onClick={handleCopyCard}
-                        className={`px-3.5 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-md active:scale-95 cursor-pointer shrink-0 ${
-                          isCopied
-                            ? 'bg-emerald-500 text-white border border-emerald-300 scale-105'
-                            : 'bg-amber-400 hover:bg-amber-300 text-pine-950 border border-amber-200 hover:scale-105'
-                        }`}
-                        title={isUz ? "Karta raqamidan nusxa olish" : "Copy card number"}
-                      >
-                        {isCopied ? (
-                          <>
-                            <Check className="w-4 h-4 text-white" />
-                            <span>Nusxalandi! ✓</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-4 h-4 text-pine-950" />
-                            <span>Nusxa olish</span>
-                          </>
-                        )}
-                      </button>
+                  {/* Anti-Fraud Order Token Details */}
+                  {activeOrder && (
+                    <div className="pt-3 border-t border-emerald-400/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs relative z-10">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Xavfsiz Buyurtma kodi: <b className="font-mono text-amber-300">#{activeOrder.id}</b></span>
+                      </div>
+                      <div className="text-emerald-300 font-bold">
+                        Biriktirilgan miqdor: <b className="text-white">{currentPlan.price} so'm</b> ({currentPlan.stories} ta qissa)
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="flex items-end justify-between pt-3 border-t border-amber-400/20 relative z-10">
-                    <div>
-                      <span className="text-[9px] font-bold text-amber-200/60 uppercase tracking-widest block">
-                        {isUz ? "Karta egasi:" : "Card Holder:"}
-                      </span>
-                      <span className="font-black text-sm sm:text-base md:text-lg tracking-wide text-white uppercase font-display">
-                        {CARD_HOLDER}
-                      </span>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="text-[9px] font-bold text-amber-200/60 uppercase tracking-widest block">
-                        {isUz ? "To'lov summasi:" : "Amount to pay:"}
-                      </span>
-                      <span className="text-sm sm:text-base font-black text-amber-300">
-                        {currentPlan.price} so'm
-                      </span>
-                    </div>
-                  </div>
                 </div>
+
               </div>
 
               {/* QAT'IY NAZORAT BANNERI */}
