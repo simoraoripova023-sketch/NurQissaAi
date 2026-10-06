@@ -1,7 +1,6 @@
 // NurQissa AI - Service Worker
-const CACHE_NAME = 'nurqissa-v1';
+const CACHE_NAME = 'nurqissa-v2';
 const STATIC_ASSETS = [
-  '/',
   '/manifest.json',
   '/logo.png',
   '/favicon.ico',
@@ -28,7 +27,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
@@ -38,10 +36,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Always Network-First for HTML navigation so users immediately see updates
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/'))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Return cache but update in background (Stale-While-Revalidate)
         fetch(event.request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
@@ -50,12 +55,7 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
 
-      return fetch(event.request).catch(() => {
-        // Fallback for offline if navigating
-        if (event.request.mode === 'navigate') {
-          return caches.match('/');
-        }
-      });
+      return fetch(event.request);
     })
   );
 });
