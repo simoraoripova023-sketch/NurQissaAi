@@ -57,14 +57,14 @@ export async function POST(req: NextRequest) {
       `💰 <b>Kutilayotgan summa:</b> <code>${Number(order.amount).toLocaleString('uz-UZ')} so'm</code>\n` +
       `🎁 <b>Beriladigan ertaklar:</b> <b>${order.storiesGranted} ta qissa</b>\n` +
       `🏦 <b>To'lov usuli:</b> ${providerEmoji[provider] || provider}\n` +
-      `💳 <b>Hisob egasi:</b> Simora Oripova (<code>9860 0803 1682 3584</code>)\n\n` +
+      `🏢 <b>Hisob egasi:</b> Simora Oripova (AO PAYNET • Rasmiy Milliy QR)\n\n` +
       `👤 <b>Mijoz:</b> ${userName || order.userName}\n` +
       `📞 <b>Telefon raqami:</b> <code>${userPhone || order.userPhone}</code>\n` +
       `🕒 <b>Vaqt:</b> ${new Date().toLocaleString('uz-UZ')}\n\n` +
       `📝 <b>Chek / Izoh:</b>\n<i>${receiptNote || "Mijoz to'lovni bajarganini bildirdi"}</i>\n\n` +
       `🛡️ <b>FIRIBGARLIKDAN HIMOYA:</b>\n` +
       `Mijoz faqat o'zi tanlagan <b>${order.planName}</b> (${order.storiesGranted} ta qissa) uchun so'rov yuborgan. Kam to'lab qimmatroq tarifni ololmaydi!\n\n` +
-      `👇 <i>Bank kartangizga pul tushgan bo'lsa, quyidagi tugmani bosib 1 soniyada tasdiqlang:</i>`
+      `👇 <i>Paynet hisobingizga to'lov kelgan bo'lsa, quyidagi tugmani bosib 1 soniyada tasdiqlang:</i>`
     );
 
     // Send to Telegram with 1-click inline buttons

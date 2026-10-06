@@ -22,17 +22,13 @@ export default function PricingModal() {
     locale 
   } = useAppStore();
 
-  const CARD_NUMBER = process.env.NEXT_PUBLIC_PAYMENT_CARD_NUMBER || "9860 0803 1682 3584";
-  const CARD_RAW = CARD_NUMBER.replace(/\s+/g, '');
-  const CARD_HOLDER = process.env.NEXT_PUBLIC_PAYMENT_CARD_HOLDER || "Simora Oripova";
   const PAYNET_BUSINESS_URL = "https://app.paynet.uz/qr-online/00020101021140440012qr-online.uz01186r2covoUU7ztMySiv10202115204531153038605802UZ5910AO'PAYNET'6008Tashkent610610002164280002uz0106PAYNET0208Toshkent80520012qr-online.uz03097120207070419marketing@paynet.uz6304984F";
 
   const [activeTab, setActiveTab] = useState<'checkout' | 'plans'>('checkout');
   const [selectedPlan, setSelectedPlan] = useState<'pack3' | 'pack10' | 'vip'>('pack10');
   const [selectedProvider, setSelectedProvider] = useState<PaymentProvider>('paynet');
   
-  // Card & checkout states
-  const [isCopied, setIsCopied] = useState(false);
+  // Checkout & receipt states
   const [hasPaidClicked, setHasPaidClicked] = useState(false);
   const [senderName, setSenderName] = useState(currentUser?.name || '');
   const [senderPhone, setSenderPhone] = useState(currentUser?.phone || '');
@@ -139,27 +135,6 @@ export default function PricingModal() {
 
     return () => clearInterval(interval);
   }, [isVerifyingStatus, activeOrder?.id, activeOrder?.planKey, activeOrder?.storiesGranted, selectedPlan, addStoryCredits, setHasPaidSubscription]);
-
-  const handleCopyCard = async () => {
-    try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(CARD_RAW);
-      } else {
-        const textArea = document.createElement("textarea");
-        textArea.value = CARD_RAW;
-        textArea.style.position = "fixed";
-        textArea.style.opacity = "0";
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textArea);
-      }
-    } catch (err) {
-      console.error("Copy failed", err);
-    }
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2500);
-  };
 
   const providerNames: Record<PaymentProvider, string> = {
     paynet: "🟢 Paynet Business (Rasmiy QR)",
@@ -396,34 +371,30 @@ export default function PricingModal() {
                         </p>
                       </div>
 
-                      {/* Primary Quick Buttons */}
-                      <div className="pt-1 flex flex-wrap items-center gap-2.5 justify-center md:justify-start">
+                      {/* Primary Quick Button */}
+                      <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 justify-center md:justify-start">
                         {/* 1-Click Paynet App/Web for Phone users */}
                         <a
                           href={PAYNET_BUSINESS_URL}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="py-3 px-5 rounded-xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:from-emerald-300 hover:to-teal-300 text-pine-950 text-xs sm:text-sm font-black inline-flex items-center gap-2 shadow-xl hover:scale-105 active:scale-95 transition-all text-center"
+                          className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:from-emerald-300 hover:to-teal-300 text-pine-950 text-xs sm:text-sm font-black inline-flex items-center justify-center gap-2 shadow-xl hover:scale-105 active:scale-95 transition-all text-center"
                         >
                           <ExternalLink className="w-4 h-4" />
-                          <span>Ilovada to'lash ({currentPlan.price} so'm)</span>
+                          <span>Telefonda to'lash ({currentPlan.price} so'm)</span>
                         </a>
 
-                        {/* Direct Card Copy Button */}
-                        <button
-                          type="button"
-                          onClick={handleCopyCard}
-                          className="py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 border border-emerald-400/40 text-emerald-100 text-xs font-black inline-flex items-center gap-2 transition-all cursor-pointer"
-                        >
-                          {isCopied ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
-                          <span>{isCopied ? "Karta nusxalandi!" : "Karta raqamini nusxalash"}</span>
-                        </button>
+                        <div className="flex items-center gap-1.5 text-xs text-emerald-200/90 font-medium">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
+                          <span>Rasmiy Milliy QR • 0% Komissiya</span>
+                        </div>
                       </div>
 
-                      {/* Card Details snippet */}
-                      <div className="pt-1 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-emerald-200/80 justify-center md:justify-start">
-                        <span>💳 <b>Karta:</b> <span className="font-mono text-white select-all">{CARD_NUMBER}</span></span>
-                        <span>👤 <b>Egasi:</b> <span className="text-white uppercase">{CARD_HOLDER}</span></span>
+                      {/* Official Business info */}
+                      <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px] text-emerald-300/80 justify-center md:justify-start">
+                        <span>🏢 <b>Qabul qiluvchi:</b> Simora Oripova (AO PAYNET)</span>
+                        <span>•</span>
+                        <span>🛡️ <b>Standart:</b> Markaziy Bank Milliy QR</span>
                       </div>
                     </div>
 
