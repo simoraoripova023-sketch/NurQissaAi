@@ -63,6 +63,8 @@ interface AppState {
   setIsPlayingAudio: (isPlaying: boolean) => void;
   audioCurrentPage: number;
   setAudioCurrentPage: (page: number) => void;
+  isAudioComingSoonOpen: boolean;
+  setIsAudioComingSoonOpen: (open: boolean) => void;
   
   // Modals
   isOrderModalOpen: boolean;
@@ -293,6 +295,9 @@ export const useAppStore = create<AppState>()(
       
       audioCurrentPage: 1,
       setAudioCurrentPage: (audioCurrentPage) => set({ audioCurrentPage }),
+
+      isAudioComingSoonOpen: false,
+      setIsAudioComingSoonOpen: (isAudioComingSoonOpen) => set({ isAudioComingSoonOpen }),
 
       isOrderModalOpen: false,
       setIsOrderModalOpen: (isOrderModalOpen) => set({ isOrderModalOpen }),

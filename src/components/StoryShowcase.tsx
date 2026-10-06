@@ -8,7 +8,7 @@ import { translations } from '@/lib/translations';
 import { SAMPLE_STORIES } from '@/lib/sampleStories';
 
 export default function StoryShowcase() {
-  const { locale, toggleFavorite } = useAppStore();
+  const { locale, toggleFavorite, setIsAudioComingSoonOpen } = useAppStore();
   const t = translations[locale];
 
   return (
@@ -121,14 +121,15 @@ export default function StoryShowcase() {
                       <span>{t.readStory}</span>
                     </Link>
 
-                    <Link
-                      href={`/story/${story.id}?audio=true`}
-                      className="py-3 px-4 rounded-xl border border-amber-300 dark:border-emerald-700 bg-amber-50 dark:bg-emerald-900/60 hover:bg-amber-100 dark:hover:bg-emerald-800 text-amber-900 dark:text-amber-200 font-bold text-sm flex items-center gap-1.5 transition-all"
+                    <button
+                      type="button"
+                      onClick={() => setIsAudioComingSoonOpen(true)}
+                      className="py-3 px-4 rounded-xl border border-amber-300 dark:border-emerald-700 bg-amber-50 dark:bg-emerald-900/60 hover:bg-amber-100 dark:hover:bg-emerald-800 text-amber-900 dark:text-amber-200 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer"
                       title={t.listenAudio}
                     >
                       <Volume2 className="w-4 h-4 text-amber-600 dark:text-amber-300" />
                       <span className="hidden sm:inline">{t.listenAudio}</span>
-                    </Link>
+                    </button>
                   </div>
 
                 </div>
