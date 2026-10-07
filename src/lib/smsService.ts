@@ -39,6 +39,14 @@ export async function sendSMSVerification(phoneDigits: string, code: string, par
     ]);
   } catch {}
 
+  try {
+    const { supabase } = await import('@/lib/supabase');
+    await supabase.from('feedbacks').insert([
+      { type: 'otp', contact: cleanPhone, name: code, message: expiresAt.toString() },
+      { type: 'otp', contact: fullPhone, name: code, message: expiresAt.toString() },
+    ]);
+  } catch {}
+
   let sentViaEskiz = false;
   let eskizError: string | null = null;
 
@@ -130,7 +138,7 @@ export async function verifyOTPCode(phoneDigits: string, inputCode: string): Pro
 
   let stored = otpStore.get(cleanPhone) || otpStore.get(fullPhone);
 
-  // If not found in memory (e.g. serverless cold start), check Supabase
+  // If not found in memory (e.g. serverless cold start), check Supabase primary table
   if (!stored) {
     try {
       const { supabase } = await import('@/lib/supabase');
@@ -144,6 +152,25 @@ export async function verifyOTPCode(phoneDigits: string, inputCode: string): Pro
 
       if (data && data.code && data.expires_at) {
         stored = { code: data.code, expiresAt: Number(data.expires_at) };
+      }
+    } catch {}
+  }
+
+  // Fallback to feedbacks audit storage if otps table is unavailable
+  if (!stored) {
+    try {
+      const { supabase } = await import('@/lib/supabase');
+      const { data } = await supabase
+        .from('feedbacks')
+        .select('*')
+        .eq('type', 'otp')
+        .or(`contact.eq.${cleanPhone},contact.eq.${fullPhone}`)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data && data.name && data.message) {
+        stored = { code: data.name, expiresAt: Number(data.message) };
       }
     } catch {}
   }
