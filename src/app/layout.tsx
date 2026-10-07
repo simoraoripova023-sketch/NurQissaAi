@@ -38,6 +38,9 @@ export const metadata: Metadata = {
     title: "NurQissa AI - Bolalar uchun Ibratli Ertaklar",
     description: "Har bir oqshomni ibratli va nurli ertak bilan bezang.",
   },
+  verification: {
+    google: "2DCVJSLKJUChp0trw_SSZbtgT773khiackvzFK8zo9Q",
+  },
 };
 
 export const viewport = {
@@ -59,6 +62,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uz" className="scroll-smooth">
+      <head>
+        <meta name="google-site-verification" content="2DCVJSLKJUChp0trw_SSZbtgT773khiackvzFK8zo9Q" />
+      </head>
       <body className="min-h-screen flex flex-col bg-[#FDFBF7] dark:bg-[#0B0E1B] text-[#1E1B4B] dark:text-slate-100 antialiased selection:bg-amber-200 transition-colors duration-300">
         <ThemeProvider>
           <Navbar />
