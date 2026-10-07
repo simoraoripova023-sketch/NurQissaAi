@@ -65,14 +65,24 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE otps ENABLE ROW LEVEL SECURITY;
 
--- 7. Open insert/select policies for client usage
+-- 7. Open insert/select policies for client usage (Idempotent)
+DROP POLICY IF EXISTS "Allow public insert to feedbacks" ON feedbacks;
 CREATE POLICY "Allow public insert to feedbacks" ON feedbacks FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public select on feedbacks" ON feedbacks;
 CREATE POLICY "Allow public select on feedbacks" ON feedbacks FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Allow public insert to stories" ON stories;
 CREATE POLICY "Allow public insert to stories" ON stories FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public select on stories" ON stories;
 CREATE POLICY "Allow public select on stories" ON stories FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Allow public all on profiles" ON profiles;
 CREATE POLICY "Allow public all on profiles" ON profiles FOR ALL USING (true);
-CREATE POLICY "Allow public all on orders" ON orders FOR ALL USING (true);
-CREATE POLICY "Allow public all on otps" ON otps FOR ALL USING (true);
 
+DROP POLICY IF EXISTS "Allow public all on orders" ON orders;
+CREATE POLICY "Allow public all on orders" ON orders FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Allow public all on otps" ON otps;
+CREATE POLICY "Allow public all on otps" ON otps FOR ALL USING (true);
