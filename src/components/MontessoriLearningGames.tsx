@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, Trophy, CheckCircle2, RotateCcw, 
@@ -92,11 +92,11 @@ export default function MontessoriLearningGames() {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
 
   // Helper to trigger voice if enabled
-  const triggerVoice = (uz: string, en: string) => {
+  const triggerVoice = useCallback((uz: string, en: string) => {
     if (voiceEnabled) {
       speakKidVoice(uz, en, isUz);
     }
-  };
+  }, [voiceEnabled, isUz]);
 
   // Welcome prompt on game change
   useEffect(() => {
@@ -121,7 +121,7 @@ export default function MontessoriLearningGames() {
         "Tap the turtles, dolphins, and clownfish in the ocean to count them!"
       );
     }
-  }, [activeGame]);
+  }, [activeGame, triggerVoice]);
 
   // ==========================================
   // GAME 1: POKLIK VA TARTIBXON (CLEANLINESS WORKSHEET)
@@ -434,7 +434,7 @@ export default function MontessoriLearningGames() {
   };
 
   return (
-    <div className="w-full rounded-3xl bg-[#FFFDF5] dark:bg-[#002621] border-2 border-pine-800/40 dark:border-butter-200/40 shadow-2xl p-4 sm:p-8 overflow-hidden">
+    <div className="w-full rounded-3xl bg-[#FFFDF5] dark:bg-[#1B200B] border-2 border-pine-800/40 dark:border-butter-200/40 shadow-2xl p-4 sm:p-8 overflow-hidden">
       
       {/* Header & Big Mode Switcher with Audio Toggle */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-pine-800/20 dark:border-butter-200/20">

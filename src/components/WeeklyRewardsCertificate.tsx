@@ -640,7 +640,7 @@ export default function WeeklyRewardsCertificate() {
           <div 
             ref={certificateRef}
             id="tashakkurnoma-print-area"
-            className="w-full max-w-[600px] aspect-[896/1200] rounded-3xl bg-[#FCF9EE] dark:bg-[#002621] text-slate-900 dark:text-butter-100 p-6 sm:p-8 border-[8px] border-double border-amber-500/80 shadow-2xl relative overflow-hidden flex flex-col justify-between print:border-8 print:border-amber-600 print:bg-white print:text-black print:p-6 print:shadow-none print:m-0 text-center"
+            className="w-full max-w-[600px] aspect-[896/1200] rounded-3xl bg-[#FCF9EE] dark:bg-[#1B200B] text-slate-900 dark:text-butter-100 p-6 sm:p-8 border-[8px] border-double border-amber-500/80 shadow-2xl relative overflow-hidden flex flex-col justify-between print:border-8 print:border-amber-600 print:bg-white print:text-black print:p-6 print:shadow-none print:m-0 text-center"
           >
             {/* Geometric Ornamental Corner Accents */}
             <div className="absolute top-2 left-2 w-10 h-10 border-t-2 border-l-2 border-amber-500 rounded-tl-lg pointer-events-none" />

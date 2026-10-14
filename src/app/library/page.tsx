@@ -26,7 +26,7 @@ export default function LibraryPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#002621] islamic-pattern py-12 transition-colors duration-300">
+    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] islamic-pattern py-12 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Banner */}
@@ -56,7 +56,7 @@ export default function LibraryPage() {
         </div>
 
         {/* Filters Bar */}
-        <div className="bg-white dark:bg-[#01342e] p-4 rounded-2xl border border-amber-200/80 dark:border-emerald-700/60 shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="bg-white dark:bg-[#283013] p-4 rounded-2xl border border-amber-200/80 dark:border-pine-700/60 shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full sm:w-80">
             <Search className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -88,7 +88,7 @@ export default function LibraryPage() {
 
         {/* Books Grid */}
         {filteredStories.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-[#01342e] rounded-3xl border border-amber-200/80 dark:border-emerald-700/60 p-8 space-y-4">
+          <div className="text-center py-16 bg-white dark:bg-[#283013] rounded-3xl border border-amber-200/80 dark:border-pine-700/60 p-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-emerald-950 text-amber-700 dark:text-amber-300 flex items-center justify-center mx-auto text-2xl">
               📚
             </div>
@@ -117,7 +117,7 @@ export default function LibraryPage() {
               return (
                 <div
                   key={story.id}
-                  className="bg-white dark:bg-[#01342e] rounded-3xl overflow-hidden border border-amber-200/80 dark:border-emerald-700/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white dark:bg-[#283013] rounded-3xl overflow-hidden border border-amber-200/80 dark:border-pine-700/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     {/* Cover Preview */}
@@ -159,7 +159,7 @@ export default function LibraryPage() {
 
                     {/* Prologue preview */}
                     <div className="p-5">
-                      <p className="text-xs text-slate-600 dark:text-emerald-100 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-slate-600 dark:text-butter-100/80 line-clamp-2 leading-relaxed">
                         {prologue}
                       </p>
                     </div>
@@ -169,19 +169,19 @@ export default function LibraryPage() {
                   <div className="p-5 pt-0 flex items-center gap-2">
                     <Link
                       href={`/story/${story.id}`}
-                      className="flex-1 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-pine-800 hover:bg-pine-700 text-butter-200 text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all border border-butter-300/40"
                     >
-                      <BookOpen className="w-3.5 h-3.5" />
+                      <BookOpen className="w-3.5 h-3.5 text-butter-300" />
                       <span>{t.readStory}</span>
                     </Link>
 
                     {/* One-Click PDF Storybook Download / Print */}
                     <Link
                       href={`/story/${story.id}?print=true`}
-                      className="p-2.5 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-950/80 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-200 text-xs font-bold transition-all flex items-center justify-center"
+                      className="p-2.5 rounded-xl border border-amber-300 dark:border-pine-700 bg-amber-50 dark:bg-pine-900/80 hover:bg-amber-100 dark:hover:bg-pine-800 text-pine-900 dark:text-butter-200 text-xs font-bold transition-all flex items-center justify-center"
                       title={locale === 'uz' ? "PDF yuklab olish / Chop etish" : "Download PDF / Print Book"}
                     >
-                      <FileDown className="w-4 h-4 text-emerald-700 dark:text-emerald-300" />
+                      <FileDown className="w-4 h-4 text-pine-800 dark:text-butter-300" />
                     </Link>
 
                     <button
@@ -189,10 +189,10 @@ export default function LibraryPage() {
                         setActiveStory(story);
                         setIsOrderModalOpen(true);
                       }}
-                      className="p-2.5 rounded-xl border border-amber-300 dark:border-emerald-700 bg-amber-50 dark:bg-emerald-950 hover:bg-amber-100 dark:hover:bg-emerald-900 text-amber-900 dark:text-amber-200 text-xs font-bold transition-all"
+                      className="p-2.5 rounded-xl border border-amber-300 dark:border-pine-700 bg-amber-50 dark:bg-pine-900 hover:bg-amber-100 dark:hover:bg-pine-800 text-pine-900 dark:text-butter-200 text-xs font-bold transition-all"
                       title={t.orderHardcover}
                     >
-                      <Printer className="w-4 h-4 text-amber-700 dark:text-amber-300" />
+                      <Printer className="w-4 h-4 text-amber-600 dark:text-butter-300" />
                     </button>
 
                     <button
@@ -201,7 +201,7 @@ export default function LibraryPage() {
                           removeStoryFromLibrary(story.id);
                         }
                       }}
-                      className="p-2.5 rounded-xl border border-slate-200 dark:border-emerald-800 text-slate-400 dark:text-emerald-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                      className="p-2.5 rounded-xl border border-slate-200 dark:border-pine-800 text-slate-400 dark:text-pine-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                       title="O'chirish"
                     >
                       <Trash2 className="w-4 h-4" />

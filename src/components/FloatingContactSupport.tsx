@@ -245,7 +245,7 @@ export default function FloatingContactSupport() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 40, scale: 0.95 }}
               transition={{ duration: 0.25 }}
-              className="relative w-full max-w-lg bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl p-3.5 sm:p-5 md:p-6 border-2 border-amber-400/80 dark:border-emerald-600/80 shadow-2xl overflow-hidden max-h-[86vh] sm:max-h-[90vh] flex flex-col"
+              className="relative w-full max-w-lg bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl p-3.5 sm:p-5 md:p-6 border-2 border-amber-400/80 dark:border-pine-700/80 shadow-2xl overflow-hidden max-h-[86vh] sm:max-h-[90vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Decorative background glow */}

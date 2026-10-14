@@ -12,7 +12,7 @@ export default function StoryShowcase() {
   const t = translations[locale];
 
   return (
-    <section className="py-20 bg-[#FFFDF5] dark:bg-[#002621] relative overflow-hidden transition-colors duration-300">
+    <section className="py-20 bg-[#FFFDF5] dark:bg-[#1B200B] relative overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -51,7 +51,7 @@ export default function StoryShowcase() {
             return (
               <div
                 key={story.id}
-                className="bg-white dark:bg-[#01342e] rounded-3xl overflow-hidden border border-amber-200/80 dark:border-emerald-700/60 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col group"
+                className="bg-white dark:bg-[#283013] rounded-3xl overflow-hidden border border-amber-200/80 dark:border-pine-700/60 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col group"
               >
                 {/* Cover Banner */}
                 <div className="relative h-64 sm:h-72 overflow-hidden bg-slate-900">
@@ -97,16 +97,16 @@ export default function StoryShowcase() {
                 {/* Body Content */}
                 <div className="p-6 flex-grow flex flex-col justify-between space-y-4">
                   <div className="space-y-3">
-                    <p className="text-sm text-slate-600 dark:text-emerald-100 leading-relaxed line-clamp-2">
+                    <p className="text-sm text-slate-600 dark:text-butter-100/80 leading-relaxed line-clamp-2">
                       {prologue}
                     </p>
 
                     {/* Today's lesson preview */}
-                    <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-emerald-950/80 border border-amber-200/60 dark:border-emerald-700/60 text-xs text-amber-950 dark:text-amber-200 flex items-start gap-2.5">
+                    <div className="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-pine-900/80 border border-amber-200/60 dark:border-pine-700/60 text-xs text-amber-950 dark:text-butter-200 flex items-start gap-2.5">
                       <span className="text-lg leading-none">🌙</span>
                       <div>
                         <span className="font-bold text-amber-900 dark:text-amber-300 block mb-0.5">{t.todaysLesson}:</span>
-                        <p className="line-clamp-2 text-slate-700 dark:text-emerald-200">{lesson}</p>
+                        <p className="line-clamp-2 text-slate-700 dark:text-butter-100/90">{lesson}</p>
                       </div>
                     </div>
                   </div>
@@ -115,21 +115,20 @@ export default function StoryShowcase() {
                   <div className="pt-2 flex items-center gap-3">
                     <Link
                       href={`/story/${story.id}`}
-                      className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
+                      className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-pine-800 to-emerald-800 hover:from-pine-900 hover:to-emerald-900 text-butter-200 font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
                     >
-                      <BookOpen className="w-4 h-4" />
+                      <BookOpen className="w-4 h-4 text-butter-300" />
                       <span>{t.readStory}</span>
                     </Link>
 
-                    <button
-                      type="button"
-                      onClick={() => setIsAudioComingSoonOpen(true)}
-                      className="py-3 px-4 rounded-xl border border-amber-300 dark:border-emerald-700 bg-amber-50 dark:bg-emerald-900/60 hover:bg-amber-100 dark:hover:bg-emerald-800 text-amber-900 dark:text-amber-200 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer"
+                    <Link
+                      href={`/story/${story.id}?audio=true`}
+                      className="py-3 px-4 rounded-xl border border-amber-300 dark:border-pine-700 bg-amber-50 dark:bg-pine-900/60 hover:bg-amber-100 dark:hover:bg-pine-800 text-amber-900 dark:text-butter-200 font-bold text-sm flex items-center gap-1.5 transition-all cursor-pointer"
                       title={t.listenAudio}
                     >
-                      <Volume2 className="w-4 h-4 text-amber-600 dark:text-amber-300" />
+                      <Volume2 className="w-4 h-4 text-amber-600 dark:text-butter-300" />
                       <span className="hidden sm:inline">{t.listenAudio}</span>
-                    </button>
+                    </Link>
                   </div>
 
                 </div>

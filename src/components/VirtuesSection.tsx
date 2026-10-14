@@ -55,7 +55,7 @@ export default function VirtuesSection() {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-white to-[#FFFDF5] dark:from-[#002621] dark:to-[#01342e] relative overflow-hidden transition-colors duration-300">
+    <section className="py-20 bg-gradient-to-b from-white to-[#FFFDF5] dark:from-[#1B200B] dark:to-[#283013] relative overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Heading */}

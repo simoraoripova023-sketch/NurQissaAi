@@ -30,7 +30,8 @@ export default function StoryReaderPage() {
       setStory(found);
       setLoading(false);
       if (typeof document !== 'undefined') {
-        document.title = `${found.title_uz} - NurQissa AI`;
+        const docTitle = locale === 'uz' ? found.title_uz : (found.title_en || found.title_uz);
+        document.title = `${docTitle} - NurQissa AI`;
       }
     } else {
       // Try reading from localStorage directly if refreshed
@@ -46,7 +47,8 @@ export default function StoryReaderPage() {
                 setStory(lsFound);
                 setLoading(false);
                 if (typeof document !== 'undefined') {
-                  document.title = `${lsFound.title_uz} - NurQissa AI`;
+                  const docTitle = locale === 'uz' ? lsFound.title_uz : (lsFound.title_en || lsFound.title_uz);
+                  document.title = `${docTitle} - NurQissa AI`;
                 }
                 return;
               }
@@ -58,13 +60,13 @@ export default function StoryReaderPage() {
       }
       setLoading(false);
     }
-  }, [storyId, stories]);
+  }, [storyId, stories, locale]);
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center bg-[#FFFDF5] dark:bg-[#002621] transition-colors duration-300">
+      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center bg-[#FFFDF5] dark:bg-[#1B200B] transition-colors duration-300">
         <Loader2 className="w-10 h-10 text-amber-500 animate-spin mb-3" />
-        <p className="text-sm font-semibold text-slate-600 dark:text-emerald-200">
+        <p className="text-sm font-semibold text-slate-600 dark:text-butter-200">
           {locale === 'uz' ? "Ertak ochilmoqda..." : "Opening storybook..."}
         </p>
       </div>
@@ -73,7 +75,7 @@ export default function StoryReaderPage() {
 
   if (!story) {
     return (
-      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center p-6 text-center bg-[#FFFDF5] dark:bg-[#002621] transition-colors duration-300">
+      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center p-6 text-center bg-[#FFFDF5] dark:bg-[#1B200B] transition-colors duration-300">
         <div className="w-16 h-16 rounded-3xl bg-amber-100 dark:bg-emerald-950 text-amber-700 dark:text-amber-300 flex items-center justify-center mb-4">
           📖
         </div>

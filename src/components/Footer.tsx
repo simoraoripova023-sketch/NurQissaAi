@@ -65,8 +65,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/story/aqilli-bola-yusuf" className="hover:text-amber-300 transition-colors">
-                  {locale === 'uz' ? "Namunaviy ertak" : "Sample Story"}
+                <Link href="/games" className="hover:text-amber-300 transition-colors">
+                  {locale === 'uz' ? "Hikmatli O'yinlar" : "Wisdom Games"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/coloring" className="hover:text-amber-300 transition-colors">
+                  {locale === 'uz' ? "Sehrli Ijodxona" : "Creative Studio"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/missions" className="hover:text-amber-300 transition-colors">
+                  {t.missions}
                 </Link>
               </li>
               <li>
@@ -153,9 +163,20 @@ export default function Footer() {
 
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-          <p>© {new Date().getFullYear()} NurQissa AI. {locale === 'uz' ? "Barcha huquqlar himoyalangan." : "All rights reserved."}</p>
+        {/* Bottom bar with Legal & Compliance Links */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+            <p>© {new Date().getFullYear()} NurQissa AI. {locale === 'uz' ? "Barcha huquqlar himoyalangan." : "All rights reserved."}</p>
+            <span className="hidden md:inline text-slate-600">•</span>
+            <Link href="/privacy" className="hover:text-amber-300 transition-colors underline underline-offset-4">
+              {locale === 'uz' ? "Maxfiylik siyosati" : "Privacy Policy"}
+            </Link>
+            <span className="text-slate-600">•</span>
+            <Link href="/terms" className="hover:text-amber-300 transition-colors underline underline-offset-4">
+              {locale === 'uz' ? "Foydalanish shartlari" : "Terms of Service"}
+            </Link>
+          </div>
+
           <div className="flex items-center gap-1.5 text-amber-300/80">
             <span>{locale === 'uz' ? "Farzandlarimiz kelajagi uchun mehr bilan yaratildi" : "Crafted with love for the children's future"}</span>
             <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400 inline" />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAppStore } from '@/lib/store';
@@ -13,6 +13,8 @@ function CallbackContent() {
   const { loginUser } = useAppStore();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState('');
+  const statusRef = useRef(status);
+  statusRef.current = status;
 
   useEffect(() => {
     let isMounted = true;
@@ -102,7 +104,7 @@ function CallbackContent() {
 
         // Timeout fallback if no session received
         setTimeout(() => {
-          if (isMounted && status === 'loading') {
+          if (isMounted && statusRef.current === 'loading') {
             supabase.auth.getSession().then(({ data: { session: checkSession } }) => {
               if (checkSession?.user) {
                 window.location.href = '/';
@@ -134,7 +136,7 @@ function CallbackContent() {
   }, [searchParams, loginUser, router]);
 
   return (
-    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#002621] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white dark:bg-pine-900 border-2 border-pine-800/30 dark:border-butter-300/30 rounded-3xl p-8 text-center shadow-2xl space-y-5">
         
         {/* Google Icon */}
@@ -198,7 +200,7 @@ function CallbackContent() {
 export default function AuthCallbackPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#002621] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] flex items-center justify-center p-4">
         <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
       </div>
     }>

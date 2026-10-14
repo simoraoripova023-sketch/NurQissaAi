@@ -27,50 +27,50 @@ const SHOP_ITEMS: ShopItem[] = [
   {
     id: 'clr_kaba',
     category: 'coloring',
-    titleUz: "Ka'ba Ziyorati va Chaqnoq Yulduzlar",
-    titleEn: "Kaaba Pilgrimage & Twinkling Stars",
+    titleUz: "Ka'ba Ziyorati va Qiblamiz",
+    titleEn: "Holy Kaaba & Our Qibla",
     descUz: "Qalblarga sokinlik ulashuvchi maxsus A4 formatdagi bolalar bo'yash rasmi",
     descEn: "Special A4 bedtime coloring illustration for kids",
     cost: 50,
     icon: '🕋',
     rewardType: 'print',
-    downloadUrl: '/coloring/kaba_coloring.png',
+    downloadUrl: '/coloring/lesson-qibla.png',
   },
   {
-    id: 'clr_dove',
+    id: 'clr_dinim',
     category: 'coloring',
-    titleUz: "Oydin Kecha va Mitti Oq Kabutar",
-    titleEn: "Peaceful Moonlit Night & White Dove",
-    descUz: "Mehr va tinchlik ramzi bo'lgan beozor qushcha rasmi",
-    descEn: "Gentle bedtime bird coloring sheet",
+    titleUz: "Muazzam Masjid va Hilol Oy",
+    titleEn: "Fairytale Mosque & Crescent Moon",
+    descUz: "Mehr va tinchlik ramzi bo'lgan nafis gumbaz va minoralar rasmi",
+    descEn: "Gentle bedtime mosque coloring sheet",
     cost: 50,
-    icon: '🕊️',
+    icon: '🕌',
     rewardType: 'print',
-    downloadUrl: '/coloring/dove_coloring.png',
+    downloadUrl: '/coloring/lesson-dinim.png',
   },
   {
-    id: 'clr_ramadan',
+    id: 'clr_kitob',
     category: 'coloring',
-    titleUz: "Ramazon Fanozi va Shirin Xurmo",
-    titleEn: "Ramadan Lantern & Sweet Dates",
-    descUz: "Fayzli oqshom va qutlug' oy shukronaligi aks etgan nafis naqsh",
-    descEn: "Festive blessing lantern illustration",
+    titleUz: "Nurli Kitob va Chaqnoq Yulduzlar",
+    titleEn: "Radiant Book & Twinkling Stars",
+    descUz: "Fayzli oqshom va qutlug' kitobxonlik aks etgan nafis naqsh",
+    descEn: "Festive blessing storybook illustration",
     cost: 60,
-    icon: '🏮',
+    icon: '📖',
     rewardType: 'print',
-    downloadUrl: '/coloring/ramadan_lantern.png',
+    downloadUrl: '/coloring/lesson-kitob.png',
   },
   {
-    id: 'clr_steed',
+    id: 'clr_robbim',
     category: 'coloring',
-    titleUz: "Jasur Chavandoz va Shiddatli Tulpor",
-    titleEn: "Brave Young Rider & Gentle Steed",
-    descUz: "Botirlik va qat'iyat fazilatini tarbiyalaydigan qahramonlik surati",
-    descEn: "Heroic bravery coloring template",
+    titleUz: "Chaqnoq Quyosh va Go'zal Tabiat",
+    titleEn: "Radiant Sun & Beautiful Nature",
+    descUz: "Shukronalik va go'zallik fazilatini tarbiyalaydigan qalb surati",
+    descEn: "Gratitude and nature coloring template",
     cost: 70,
-    icon: '🐎',
+    icon: '☀️',
     rewardType: 'print',
-    downloadUrl: '/coloring/steed_coloring.png',
+    downloadUrl: '/coloring/lesson-robbim.png',
   },
 
   // 2. Badges
@@ -196,7 +196,7 @@ export default function NurShopModal() {
         initial={{ opacity: 0, scale: 0.94, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.94, y: 20 }}
-        className="bg-[#FFFDF5] dark:bg-[#002621] w-full max-w-4xl rounded-3xl border-2 sm:border-4 border-amber-300 dark:border-emerald-700 shadow-2xl overflow-hidden my-6 flex flex-col max-h-[92vh]"
+        className="bg-[#FFFDF5] dark:bg-[#1B200B] w-full max-w-4xl rounded-3xl border-2 sm:border-4 border-amber-300 dark:border-pine-700 shadow-2xl overflow-hidden my-6 flex flex-col max-h-[92vh]"
       >
         {/* Top Header */}
         <div className="p-5 sm:p-6 bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-600 text-slate-950 flex items-center justify-between shadow-md shrink-0">
@@ -240,7 +240,7 @@ export default function NurShopModal() {
         </div>
 
         {/* Categories Bar */}
-        <div className="p-3 sm:p-4 bg-white/95 dark:bg-[#01342e] border-b border-amber-200 dark:border-emerald-800 flex items-center justify-between gap-2 overflow-x-auto shrink-0">
+        <div className="p-3 sm:p-4 bg-white/95 dark:bg-[#283013] border-b border-amber-200 dark:border-pine-800 flex items-center justify-between gap-2 overflow-x-auto shrink-0">
           <div className="flex items-center gap-1.5 sm:gap-2">
             {[
               { id: 'all', label: isUz ? "🌟 Barchasi" : "🌟 All" },
@@ -284,7 +284,7 @@ export default function NurShopModal() {
                     isUnlocked
                       ? 'bg-emerald-50/80 dark:bg-emerald-950/70 border-emerald-400 shadow-sm'
                       : canAfford
-                        ? 'bg-white dark:bg-[#01342e] border-amber-300 hover:border-amber-400 hover:shadow-lg'
+                        ? 'bg-white dark:bg-[#283013] border-amber-300 hover:border-amber-400 hover:shadow-lg'
                         : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-80'
                   }`}
                 >

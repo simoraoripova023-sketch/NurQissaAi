@@ -102,6 +102,8 @@ export default function PricingModal() {
       .catch((err) => console.error('Error creating order:', err));
 
     return () => { isMounted = false; };
+    // Intentionally omit senderName / senderPhone to avoid firing order creation on every keystroke
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPlan, isPricingModalOpen, selectedProvider]);
 
   // Real-time polling: automatically activates when owner approves from Telegram
@@ -186,7 +188,7 @@ export default function PricingModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-fade-in pt-[env(safe-area-inset-top,16px)] pb-[env(safe-area-inset-bottom,16px)]">
-      <div className="relative w-full max-w-4xl my-auto bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 border-pine-800/40 dark:border-butter-200/40 shadow-2xl overflow-hidden max-h-[94dvh] flex flex-col">
+      <div className="relative w-full max-w-4xl my-auto bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl border-2 border-pine-800/40 dark:border-butter-200/40 shadow-2xl overflow-hidden max-h-[94dvh] flex flex-col">
         
         {/* Top Header Banner */}
         <div className="relative bg-gradient-to-r from-pine-950 via-pine-900 to-emerald-950 p-4 sm:p-6 text-white shrink-0">

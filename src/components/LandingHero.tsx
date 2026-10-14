@@ -14,7 +14,7 @@ export default function LandingHero() {
   return (
     <section className="relative pt-6 pb-12 sm:pt-10 sm:pb-24 lg:pt-12 overflow-hidden islamic-pattern">
       {/* Background Soft Glow Orbs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-amber-200/40 via-emerald-100/30 to-indigo-200/30 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-[#FFEB7C]/35 via-[#61642F]/25 to-[#D0A44A]/30 rounded-full blur-3xl pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">

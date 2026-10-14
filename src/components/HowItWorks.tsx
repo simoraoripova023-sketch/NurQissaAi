@@ -41,7 +41,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-[#002621] relative overflow-hidden border-y border-amber-100 dark:border-emerald-800 transition-colors duration-300">
+    <section className="py-20 bg-white dark:bg-[#1B200B] relative overflow-hidden border-y border-amber-100 dark:border-pine-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Heading */}
@@ -64,7 +64,7 @@ export default function HowItWorks() {
             return (
               <div
                 key={index}
-                className="relative bg-[#FFFDF5] dark:bg-[#01342e] p-8 rounded-3xl border border-amber-200/70 dark:border-emerald-700/60 shadow-md hover:shadow-xl transition-all duration-300 group hover:-translate-y-1.5"
+                className="relative bg-[#FFFDF5] dark:bg-[#283013] p-8 rounded-3xl border border-amber-200/70 dark:border-pine-700/60 shadow-md hover:shadow-xl transition-all duration-300 group hover:-translate-y-1.5"
               >
                 {/* Step badge */}
                 <div className="flex items-center justify-between mb-6">

@@ -173,7 +173,7 @@ export default function StoryWizard() {
       )}
 
       {/* Main Wizard Form Card */}
-      <div className="bg-white dark:bg-[#002621] rounded-3xl border-2 border-pine-800/30 dark:border-butter-300/30 shadow-2xl p-6 sm:p-9 relative overflow-hidden">
+      <div className="bg-white dark:bg-[#1B200B] rounded-3xl border-2 border-pine-800/30 dark:border-butter-300/30 shadow-2xl p-6 sm:p-9 relative overflow-hidden">
         
         {/* If Generating: Full-Screen Animated Step Loader */}
         {isGenerating ? (

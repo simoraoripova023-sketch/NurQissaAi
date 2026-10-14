@@ -38,7 +38,12 @@ export function generateOrderSecret(orderId: string): string {
 export function verifyOrderSecret(orderId: string, signature: string): boolean {
   if (!orderId || !signature) return false;
   const expected = generateOrderSecret(orderId);
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  const expectedBuf = Buffer.from(expected);
+  const signatureBuf = Buffer.from(signature);
+  if (expectedBuf.length !== signatureBuf.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(expectedBuf, signatureBuf);
 }
 
 export async function createOrder(params: {

@@ -41,11 +41,11 @@ function MoonPhaseOrb({ progress }: { progress: number }) {
       <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${
         isFull 
           ? 'bg-gradient-to-tr from-amber-200 via-yellow-300 to-amber-100 shadow-[0_0_16px_rgba(253,224,71,0.9)] ring-2 ring-amber-300' 
-          : 'bg-[#03231F] border border-amber-300/80 shadow-[0_0_10px_rgba(251,191,36,0.6)]'
+          : 'bg-[#283013] border border-amber-300/80 shadow-[0_0_10px_rgba(208,164,74,0.6)]'
       }`}>
         <svg viewBox="0 0 32 32" className="w-6 h-6 transform -rotate-12">
           {/* Dark moon background */}
-          <circle cx="16" cy="16" r="13" fill="#011815" />
+          <circle cx="16" cy="16" r="13" fill="#1B200B" />
           
           {/* Golden Illuminated Moon Phase */}
           {progress <= 0.25 ? (
@@ -144,7 +144,7 @@ export default function HeroIslamicBook() {
       particleCount: 20,
       spread: 45,
       origin: { y: 0.2, x: 0.75 },
-      colors: ['#FFEFB3', '#013E37', '#F59E0B'],
+      colors: ['#FFEB7C', '#3E451B', '#D0A44A'],
     });
   };
 
@@ -237,7 +237,7 @@ export default function HeroIslamicBook() {
     <div className="relative w-full max-w-lg select-none mx-auto">
       
       {/* Background Starlight Aura */}
-      <div className="absolute -inset-4 bg-gradient-to-tr from-amber-400/20 via-emerald-500/20 to-teal-400/20 rounded-[40px] blur-2xl pointer-events-none -z-10 animate-pulse" />
+      <div className="absolute -inset-4 bg-gradient-to-tr from-[#D0A44A]/30 via-[#61642F]/30 to-[#FFEB7C]/30 rounded-[40px] blur-2xl pointer-events-none -z-10 animate-pulse" />
 
       {/* Story Selection Tabs (Yusuf, Fotima, Zubayr) */}
       <div className="flex items-center justify-between gap-2 mb-3 px-1">
@@ -264,7 +264,7 @@ export default function HeroIslamicBook() {
       </div>
 
       {/* Masterpiece 3D Hardcover Book Shell */}
-      <div className="relative rounded-[32px] p-3 sm:p-4 bg-gradient-to-br from-[#02332D] via-[#012520] to-[#001815] border-4 border-amber-300/90 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]">
+      <div className="relative rounded-[32px] p-3 sm:p-4 bg-gradient-to-br from-[#3E451B] via-[#2A3113] to-[#1B200B] border-4 border-[#D0A44A]/90 shadow-[0_25px_60px_-15px_rgba(57,41,8,0.7)]">
         
         {/* Arabesque Gold Corner Filigree Ornaments */}
         <div className="absolute top-2 left-2 text-amber-300/80 text-xs pointer-events-none font-mono">✦ ──</div>
@@ -309,7 +309,7 @@ export default function HeroIslamicBook() {
         {/* 3D BOOK LEAF CONTAINER (Single Full-Page with Page Curl) */}
         <div 
           style={{ perspective: 1400 }}
-          className="relative rounded-2xl overflow-hidden border-2 border-amber-300/40 bg-[#001D19] shadow-inner"
+          className="relative rounded-2xl overflow-hidden border-2 border-amber-300/40 bg-[#242A0F] shadow-inner"
         >
           
           <AnimatePresence mode="wait" custom={direction}>
@@ -327,7 +327,7 @@ export default function HeroIslamicBook() {
                 
                 {/* 1. TYPE = PURE FULL-PAGE IMAGE (Faqatgina to'liq surat!) */}
                 {currentLeaf.type === 'image' && (
-                  <div className="relative w-full h-full bg-[#001D19] flex flex-col justify-between p-3.5 sm:p-4">
+                  <div className="relative w-full h-full bg-[#242A0F] flex flex-col justify-between p-3.5 sm:p-4">
                     {/* The Full Artwork */}
                     <img
                       src={currentLeaf.image_url}
@@ -356,7 +356,7 @@ export default function HeroIslamicBook() {
 
                 {/* 2. TYPE = PURE FULL-PAGE TEXT (Faqatgina to'liq matn!) */}
                 {currentLeaf.type === 'text' && (
-                  <div className="w-full h-full bg-[#FFFDF5] dark:bg-[#012A25] p-4 sm:p-6 md:p-7 flex flex-col justify-between relative shadow-inner overflow-y-auto">
+                  <div className="w-full h-full bg-[#FFFDF5] dark:bg-[#283013] p-4 sm:p-6 md:p-7 flex flex-col justify-between relative shadow-inner overflow-y-auto">
                     
                     {/* Top Bismillah Header */}
                     <div>
@@ -394,7 +394,7 @@ export default function HeroIslamicBook() {
 
                 {/* 3. TYPE = BEDTIME DUA & REFLECTION */}
                 {currentLeaf.type === 'dua' && (
-                  <div className="w-full h-full p-6 flex flex-col justify-between bg-gradient-to-b from-[#012E29] to-[#001D19] text-white">
+                  <div className="w-full h-full p-6 flex flex-col justify-between bg-gradient-to-b from-[#3E451B] to-[#1B200B] text-white">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between border-b border-amber-300/20 pb-2">
                         <div className="flex items-center gap-2 text-amber-300">
@@ -442,7 +442,7 @@ export default function HeroIslamicBook() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                className="w-full p-4 sm:p-6 flex flex-col justify-between bg-gradient-to-b from-[#012E29] to-[#001815] text-white h-[370px] sm:h-[400px]"
+                className="w-full p-4 sm:p-6 flex flex-col justify-between bg-gradient-to-b from-[#3E451B] to-[#1B200B] text-white h-[370px] sm:h-[400px]"
               >
                 <div className="space-y-2 text-center pt-2">
                   <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-400/20 border-2 border-amber-300 flex items-center justify-center shadow-lg">
@@ -512,7 +512,7 @@ export default function HeroIslamicBook() {
           {/* ========================================================================= */}
           {/* 🌙 NURLI HILOL (BOSHIDA YANGI OY -> OXIRIDA TO'LIN OY BO'LISHI) 🌕 */}
           {/* ========================================================================= */}
-          <div className="px-4 py-3 bg-gradient-to-r from-pine-950 via-[#012520] to-pine-950 border-t border-amber-300/40">
+          <div className="px-4 py-3 bg-gradient-to-r from-pine-950 via-[#283013] to-pine-950 border-t border-amber-300/40">
             
             {/* Celestial Orbit Track Header */}
             <div className="flex items-center justify-between text-[11px] font-bold text-amber-200/90 mb-2 px-1">

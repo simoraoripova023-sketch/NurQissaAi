@@ -102,7 +102,7 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
         particleCount: 26,
         spread: 55,
         origin: { y: 0.15, x: 0.24 },
-        colors: ['#FFEFB3', '#013E37', '#F59E0B', '#38BDF8', '#A855F7'],
+        colors: ['#FFEB7C', '#3E451B', '#D0A44A', '#61642F', '#8F7F47'],
       });
     }
   };
@@ -184,17 +184,17 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    {/* Folded canopy in deep pine with gold highlights */}
+                    {/* Folded canopy in deep warm forest olive with gold highlights */}
                     <path
                       d="M13 1.5C10 6.5 8.5 12 8.5 17C10.5 16 15.5 16 17.5 17C17.5 12 16 6.5 13 1.5Z"
-                      fill="#013E37"
-                      stroke="#012621"
+                      fill="#3E451B"
+                      stroke="#1B200B"
                       strokeWidth="1.5"
                     />
                     {/* Canopy folds and stars */}
-                    <path d="M13 1.5V16" stroke="#FFEFB3" strokeWidth="1.2" strokeLinecap="round" />
-                    <circle cx="13" cy="7.5" r="1.3" fill="#F59E0B" />
-                    <circle cx="13" cy="12.5" r="1" fill="#FFEFB3" />
+                    <path d="M13 1.5V16" stroke="#FFEB7C" strokeWidth="1.2" strokeLinecap="round" />
+                    <circle cx="13" cy="7.5" r="1.3" fill="#D0A44A" />
+                    <circle cx="13" cy="12.5" r="1" fill="#FFEB7C" />
                   </motion.svg>
                 ) : (
                   /* OPEN / BLOSSOMED MAGICAL UMBRELLA DOME */
@@ -210,20 +210,20 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    {/* Wide blooming fairytale dome in dark pine */}
+                    {/* Wide blooming fairytale dome in dark olive pine */}
                     <path
                       d="M2 14.5C3 5.5 9 1.5 16 1.5C23 1.5 29 5.5 30 14.5C27 13 24 14.5 22 13C20 14.5 17 13 16 13.5C15 13 12 14.5 10 13C8 14.5 5 13 2 14.5Z"
-                      fill="#013E37"
-                      stroke="#012621"
+                      fill="#3E451B"
+                      stroke="#1B200B"
                       strokeWidth="1.5"
                     />
                     {/* Arched ribs and starry spots */}
-                    <path d="M16 1.5V13.5" stroke="#FFEFB3" strokeWidth="1" strokeLinecap="round" />
-                    <path d="M16 1.5C13 5.5 10 9.5 10 13" stroke="#FFEFB3" strokeWidth="1" strokeLinecap="round" />
-                    <path d="M16 1.5C19 5.5 22 9.5 22 13" stroke="#FFEFB3" strokeWidth="1" strokeLinecap="round" />
-                    <circle cx="7" cy="9.5" r="1.2" fill="#F59E0B" />
-                    <circle cx="16" cy="6.5" r="1.3" fill="#FFEFB3" />
-                    <circle cx="25" cy="9.5" r="1.2" fill="#F59E0B" />
+                    <path d="M16 1.5V13.5" stroke="#FFEB7C" strokeWidth="1" strokeLinecap="round" />
+                    <path d="M16 1.5C13 5.5 10 9.5 10 13" stroke="#FFEB7C" strokeWidth="1" strokeLinecap="round" />
+                    <path d="M16 1.5C19 5.5 22 9.5 22 13" stroke="#FFEB7C" strokeWidth="1" strokeLinecap="round" />
+                    <circle cx="7" cy="9.5" r="1.2" fill="#D0A44A" />
+                    <circle cx="16" cy="6.5" r="1.3" fill="#FFEB7C" />
+                    <circle cx="25" cy="9.5" r="1.2" fill="#D0A44A" />
                   </motion.svg>
                 )}
               </AnimatePresence>
@@ -244,17 +244,17 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
               }}
               className="relative flex flex-col items-center -mt-1 cursor-grab active:cursor-grabbing"
             >
-              {/* Dark Solid Metallic/Wooden J-Hook Handle SVG (Bold & Distinct in #013E37 / Gold) */}
+              {/* Dark Solid Metallic/Wooden J-Hook Handle SVG (Bold & Distinct in #3E451B / Gold) */}
               <svg width="18" height="15" viewBox="0 0 18 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-sm">
                 {/* Central Shaft Line */}
-                <line x1="9" y1="0" x2="9" y2="8" stroke="#013E37" strokeWidth="2.6" strokeLinecap="round" />
+                <line x1="9" y1="0" x2="9" y2="8" stroke="#3E451B" strokeWidth="2.6" strokeLinecap="round" />
                 {/* Inner Gold Highlight on Shaft */}
-                <line x1="9" y1="1" x2="9" y2="6" stroke="#F59E0B" strokeWidth="1" strokeLinecap="round" />
+                <line x1="9" y1="1" x2="9" y2="6" stroke="#D0A44A" strokeWidth="1" strokeLinecap="round" />
                 
                 {/* Classic Umbrella Curved J-Hook Handle */}
                 <path
                   d="M9 8C9 11.5 6.5 13.5 4 13.5C2 13.5 1 12 1 10C1 8.5 2 7.5 3 7.5"
-                  stroke="#013E37"
+                  stroke="#3E451B"
                   strokeWidth="2.6"
                   strokeLinecap="round"
                   fill="none"
@@ -262,13 +262,13 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
                 {/* Gold Highlight along the hook */}
                 <path
                   d="M8.5 9C8.5 11 6.5 12.3 4.2 12.3"
-                  stroke="#FFEFB3"
+                  stroke="#FFEB7C"
                   strokeWidth="0.9"
                   strokeLinecap="round"
                   fill="none"
                 />
                 {/* Handle Tip Knob */}
-                <circle cx="3" cy="7.5" r="1.5" fill="#F59E0B" stroke="#013E37" strokeWidth="0.8" />
+                <circle cx="3" cy="7.5" r="1.5" fill="#D0A44A" stroke="#3E451B" strokeWidth="0.8" />
               </svg>
             </motion.div>
 
@@ -300,7 +300,7 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.22, ease: "easeOut" }}
-            className="absolute left-0 sm:left-0 top-full mt-3 w-[calc(100vw-20px)] max-w-[340px] sm:w-84 bg-[#FFFDF5]/95 dark:bg-[#002621]/95 backdrop-blur-xl border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-3.5 sm:p-5 shadow-2xl space-y-3 z-50 overflow-hidden max-h-[85vh] overflow-y-auto"
+            className="absolute left-0 sm:left-0 top-full mt-3 w-[calc(100vw-20px)] max-w-[340px] sm:w-84 bg-[#FFFDF5]/95 dark:bg-[#1B200B]/95 backdrop-blur-xl border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-3.5 sm:p-5 shadow-2xl space-y-3 z-50 overflow-hidden max-h-[85vh] overflow-y-auto"
           >
             {/* Fairytale Background Ambient Glow */}
             <div className="absolute -top-12 -left-12 w-36 h-36 bg-amber-400/20 dark:bg-butter-300/10 rounded-full blur-2xl pointer-events-none" />

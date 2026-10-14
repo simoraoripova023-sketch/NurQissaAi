@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Sparkles, Home, PlusCircle, Target, Library, 
-  X, ChevronRight
+  Sparkles, Home, PlusCircle, Target, Library, Trophy, Palette,
+  X, ChevronRight, Gift, CreditCard
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
@@ -18,7 +18,7 @@ interface MagicMushroomPullLampProps {
 
 export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPullLampProps) {
   const pathname = usePathname();
-  const { locale, theme, stories, nurCoins } = useAppStore();
+  const { locale, theme, stories, nurCoins, setIsPricingModalOpen, setIsNurShopOpen } = useAppStore();
   const t = translations[locale];
 
   const [isOpen, setIsOpen] = useState(false);
@@ -49,11 +49,41 @@ export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPul
       badge: undefined,
     },
     { 
+      href: '/games', 
+      label: locale === 'uz' ? "Hikmatli O'yinlar" : 'Wisdom Games', 
+      desc: locale === 'uz' ? 'Montessori, Poklik, Ozuqachi & Mozaika' : 'Montessori sorting, I Spy & Puzzles',
+      icon: Trophy, 
+      badge: '🎮 O\'yin',
+    },
+    { 
+      href: '/coloring', 
+      label: locale === 'uz' ? 'Sehrli Ijodxona' : 'Creative Studio', 
+      desc: locale === 'uz' ? "Saboqlar bo'yash, Sehrli chiziqlar & Stikerlar" : 'Aqida coloring, Tracing & Stickers',
+      icon: Palette, 
+      badge: '🎨 Ijod',
+    },
+    { 
       href: '/library', 
       label: t.library, 
       desc: locale === 'uz' ? 'Siz yaratgan ertaklar javoni' : 'Your saved storybooks shelf',
       icon: Library, 
       badge: stories.length > 0 ? stories.length : undefined,
+    },
+    { 
+      href: '#shop', 
+      label: locale === 'uz' ? "Nur Do'koni" : "NurCoins Shop", 
+      desc: locale === 'uz' ? "Tangalarga sovg'alar va bo'yash rasmlari" : "Redeem coins for rewards",
+      icon: Gift, 
+      badge: '🛍️ Do\'kon',
+      isShop: true,
+    },
+    { 
+      href: '#pricing', 
+      label: locale === 'uz' ? "Obuna va To'lov" : "Subscription & Payment", 
+      desc: locale === 'uz' ? "Karta orqali to'lov & VIP tariflar" : "Card payment & VIP plans",
+      icon: CreditCard, 
+      badge: '💳 To\'lov',
+      isSubscription: true,
     },
   ];
 
@@ -71,7 +101,7 @@ export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPul
         particleCount: 22,
         spread: 50,
         origin: { y: 0.15, x: 0.24 },
-        colors: ['#FFEFB3', '#013E37', '#F59E0B', '#10B981'],
+        colors: ['#FFEB7C', '#3E451B', '#D0A44A', '#61642F'],
       });
     }
   };
@@ -136,21 +166,21 @@ export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPul
               {/* Mushroom Dome Cap */}
               <path
                 d="M3 24C3 12.402 11.5066 3 22 3C32.4934 3 41 12.402 41 24C41 25.5 39.8 26.5 38 26.5C31.5 26.5 27 25 22 25C17 25 12.5 26.5 6 26.5C4.2 26.5 3 25.5 3 24Z"
-                fill="#013E37"
-                stroke="#FFEFB3"
+                fill="#3E451B"
+                stroke="#FFEB7C"
                 strokeWidth="2.4"
               />
               {/* Fairytale Warm Cream Spots */}
-              <circle cx="14" cy="14" r="3.2" fill="#FFEFB3" />
-              <circle cx="28" cy="11" r="2.6" fill="#FFEFB3" />
-              <circle cx="22" cy="19" r="2.2" fill="#FFEFB3" />
-              <circle cx="34" cy="19" r="2" fill="#FFEFB3" />
+              <circle cx="14" cy="14" r="3.2" fill="#FFEB7C" />
+              <circle cx="28" cy="11" r="2.6" fill="#FFEB7C" />
+              <circle cx="22" cy="19" r="2.2" fill="#FFEB7C" />
+              <circle cx="34" cy="19" r="2" fill="#FFEB7C" />
 
               {/* Glowing Base / Stem */}
               <path
                 d="M17 26.5V32C17 33.5 19 34.5 22 34.5C25 34.5 27 33.5 27 32V26.5"
-                fill="#FFEFB3"
-                stroke="#013E37"
+                fill="#FFEB7C"
+                stroke="#3E451B"
                 strokeWidth="1.8"
               />
             </svg>
@@ -196,7 +226,7 @@ export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPul
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute left-0 top-full mt-3 w-80 sm:w-84 bg-[#FFFDF5]/95 dark:bg-[#002621]/95 backdrop-blur-xl border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-4 sm:p-5 shadow-2xl space-y-3 z-50 overflow-hidden"
+            className="absolute left-0 top-full mt-3 w-80 sm:w-84 bg-[#FFFDF5]/95 dark:bg-[#1B200B]/95 backdrop-blur-xl border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-4 sm:p-5 shadow-2xl space-y-3 z-50 overflow-hidden"
           >
             {/* Fairytale Background Glow */}
             <div className="absolute -top-12 -left-12 w-36 h-36 bg-amber-400/20 dark:bg-butter-300/10 rounded-full blur-2xl pointer-events-none" />
@@ -235,6 +265,74 @@ export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPul
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 const Icon = link.icon;
+
+                if ((link as any).isSubscription) {
+                  return (
+                    <button
+                      key={link.href}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setIsPricingModalOpen(true);
+                      }}
+                      className="flex items-center justify-between p-3 rounded-2xl transition-all group bg-gradient-to-r from-amber-400/20 to-orange-400/20 hover:from-amber-400/30 hover:to-orange-400/30 border border-amber-400/50 shadow-sm w-full text-left cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-sm">
+                          💳
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-xs sm:text-sm font-black leading-tight text-pine-950 dark:text-butter-100">
+                            {link.label}
+                          </span>
+                          <span className="text-[10px] font-medium leading-tight text-pine-700 dark:text-butter-300/80">
+                            {link.desc}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 text-[11px] font-black rounded-full bg-amber-400 text-pine-950 border border-amber-500/40">
+                          {link.badge}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-pine-400 dark:text-butter-300/60" />
+                      </div>
+                    </button>
+                  );
+                }
+
+                if ((link as any).isShop) {
+                  return (
+                    <button
+                      key={link.href}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setIsNurShopOpen(true);
+                      }}
+                      className="flex items-center justify-between p-3 rounded-2xl transition-all group bg-gradient-to-r from-amber-400/20 to-orange-400/20 hover:from-amber-400/30 hover:to-orange-400/30 border border-amber-400/50 shadow-sm w-full text-left cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-sm">
+                          🛍️
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-xs sm:text-sm font-black leading-tight text-pine-950 dark:text-butter-100">
+                            {link.label}
+                          </span>
+                          <span className="text-[10px] font-medium leading-tight text-pine-700 dark:text-butter-300/80">
+                            {link.desc}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 text-[11px] font-black rounded-full bg-amber-400 text-pine-950 border border-amber-500/40">
+                          {link.badge}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-pine-400 dark:text-butter-300/60" />
+                      </div>
+                    </button>
+                  );
+                }
 
                 return (
                   <Link

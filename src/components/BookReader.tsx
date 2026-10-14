@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -161,17 +161,11 @@ export default function BookReader({ story }: BookReaderProps) {
       if (data.success && data.imageUrl) {
         setCustomPageImages((prev) => ({ ...prev, [pageIdx]: data.imageUrl }));
         page.image_url = data.imageUrl;
-        confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
       } else {
-        alert(
-          locale === 'uz'
-            ? data.error || "Rasm generatsiyasi uchun xatolik yuz berdi (.env.local faylini tekshiring)."
-            : data.error || "Generation failed. Please check configuration."
-        );
+        console.warn('AI image regeneration notice:', data?.error);
       }
     } catch (err: any) {
-      console.error(err);
-      alert(locale === 'uz' ? "Rasm yaratishda xatolik yuz berdi" : "Error generating AI image");
+      console.warn('Error generating AI image for page:', err);
     } finally {
       setIsGeneratingImage(false);
     }
@@ -181,27 +175,25 @@ export default function BookReader({ story }: BookReaderProps) {
   const prologue = locale === 'uz' ? story.prologue_uz : story.prologue_en;
   const totalPages = story.pages.length;
 
-  // Auto-generate high-definition AI illustration if page is currently viewing placeholder
-  useEffect(() => {
-    if (currentPageIndex >= 1 && currentPageIndex <= totalPages) {
-      const page = story.pages[currentPageIndex - 1];
-      const currentImg = customPageImages[currentPageIndex] || page?.image_url;
-      if (!currentImg || currentImg.startsWith('/api/story-image') || currentImg.includes('.svg')) {
-        if (!isGeneratingImage && !customPageImages[currentPageIndex]) {
-          handleGenerateAiImage(currentPageIndex);
-        }
-      }
-    }
-  }, [currentPageIndex]);
-
-  // Auto-detect ?print=true from URL to open PDF book modal
+  // Auto-detect ?print=true or ?audio=true from URL
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('print') === 'true') {
         setIsBookPrintModalOpen(true);
       }
+      if (params.get('audio') === 'true') {
+        setCurrentPageIndex(1);
+      }
     }
+  }, []);
+
+  const nextPage = useCallback(() => {
+    setCurrentPageIndex((prev) => (prev < totalPages + 1 ? prev + 1 : prev));
+  }, [totalPages]);
+
+  const prevPage = useCallback(() => {
+    setCurrentPageIndex((prev) => (prev > 0 ? prev - 1 : prev));
   }, []);
 
   // Keyboard navigation
@@ -215,19 +207,7 @@ export default function BookReader({ story }: BookReaderProps) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentPageIndex]);
-
-  const nextPage = () => {
-    if (currentPageIndex < totalPages + 1) {
-      setCurrentPageIndex((prev) => prev + 1);
-    }
-  };
-
-  const prevPage = () => {
-    if (currentPageIndex > 0) {
-      setCurrentPageIndex((prev) => prev - 1);
-    }
-  };
+  }, [nextPage, prevPage]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -284,7 +264,7 @@ export default function BookReader({ story }: BookReaderProps) {
   return (
     <>
       {/* On-screen interactive reader - hidden during PDF print */}
-      <div className="no-print print:hidden min-h-screen bg-[#FFFDF5] dark:bg-[#002621] islamic-pattern pb-16 pt-4 transition-colors duration-300">
+      <div className="no-print print:hidden min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] islamic-pattern pb-16 pt-4 transition-colors duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           
           {/* Top Control Bar */}
@@ -443,7 +423,7 @@ export default function BookReader({ story }: BookReaderProps) {
               ) : <div />}
             </div>
 
-            <div className="relative bg-[#FFFDF5] dark:bg-[#002621] rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-2xl border-2 sm:border-4 border-amber-300/80 dark:border-emerald-700/80 flex flex-col justify-between">
+            <div className="relative bg-[#FFFDF5] dark:bg-[#1B200B] rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-2xl border-2 sm:border-4 border-amber-300/80 dark:border-pine-700/80 flex flex-col justify-between">
               
               {/* Book Pages with Page Transitions */}
               <AnimatePresence mode="wait">
@@ -844,14 +824,14 @@ export default function BookReader({ story }: BookReaderProps) {
           </div>
 
           {/* Bottom Page Thumbnails Strip */}
-          <div className="bg-white/80 dark:bg-emerald-950/90 backdrop-blur-md p-4 rounded-2xl border border-amber-200/80 dark:border-emerald-800 shadow-sm flex items-center justify-between gap-2 overflow-x-auto">
+          <div className="bg-white/80 dark:bg-pine-900/90 backdrop-blur-md p-4 rounded-2xl border border-amber-200/80 dark:border-pine-700/80 shadow-sm flex items-center justify-between gap-2 overflow-x-auto">
             {/* Cover thumb */}
             <button
               onClick={() => setCurrentPageIndex(0)}
               className={`px-3 py-2 rounded-xl text-xs font-bold shrink-0 transition-all ${
                 currentPageIndex === 0
                   ? 'bg-amber-500 text-white shadow'
-                  : 'bg-amber-50 dark:bg-emerald-900/60 text-slate-700 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-emerald-800'
+                  : 'bg-amber-50 dark:bg-pine-800/60 text-slate-700 dark:text-butter-200 hover:bg-amber-100 dark:hover:bg-pine-700'
               }`}
             >
               📖 {locale === 'uz' ? "Muqova" : "Cover"}
@@ -864,8 +844,8 @@ export default function BookReader({ story }: BookReaderProps) {
                 onClick={() => setCurrentPageIndex(idx + 1)}
                 className={`w-9 h-9 rounded-xl text-xs font-bold shrink-0 transition-all ${
                   currentPageIndex === idx + 1
-                    ? 'bg-gradient-to-r from-amber-500 to-emerald-500 text-white shadow scale-105'
-                    : 'bg-amber-50/70 dark:bg-emerald-900/60 text-slate-700 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-emerald-800 border border-amber-200/60 dark:border-emerald-700'
+                    ? 'bg-gradient-to-r from-amber-500 to-pine-700 text-white shadow scale-105'
+                    : 'bg-amber-50/70 dark:bg-pine-800/60 text-slate-700 dark:text-butter-200 hover:bg-amber-100 dark:hover:bg-pine-700 border border-amber-200/60 dark:border-pine-700'
                 }`}
               >
                 {idx + 1}
@@ -877,8 +857,8 @@ export default function BookReader({ story }: BookReaderProps) {
               onClick={() => setCurrentPageIndex(totalPages + 1)}
               className={`px-3 py-2 rounded-xl text-xs font-bold shrink-0 transition-all ${
                 currentPageIndex === totalPages + 1
-                  ? 'bg-emerald-600 text-white shadow'
-                  : 'bg-emerald-50 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 hover:bg-emerald-100 dark:hover:bg-emerald-800'
+                  ? 'bg-pine-800 text-butter-200 border border-butter-300 shadow'
+                  : 'bg-amber-50/70 dark:bg-pine-800/60 text-pine-900 dark:text-butter-200 hover:bg-amber-100 dark:hover:bg-pine-700'
               }`}
             >
               🌙 {t.reflectionTab}
@@ -923,7 +903,7 @@ export default function BookReader({ story }: BookReaderProps) {
                 initial={{ scale: 0.95, y: 15 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 15 }}
-                className="relative w-full max-w-4xl max-h-[92vh] bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl shadow-2xl border-2 sm:border-4 border-amber-300 dark:border-emerald-700 flex flex-col overflow-hidden text-slate-900 dark:text-amber-100"
+                className="relative w-full max-w-4xl max-h-[92vh] bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl shadow-2xl border-2 sm:border-4 border-amber-300 dark:border-pine-700 flex flex-col overflow-hidden text-slate-900 dark:text-amber-100"
               >
                 {/* Modal Top Control Bar */}
                 <div className="p-4 sm:p-5 bg-white/95 dark:bg-emerald-950/95 border-b border-amber-200 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
@@ -1007,16 +987,16 @@ export default function BookReader({ story }: BookReaderProps) {
                     </div>
 
                     {/* PAGE 1: PREVIEW COVER */}
-                    <div className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
-                      <div className="px-4 py-2 bg-amber-100 dark:bg-emerald-950 border-b border-amber-200 dark:border-emerald-800 flex items-center justify-between text-xs font-black text-amber-950 dark:text-amber-200">
+                    <div className="bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
+                      <div className="px-4 py-2 bg-amber-100 dark:bg-pine-950 border-b border-amber-200 dark:border-pine-800 flex items-center justify-between text-xs font-black text-amber-950 dark:text-amber-200">
                         <span>📖 1-sahifa: Kitob Muqovasi</span>
                         <span>NurQissa AI</span>
                       </div>
                       <div className="relative w-full h-72 sm:h-80 overflow-hidden bg-slate-900">
                         <img src={story.cover_image_url} alt={title} className="w-full h-full object-cover" />
                       </div>
-                      <div className="p-5 sm:p-6 bg-[#FFFDF0] dark:bg-[#042820]">
-                        <div className="relative rounded-2xl border-2 border-dashed border-emerald-500/70 p-5 bg-[#FFFDF5] dark:bg-emerald-950/40 text-center">
+                      <div className="p-5 sm:p-6 bg-[#FFFDF0] dark:bg-[#283013]">
+                        <div className="relative rounded-2xl border-2 border-dashed border-emerald-500/70 p-5 bg-[#FFFDF5] dark:bg-pine-950/40 text-center">
                           <h2 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-amber-200 font-display mb-2">{title}</h2>
                           <p className="text-xs text-amber-800 dark:text-amber-300 font-bold mb-2">
                             {story.child_profile.child_name} {locale === 'uz' ? "uchun mehr va duolar bilan" : "with love and prayers"}
@@ -1033,8 +1013,8 @@ export default function BookReader({ story }: BookReaderProps) {
                     {story.pages.map((p) => {
                       const dualTitle = getDualToneTitle(p.scene_summary, title);
                       return (
-                        <div key={p.page_number} className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
-                          <div className="px-4 py-2 bg-amber-100 dark:bg-emerald-950 border-b border-amber-200 dark:border-emerald-800 flex items-center justify-between text-xs font-black text-amber-950 dark:text-amber-200">
+                        <div key={p.page_number} className="bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
+                          <div className="px-4 py-2 bg-amber-100 dark:bg-pine-950 border-b border-amber-200 dark:border-pine-800 flex items-center justify-between text-xs font-black text-amber-950 dark:text-amber-200">
                             <span>📄 Sahifa {p.page_number} / {totalPages}</span>
                             <span className="truncate max-w-[200px]">{p.scene_summary || title}</span>
                           </div>
@@ -1049,8 +1029,8 @@ export default function BookReader({ story }: BookReaderProps) {
                           </div>
 
                           {/* Scalloped Framed Card */}
-                          <div className="p-4 sm:p-6 bg-[#FFFDF0] dark:bg-[#042820]">
-                            <div className="relative rounded-2xl border-2 border-dashed border-emerald-500/70 p-5 bg-[#FFFDF5] dark:bg-emerald-950/40 text-center">
+                          <div className="p-4 sm:p-6 bg-[#FFFDF0] dark:bg-[#283013]">
+                            <div className="relative rounded-2xl border-2 border-dashed border-emerald-500/70 p-5 bg-[#FFFDF5] dark:bg-pine-950/40 text-center">
                               <div className="absolute -top-3 -left-2 pointer-events-none">
                                 <LaurelBranch className="w-8 h-8 text-emerald-600" />
                               </div>
@@ -1086,7 +1066,7 @@ export default function BookReader({ story }: BookReaderProps) {
                     })}
 
                     {/* FINAL REFLECTION PREVIEW */}
-                    <div className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-emerald-400/80 shadow-xl overflow-hidden flex flex-col">
+                    <div className="bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl border-2 sm:border-4 border-emerald-400/80 shadow-xl overflow-hidden flex flex-col">
                       <div className="px-4 py-2 bg-emerald-100 dark:bg-emerald-950 border-b border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-black text-emerald-950 dark:text-emerald-200">
                         <span>🌙 Yakuniy Saboq & Duo</span>
                         <span>NurQissa AI</span>

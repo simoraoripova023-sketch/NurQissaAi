@@ -10,10 +10,14 @@
    ========================================================================== */
 
 :root {
-  --background: #FFFDF5;
-  --foreground: #013E37;
-  --butter: #FFEFB3;
-  --pine: #013E37;
+  --background: #FAF7EE; /* Warm fairy parchment / sunlight cream */
+  --foreground: #3E451B; /* User Palette: Deep warm forest olive (#3E451B) */
+  --butter: #FFEB7C;     /* User Palette: Glowing fairy butter (#FFEB7C) */
+  --pine: #3E451B;       /* User Palette: Warm forest olive (#3E451B) */
+  --moss: #61642F;       /* User Palette: Warm moss olive (#61642F) */
+  --khaki: #8F7F47;      /* User Palette: Warm golden olive (#8F7F47) */
+  --amber: #D0A44A;      /* User Palette: Luminous honey amber (#D0A44A) */
+  --bark: #392908;       /* User Palette: Darkest warm forest bark (#392908) */
   --font-outfit: 'Outfit', sans-serif;
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;
   --font-caveat: 'Caveat', cursive;
@@ -26,10 +30,14 @@
 }
 
 .dark {
-  --background: #002621;
-  --foreground: #FFEFB3;
-  --butter: #FFEFB3;
-  --pine: #013E37;
+  --background: #1B200B; /* Enchanted warm forest night base (#1B200B) */
+  --foreground: #FFEB7C; /* Glowing warm fairy text (#FFEB7C) */
+  --butter: #FFEB7C;
+  --pine: #3E451B;
+  --moss: #61642F;
+  --khaki: #8F7F47;
+  --amber: #D0A44A;
+  --bark: #392908;
 }
 
 /* Global Reset & Touch Optimization */
@@ -125,53 +133,53 @@ img, video, canvas, svg {
   padding-top: max(1rem, env(safe-area-inset-top, 0px));
 }
 
-/* Custom Islamic Geometric Pattern Background Overlay with Butter & Pine */
+/* Custom Islamic Geometric Pattern Background Overlay with Warm Butter & Warm Forest Olive */
 .islamic-pattern {
-  background-color: #FFFDF5;
-  background-image: radial-gradient(#013E37 0.75px, transparent 0.75px), radial-gradient(#FFEFB3 0.75px, #FFFDF5 0.75px);
+  background-color: #FAF7EE;
+  background-image: radial-gradient(#3E451B 0.85px, transparent 0.85px), radial-gradient(#FFEB7C 0.85px, #FAF7EE 0.85px);
   background-size: 30px 30px;
   background-position: 0 0, 15px 15px;
   opacity: 0.95;
 }
 
 .dark .islamic-pattern {
-  background-color: #002621;
-  background-image: radial-gradient(#FFEFB3 0.75px, transparent 0.75px), radial-gradient(#045E54 0.75px, #002621 0.75px);
+  background-color: #1B200B;
+  background-image: radial-gradient(#FFEB7C 0.75px, transparent 0.75px), radial-gradient(#61642F 0.75px, #1B200B 0.75px);
   opacity: 0.95;
 }
 
 /* Luxury Butter-Pine Capsule Pills */
 .pill-butter {
-  background-color: #FFEFB3;
-  color: #013E37;
-  border: 1.5px solid #013E37;
+  background-color: #FFEB7C;
+  color: #3E451B;
+  border: 1.5px solid #3E451B;
   font-weight: 700;
 }
 
 .pill-pine {
-  background-color: #013E37;
-  color: #FFEFB3;
-  border: 1.5px solid #FFEFB3;
+  background-color: #3E451B;
+  color: #FFEB7C;
+  border: 1.5px solid #D0A44A;
   font-weight: 700;
 }
 
 .night-sky-pattern {
-  background: radial-gradient(ellipse at bottom, #1E1B4B 0%, #0F172A 100%);
+  background: radial-gradient(ellipse at bottom, #3E451B 0%, #1B200B 100%);
 }
 
 /* Glassmorphism */
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 253, 245, 0.88);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(254, 243, 199, 0.6);
+  border: 1px solid rgba(255, 235, 124, 0.6);
 }
 
 .glass-dark {
-  background: rgba(30, 27, 75, 0.75);
+  background: rgba(27, 32, 11, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(208, 164, 74, 0.25);
 }
 
 /* Realistic 3D Book Spine & Shadows */
@@ -181,7 +189,7 @@ img, video, canvas, svg {
 
 .book-spread {
   transform-style: preserve-3d;
-  box-shadow: 0 30px 60px -15px rgba(30, 27, 75, 0.3), 0 0 0 1px rgba(245, 158, 11, 0.15);
+  box-shadow: 0 30px 60px -15px rgba(57, 41, 8, 0.35), 0 0 0 1px rgba(208, 164, 74, 0.2);
 }
 
 .book-spine-gradient {
@@ -198,18 +206,30 @@ img, video, canvas, svg {
   background: #FDFBF7;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #1B200B;
+}
+
 ::-webkit-scrollbar-thumb {
-  background: #FDE68A;
+  background: #FFEB7C;
   border-radius: 9999px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #61642F;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #F59E0B;
+  background: #D0A44A;
 }
 
 /* Glow effects */
 .gold-glow {
-  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.4));
+  filter: drop-shadow(0 0 14px rgba(208, 164, 74, 0.5));
+}
+
+.fairy-glow {
+  filter: drop-shadow(0 0 16px rgba(255, 235, 124, 0.65));
 }
 
 @keyframes floatAnimation {

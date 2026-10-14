@@ -38,7 +38,7 @@ export default function Testimonials() {
   ];
 
   return (
-    <section className="py-20 bg-[#FFFDF5] dark:bg-[#002621] relative overflow-hidden transition-colors duration-300">
+    <section className="py-20 bg-[#FFFDF5] dark:bg-[#1B200B] relative overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
@@ -57,7 +57,7 @@ export default function Testimonials() {
           {reviews.map((rev, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-[#01342e] p-8 rounded-3xl border border-amber-200/70 dark:border-emerald-700/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+              className="bg-white dark:bg-[#283013] p-8 rounded-3xl border border-amber-200/70 dark:border-pine-700/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
             >
               <div className="space-y-4">
                 {/* Rating stars */}
@@ -67,9 +67,9 @@ export default function Testimonials() {
                   ))}
                 </div>
 
-                <Quote className="w-8 h-8 text-amber-300/80 dark:text-emerald-700" />
+                <Quote className="w-8 h-8 text-amber-300/80 dark:text-pine-600" />
 
-                <p className="text-sm text-slate-700 dark:text-emerald-100 italic leading-relaxed">
+                <p className="text-sm text-slate-700 dark:text-butter-100 italic leading-relaxed">
                   "{rev.comment}"
                 </p>
               </div>

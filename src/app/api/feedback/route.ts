@@ -151,7 +151,19 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const secret = searchParams.get('key') || req.headers.get('x-admin-key');
+  const validAdminKey = process.env.ADMIN_SECRET_KEY || process.env.ADMIN_TELEGRAM_ID;
+
+  // Protect sensitive customer details from unauthorized public scrapers
+  if (!validAdminKey || secret !== validAdminKey) {
+    return NextResponse.json(
+      { error: 'Ruxsat berilmadi: Ushbu ma\'lumotlar maxfiy' },
+      { status: 401 }
+    );
+  }
+
   try {
     const { supabase } = await import('@/lib/supabase');
     const { data } = await supabase.from('feedbacks').select('*').order('created_at', { ascending: false }).limit(20);

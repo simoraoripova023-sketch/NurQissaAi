@@ -60,7 +60,7 @@ export default function MissionsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#002621] islamic-pattern py-10 pb-20 transition-colors duration-300">
+    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] islamic-pattern py-10 pb-20 transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* Header & Stats Banner */}
@@ -209,7 +209,7 @@ export default function MissionsPage() {
                     ? 'bg-emerald-50/60 dark:bg-emerald-950/80 border-emerald-300/80 dark:border-emerald-700/80 shadow-sm'
                     : isPending
                     ? 'bg-amber-50/70 dark:bg-amber-950/60 border-amber-300 dark:border-amber-700/80 shadow-sm'
-                    : 'bg-white dark:bg-[#01342e] border-slate-200 dark:border-emerald-700/60 hover:border-amber-400 dark:hover:border-amber-400 hover:shadow-md'
+                    : 'bg-white dark:bg-[#283013] border-slate-200 dark:border-pine-700/60 hover:border-amber-400 dark:hover:border-amber-400 hover:shadow-md'
                 }`}
               >
                 {/* Checkbox icon */}
@@ -284,7 +284,7 @@ export default function MissionsPage() {
         </div>
 
         {/* Badges & Achievements Gallery Section */}
-        <div className="bg-white dark:bg-[#01342e] rounded-3xl border border-amber-200/80 dark:border-emerald-700/60 p-6 sm:p-10 shadow-lg space-y-6">
+        <div className="bg-white dark:bg-[#283013] rounded-3xl border border-amber-200/80 dark:border-pine-700/60 p-6 sm:p-10 shadow-lg space-y-6">
           <div className="space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-butter-200 text-pine-900 border border-pine-800 text-xs font-bold uppercase">
               <Award className="w-3.5 h-3.5 text-pine-800" />

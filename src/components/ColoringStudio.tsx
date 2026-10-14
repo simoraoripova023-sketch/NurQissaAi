@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Palette, Brush, Eraser, RotateCcw, 
@@ -158,7 +158,7 @@ export default function ColoringStudio() {
   const [placedStickers, setPlacedStickers] = useState<{ id: string; icon: string; x: number; y: number }[]>([]);
 
   // Clear paint layer on template change
-  const clearPaintCanvas = () => {
+  const clearPaintCanvas = useCallback(() => {
     const canvas = activeTab === 'coloring' ? canvasRef.current : (activeTab === 'freehand' ? freeCanvasRef.current : traceCanvasRef.current);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -168,11 +168,11 @@ export default function ColoringStudio() {
     if (activeTab === 'freehand') {
       setPlacedStickers([]);
     }
-  };
+  }, [activeTab]);
 
   useEffect(() => {
     clearPaintCanvas();
-  }, [selectedTemplate, activeTab, selectedTracePath]);
+  }, [selectedTemplate, selectedTracePath, clearPaintCanvas]);
 
   // Audio speech narration for children
   const speakLesson = () => {
@@ -344,7 +344,7 @@ export default function ColoringStudio() {
   };
 
   return (
-    <div className="relative w-full rounded-3xl bg-[#FFFDF5] dark:bg-[#002621] border-2 border-pine-800/40 dark:border-butter-200/40 shadow-2xl p-5 sm:p-8 overflow-hidden">
+    <div className="relative w-full rounded-3xl bg-[#FFFDF5] dark:bg-[#1B200B] border-2 border-pine-800/40 dark:border-butter-200/40 shadow-2xl p-5 sm:p-8 overflow-hidden">
       
       {/* Top Main Switcher: Coloring vs Tracing vs Free Drawing */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-pine-800/20 dark:border-butter-200/20">

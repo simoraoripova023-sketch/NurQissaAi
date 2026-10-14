@@ -20,7 +20,7 @@ export default function MagicOwlAuthButton() {
       particleCount: 20,
       spread: 45,
       origin: { y: 0.15, x: 0.82 },
-      colors: ['#FFEFB3', '#013E37', '#F59E0B'],
+      colors: ['#FFEB7C', '#3E451B', '#D0A44A'],
     });
 
     setIsAuthModalOpen(true);
@@ -46,50 +46,50 @@ export default function MagicOwlAuthButton() {
           
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* Owl Body */}
-            <ellipse cx="16" cy="18" rx="11" ry="12" fill="#013E37" />
+            <ellipse cx="16" cy="18" rx="11" ry="12" fill="#3E451B" />
             
             {/* Owl Belly (Butter Cream) */}
-            <ellipse cx="16" cy="20" rx="7" ry="8" fill="#FFEFB3" />
+            <ellipse cx="16" cy="20" rx="7" ry="8" fill="#FFEB7C" />
             
             {/* Belly Feather Patterns */}
-            <path d="M14 17C14.5 18 15.5 18 16 17" stroke="#013E37" strokeWidth="1.2" strokeLinecap="round" />
-            <path d="M16 17C16.5 18 17.5 18 18 17" stroke="#013E37" strokeWidth="1.2" strokeLinecap="round" />
-            <path d="M15 21C15.5 22 16.5 22 17 21" stroke="#013E37" strokeWidth="1.2" strokeLinecap="round" />
+            <path d="M14 17C14.5 18 15.5 18 16 17" stroke="#3E451B" strokeWidth="1.2" strokeLinecap="round" />
+            <path d="M16 17C16.5 18 17.5 18 18 17" stroke="#3E451B" strokeWidth="1.2" strokeLinecap="round" />
+            <path d="M15 21C15.5 22 16.5 22 17 21" stroke="#3E451B" strokeWidth="1.2" strokeLinecap="round" />
 
             {/* Owl Feather Ears */}
-            <path d="M7 10L11 13L9 6L7 10Z" fill="#013E37" />
-            <path d="M25 10L21 13L23 6L25 10Z" fill="#013E37" />
+            <path d="M7 10L11 13L9 6L7 10Z" fill="#3E451B" />
+            <path d="M25 10L21 13L23 6L25 10Z" fill="#3E451B" />
 
             {/* Left Eye (Big and Cute) */}
-            <circle cx="11.5" cy="13.5" r="4.5" fill="#FFEFB3" stroke="#013E37" strokeWidth="1.2" />
+            <circle cx="11.5" cy="13.5" r="4.5" fill="#FFEB7C" stroke="#3E451B" strokeWidth="1.2" />
             {isWinking ? (
-              <path d="M9.5 14C10.5 12.5 12.5 12.5 13.5 14" stroke="#013E37" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M9.5 14C10.5 12.5 12.5 12.5 13.5 14" stroke="#3E451B" strokeWidth="1.5" strokeLinecap="round" />
             ) : (
               <>
-                <circle cx="11.5" cy="13.5" r="2.3" fill="#013E37" />
+                <circle cx="11.5" cy="13.5" r="2.3" fill="#3E451B" />
                 <circle cx="12.3" cy="12.5" r="0.8" fill="#FFFDF5" />
               </>
             )}
 
             {/* Right Eye (Big and Cute) */}
-            <circle cx="20.5" cy="13.5" r="4.5" fill="#FFEFB3" stroke="#013E37" strokeWidth="1.2" />
-            <circle cx="20.5" cy="13.5" r="2.3" fill="#013E37" />
+            <circle cx="20.5" cy="13.5" r="4.5" fill="#FFEB7C" stroke="#3E451B" strokeWidth="1.2" />
+            <circle cx="20.5" cy="13.5" r="2.3" fill="#3E451B" />
             <circle cx="21.3" cy="12.5" r="0.8" fill="#FFFDF5" />
 
             {/* Beak */}
-            <polygon points="16,15 14,18 18,18" fill="#F59E0B" />
+            <polygon points="16,15 14,18 18,18" fill="#D0A44A" />
 
             {/* Tiny Wings */}
-            <path d="M5 16C5 21 7 24 9 24" stroke="#013E37" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-            <path d="M27 16C27 21 25 24 23 24" stroke="#013E37" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+            <path d="M5 16C5 21 7 24 9 24" stroke="#3E451B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+            <path d="M27 16C27 21 25 24 23 24" stroke="#3E451B" strokeWidth="2.2" strokeLinecap="round" fill="none" />
 
             {/* Little Nightcap */}
-            <path d="M12 7C14 4 18 4 20 7L24 9C24 9 23 5 18 5C14 5 12 7 12 7Z" fill="#F59E0B" />
-            <circle cx="24.5" cy="9.5" r="1.8" fill="#FFEFB3" stroke="#013E37" strokeWidth="0.8" />
+            <path d="M12 7C14 4 18 4 20 7L24 9C24 9 23 5 18 5C14 5 12 7 12 7Z" fill="#D0A44A" />
+            <circle cx="24.5" cy="9.5" r="1.8" fill="#FFEB7C" stroke="#3E451B" strokeWidth="0.8" />
 
             {/* Feet */}
-            <ellipse cx="13" cy="29" rx="2" ry="1" fill="#F59E0B" />
-            <ellipse cx="19" cy="29" rx="2" ry="1" fill="#F59E0B" />
+            <ellipse cx="13" cy="29" rx="2" ry="1" fill="#D0A44A" />
+            <ellipse cx="19" cy="29" rx="2" ry="1" fill="#D0A44A" />
           </svg>
 
           {/* Tiny Scroll in Wing */}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { CheckCircle2, XCircle, Clock, Sparkles, BookOpen, ArrowRight, RefreshCw } from 'lucide-react';
@@ -18,8 +18,10 @@ function PaymentCallbackContent() {
   const [order, setOrder] = useState<any>(null);
   const [status, setStatus] = useState<'checking' | 'paid' | 'pending' | 'failed' | 'not_found'>('checking');
   const [errorMessage, setErrorMessage] = useState('');
+  const statusRef = useRef(status);
+  statusRef.current = status;
 
-  const checkOrder = async () => {
+  const checkOrder = useCallback(async () => {
     if (!orderId) {
       setStatus('not_found');
       setLoading(false);
@@ -75,7 +77,7 @@ function PaymentCallbackContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId, addStoryCredits, setHasPaidSubscription]);
 
   useEffect(() => {
     checkOrder();
@@ -84,17 +86,17 @@ function PaymentCallbackContent() {
     let attempts = 0;
     const interval = setInterval(async () => {
       attempts += 1;
-      if (attempts >= 4) {
+      if (attempts >= 4 || statusRef.current === 'paid' || statusRef.current === 'failed') {
         clearInterval(interval);
         return;
       }
-      if (status === 'checking' || status === 'pending') {
+      if (statusRef.current === 'checking' || statusRef.current === 'pending') {
         await checkOrder();
       }
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [orderId]);
+  }, [checkOrder]);
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4 bg-[#FDFBF7] dark:bg-[#0B0E1B]">
