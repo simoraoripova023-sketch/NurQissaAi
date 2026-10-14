@@ -121,7 +121,7 @@ const initialChildProfile: ChildProfile = {
   emotional_state: 'happy',
   reading_time_context: 'daytime',
   parent_goal: 'kindness',
-  favorite_animal: 'Quyoncha 🐰',
+  favorite_animal: '',
   favorite_color: 'Zumrad yashil 🟢',
   story_setting: 'blessed_garden',
   illustration_style: 'pixar_3d',

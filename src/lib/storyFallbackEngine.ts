@@ -25,7 +25,6 @@ export function generateDynamicIslamicStory(
   const childName = profile.child_name || 'Farzandimiz';
   const isBoy = profile.gender === 'boy';
   const age = profile.age || 6;
-  const animal = profile.favorite_animal || (isBoy ? 'oq kabutar' : 'mitti quyoncha');
   const color = profile.favorite_color || 'zumrad yashil va iliq tilla rang';
   const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 4), 10);
   const archetype = getMatchingArchetype(profile.parent_goal);
@@ -36,10 +35,10 @@ export function generateDynamicIslamicStory(
   if (archetype.id === 'food_gratitude') {
     templates = [
       {
-        uz: `Shom quyoshi ufqqa bosh qo'yib, xonadon derazalariga iliq tillarang nurlarini taratar edi. ${childName} o'zining suyukli ${animal}i bilan xonada o'ynab o'tirarkan, oshxonadan yangi pishgan issiq taomning yoqimli hidi taraldi. Onajonisi jilmayib dasturxonga chorladi.`,
-        en: `As the warm twilight sun set, casting golden hues through the windows, ${childName} played with their beloved ${animal} when the comforting aroma of a home-cooked meal called them to the dinner table.`,
+        uz: `Shom quyoshi ufqqa bosh qo'yib, xonadon derazalariga iliq tillarang nurlarini taratar edi. ${childName} xonada chiroyli kitob varoqlab o'tirarkan, oshxonadan yangi pishgan issiq taomning yoqimli hidi taraldi. Onajonisi jilmayib dasturxonga chorladi.`,
+        en: `As the warm twilight sun set, casting golden hues through the windows, ${childName} was reading a lovely picture book when the comforting aroma of a home-cooked meal called them to the dinner table.`,
         sceneSummary: `${childName}ning oqshomgi xursandchiligi va oshxona fayzi`,
-        actionPrompt: `${masterAnchor}, sitting pleasantly on a cozy patterned floor rug near the window with beloved companion ${animal}, warm sunset glow casting amber light, traditional clean Uzbek home with wooden details`
+        actionPrompt: `${masterAnchor}, sitting pleasantly on a cozy patterned floor rug near the window reading an open illustrated book, warm sunset glow casting amber light, traditional clean Uzbek home with wooden details`
       },
       {
         uz: `Dasturxonga kechagi mazali sho'rva va issiq non tortildi. Ammo ${childName} qoshlarini biroz chimirib: "Onajon, men kechagi taomni yegim kelmayapti. Menga yangi shirinlik yoki boshqa narsa pishirib bering", deb erkalik qildi.`,
@@ -48,7 +47,7 @@ export function generateDynamicIslamicStory(
         actionPrompt: `${masterAnchor}, sitting at a low wooden dining table with a steaming ceramic bowl of soup, looking momentarily hesitant and pouting innocently, loving mother in modest pastel hijab looking gently`
       },
       {
-        uz: `Onasi ${childName}ning mayin qo'llaridan mehr bilan ushlab, ko'zlariga boqdi: "Ko'zimning oqi, bilasanmi, dunyoda qancha bolalar bir burda qotgan nonga ham zor bo'lib yashashadi. Payg'ambarimiz sallallohu alayhi vasallam hech qachon dasturxondagi taomni ayblamaganlar. Har bir luqma — Robbizmizning bizga yuborgan ulug' omonati va barakasidir", dedilar.`,
+        uz: `Onasi ${childName}ning mayin qo'llaridan mehr bilan ushlab, ko'zlariga boqdi: "Ko'zimning oqi, bilasanmi, dunyoda qancha bolalar bir burda qotgan nonga ham zor bo'lib yashashadi. Payg'ambarimiz sallallohu alayhi vasallam hech qachon dasturxondagi taomni ayblamaganlar. Har bir luqma — Robbimizning bizga yuborgan ulug' omonati va barakasidir", dedilar.`,
         en: `Mother held ${childName}'s hand gently: "My darling, many children in the world yearn for a single bite of bread. Our Prophet (pbuh) never criticized food; every bite is Allah's precious blessing."`,
         sceneSummary: `Onaning mehr to'la o'giti va Payg'ambarimiz sunnatlari`,
         actionPrompt: `${masterAnchor}, sitting attentively beside loving mother who is holding hands gently and speaking with immense warmth and tenderness, warm ambient dining room light`
@@ -63,7 +62,7 @@ export function generateDynamicIslamicStory(
         uz: `${childName} qo'llarini ko'ksiga qo'yib, xushovozlik bilan: "Bismillahir Rohmanir Rohiym!" dedi-da, taomdan bir qoshiq ichdi. Mo'jizadek tuyuldi — taom shu qadar totli va xushbo'y ediki, ${childName} uning har bir luqmasidan huzur oldi va onasining yuzidan o'pib: "Alhamdulillah, dunyodagi eng mazzali taom ekan!" dedi.`,
         en: `Saying 'Bismillah', ${childName} tasted the soup. It tasted miraculously delicious. With a shining smile, they hugged mother saying 'Alhamdulillah, this is truly delicious!'`,
         sceneSummary: `Bismillah bilan boshlangan taom va shukrona lazzati`,
-        actionPrompt: `${masterAnchor}, happily eating from a colorful ceramic bowl with a spoon, joyful bright radiant smile, mother smiling proudly, ${animal} looking up cheerfully beside table`
+        actionPrompt: `${masterAnchor}, happily eating from a colorful ceramic bowl with a spoon, joyful bright radiant smile, mother smiling proudly beside table`
       },
       {
         uz: `Taomdan so'ng ${childName} onasiga dasturxonni yig'ishtirishda yordamlashdi. Ota-onasi uning odobidan quvonib, boshini siladilar: "Alloh senga ikki dunyo saodatini bersin, qobil bolam!" deya duo qildilar. Xonadonga maloikalar qanot qoqib, beqiyos fayz va baraka yog'ildi.`,
@@ -81,20 +80,20 @@ export function generateDynamicIslamicStory(
         uz: `${childName} yostig'iga bosh qo'yar ekan, qalbida cheksiz halovat va qanoat his qildi. U endi aslo taom tanlamaslikka, har bir luqmani e'zozlashga ahd qildi. Shirin tushlar og'ushida, farishtalar himoyasida orom oldi. Xayrli tun, shukr qiluvchi aziz ${childName}!`,
         en: `Resting on soft pillows with a peaceful heart, ${childName} promised never to complain about food again, drifting into deep sweet sleep under the protection of angels.`,
         sceneSummary: `Shukr ila orom olgan shirin uyqu`,
-        actionPrompt: `${masterAnchor}, sleeping peacefully in a comfortable bed under a soft quilt, gentle innocent smile, ${animal} curled up quietly by the bed, soft nightlight glow`
+        actionPrompt: `${masterAnchor}, sleeping peacefully in a comfortable bed under a soft quilt, gentle innocent smile, soft nightlight glow, peaceful atmosphere`
       }
     ];
   } else if (archetype.id === 'tidiness_sharing') {
     templates = [
       {
-        uz: `${childName}ning xonasi har xil ajoyib o'yinchoqlar, rang-barang kubiklar va kitoblar bilan to'la edi. U o'zining yaxshi ko'rgan ${animal}i bilan gilam ustida baland qal'alar qurar, mashinalarni quvlab zavqlanardi.`,
-        en: `${childName}'s room was filled with colorful toy blocks, cars, and storybooks. Together with beloved ${animal}, they spent the afternoon happily building grand towers on the soft carpet.`,
+        uz: `${childName}ning xonasi ajoyib kitoblar, rang-barang kubiklar va o'yinchoqlar bilan to'la edi. U gilam ustida chiroyli minoralar qurar, kitoblarini tartiblamasdan quvnoq o'ynab o'tirardi.`,
+        en: `${childName}'s room was filled with colorful toy blocks, puzzles, and storybooks. They spent the afternoon building grand towers on the soft carpet.`,
         sceneSummary: `${childName}ning o'yinchoqlar bilan to'la xonasi`,
-        actionPrompt: `${masterAnchor}, sitting cross-legged on a patterned carpet surrounded by colorful wooden toy blocks and miniature toy cars, holding a toy happily, bright room with sunlight`
+        actionPrompt: `${masterAnchor}, sitting cross-legged on a patterned carpet surrounded by colorful wooden toy blocks and books, holding a toy happily, bright room with sunlight`
       },
       {
-        uz: `Biroq o'yin tugagach, butun xona ostin-ustun bo'lib yotardi. Onasi eshikdan mo'ralab: "${childName}jon, o'ynab bo'lganingdan so'ng o'yinchoqlaringni sandiqqa yig'ishtirib qo'ygin", dedi. Ammo ${childName} erinib: "Ertaga yig'aman, bugun charchadim", deya joyiga yotib oldi.`,
-        en: `When playtime ended, toys were scattered all over the floor. Mother gently reminded them to tidy up, but ${childName} felt too lazy, saying they would clean it tomorrow instead.`,
+        uz: `Biroq o'yin tugagach, butun xona ostin-ustun bo'lib yotardi. Onasi eshikdan mo'ralab: "${childName}jon, o'ynab bo'lganingdan so'ng buyumlaringni sandiqqa yig'ishtirib qo'ygin", dedi. Ammo ${childName} erinib: "Ertaga yig'aman, bugun charchadim", deya joyiga yotib oldi.`,
+        en: `When playtime ended, things were scattered all over the floor. Mother gently reminded them to tidy up, but ${childName} felt too lazy, saying they would clean it tomorrow instead.`,
         sceneSummary: `Betartib xona va bolaning erinchoqligi`,
         actionPrompt: `${masterAnchor}, climbing into bed with toys still scattered messily across the bedroom rug, looking sleepy and hesitant, mother standing at the doorway with a gentle caring expression`
       },
@@ -108,7 +107,7 @@ export function generateDynamicIslamicStory(
         uz: `${childName} darhol o'rnidan turib, mehr bilan har bir o'yinchoqni artib, chiroyli qilib javonlarga terib qo'ydi. Xona ko'z ochib yumguncha ozoda va sarishta bo'lib qoldi. Onasi kirib kelib, bu go'zal tartibni ko'rgach, cheksiz quvondi.`,
         en: `Quickly getting out of bed, ${childName} lovingly picked up every single toy, neatly placing them into organizers and shelves until the whole room sparkled with cleanliness.`,
         sceneSummary: `Tezkor saranjomlik va xonadagi pokiza tartib`,
-        actionPrompt: `${masterAnchor}, happily carrying a clear storage box filled with neat toy cars and blocks, organizing wooden shelves with an energetic joyful smile, sunlit bright clean bedroom`
+        actionPrompt: `${masterAnchor}, happily carrying a clear storage box filled with neat toys and books, organizing wooden shelves with an energetic joyful smile, sunlit bright clean bedroom`
       },
       {
         uz: `Onasi ${childName}ning peshonasidan mehr bilan o'pdi: "Bilasanmi, Payg'ambarimiz sallallohu alayhi vasallam: «Poklik iymondandir» deganlar. Lekin o'yinchoqlarning haddan tashqari ko'p bo'lib har yerda yotishi isrofga olib keladi. Kel, o'zing kam o'ynaydigan o'yinchoqlaringni va ortiqcha kiyimlaringni mahallamizdagi muhtoj yetim bolalarga hadya qilamiz", dedi.`,
@@ -117,7 +116,7 @@ export function generateDynamicIslamicStory(
         actionPrompt: `${masterAnchor}, sitting beside mother holding a large cardboard box labeled for donation, packing colorful clothes and toys together with deep compassion and understanding`
       },
       {
-        uz: `${childName} xursand bo'lib, o'zi yaxshi ko'rgan bir nechta eng chiroyli mashinasi va kiyimlarini alohida chiroyli qutiga joyladi. Ular mahalladagi kamtargina xonadonga borib, dadasi vafot etgan jajji bolakayga ushbu hadyalarni ulashdilar. U bolakayning ko'zlaridagi quvonchni ko'rib, ${childName}ning qalbi iliq nurlarga to'ldi.`,
+        uz: `${childName} xursand bo'lib, o'zi yaxshi ko'rgan bir nechta eng chiroyli buyumlari va kiyimlarini alohida chiroyli qutiga joyladi. Ular mahalladagi kamtargina xonadonga borib, dadasi vafot etgan jajji bolakayga ushbu hadyalarni ulashdilar. U bolakayning ko'zlaridagi quvonchni ko'rib, ${childName}ning qalbi iliq nurlarga to'ldi.`,
         en: `With a generous heart, ${childName} picked their best items and gifted them to a fatherless child nearby. Seeing the orphan boy's eyes light up with immense joy filled ${childName} with radiant bliss.`,
         sceneSummary: `Muhtoj bolaga hadya ulashish va saxovat quvonchi`,
         actionPrompt: `${masterAnchor}, handing a beautifully wrapped gift box to a smiling humble neighbor child, both smiling warmly outside a modest courtyard house, beautiful golden sunshine`
@@ -126,7 +125,7 @@ export function generateDynamicIslamicStory(
         uz: `Uyga qaytayotganda ${childName} onasining qo'lidan tutib: "Oyijon, birovga yaxshilik qilish qanchalar shirin bo'larkan! Endi ortiqcha narsalar olib bering deb xarxasha qilmayman, boriga shukr qilib, boshqalar bilan baham ko'raman", dedi. Onasi unga faxr bilan boqdi.`,
         en: `Walking home hand-in-hand, ${childName} said: "Sharing brings the greatest joy! I will always keep my room neat, appreciate what I have, and share with those who have less."`,
         sceneSummary: `Qalb saxovati va o'zgarish xulosasi`,
-        actionPrompt: `${masterAnchor}, walking happily hand in hand with mother along a peaceful street, smiling up lovingly, ${animal} trotting cheerfully along, heartwarming sunset atmosphere`
+        actionPrompt: `${masterAnchor}, walking happily hand in hand with mother along a peaceful street, smiling up lovingly, heartwarming sunset atmosphere`
       },
       {
         uz: `Kechqurun ${childName} xotirjam qalb bilan joynamoz ustiga tiz cho'kib duo qildi: "Yo Robbim! Qo'limni saxiy, qalbimni pokiza ayla. Ota-onamni jannat bog'larida siyla. Omin!". So'ng shirin tushlar ko'rib, farishtalar panohida orom oldi.`,
@@ -136,55 +135,55 @@ export function generateDynamicIslamicStory(
       }
     ];
   } else {
-    // Default / Mercy to Animals archetype (Zahro / Payg'ambarimiz shafqatlari)
+    // Default: Kindness to Grandparents, Elders & Quranic Family Guidance
     templates = [
       {
-        uz: `Quyosh botib, hovliga mayin shabada esar edi. ${childName} o'zining suyukli ${animal}i bilan birga yashil maysazorda quvnoq o'yinlar o'ynab o'tirardi. Atrof sokin, daraxtlar bargi mayin shivirlardi.`,
-        en: `The evening breeze rustled gently through the courtyard trees as ${childName} played joyful games with their beloved ${animal} on the soft green lawn.`,
-        sceneSummary: `${childName}ning oqshomgi mayin o'yini va tabiat go'zalligi`,
-        actionPrompt: `${masterAnchor}, kneeling happily on lush green courtyard grass playing with cute companion ${animal}, warm golden sunset, blooming flowers and vine trellis background`
+        uz: `Fayzli oqshom pallasi edi. Xonadonda sokin va iliq muhit hukm surar, pechdan issiq non va rayhon ifori taralardi. ${childName} xonada o'z yumushlari bilan mashg'ul bo'lib o'tirarkan, so'rida o'tirgan nuroniy buvijonisi asta yo'talib qo'ydi.`,
+        en: `It was a peaceful blessed evening. The home was warm with the scent of basil and fresh bread. As ${childName} sat engaged in their tasks, their dear grandmother softly coughed from the low seating area.`,
+        sceneSummary: `Oqshomgi xonadon fayzi va buvijonning huzuri`,
+        actionPrompt: `${masterAnchor}, sitting respectfully in a warm traditional Uzbek living room with oriental carpet, soft glowing lamp, elderly grandmother wearing a modest white scarf seated gently on cushions`
       },
       {
-        uz: `Birdan uzoqdan zaif, ingroqli bir ovoz eshitildi: "Miyov... miyov...". ${childName} darhol o'yinini to'xtatdi. Qulog'ini ding qilib, ovoz kelgan yog'och so'ri tagiga sekin qaradi. Qorong'u burchakda mitti, sovuqdan qaltirab turgan nochor mushukcha o'tirardi.`,
-        en: `Suddenly, a faint trembling cry broke the silence. Pausing their play, ${childName} peeked under the wooden bench and discovered a tiny, helpless kitten shivering alone in the cold.`,
-        sceneSummary: `Mitti jonzotning nidosi va so'ri tagidagi kashfiyot`,
-        actionPrompt: `${masterAnchor}, gently bending down looking under a traditional wooden supa bench, discovering a tiny shivering kitten with wide expressive eyes, caring gentle posture`
+        uz: `Buvijonisi mehribon nigoh bilan nabirasiga boqib: "${childName}jon, ko'zimning nuri, menga bir piyola issiq damlama quyib bera olasanmi, oyog'im biroz zirqirab turibdi", deb iltimos qildi. Ammo ${childName} o'ynayotgan narsasidan ajralgisi kelmay: "Hozir, buvijon, yana ozgina o'ynab olay", deya biroz paysalga soldi.`,
+        en: `Grandmother smiled gently: "${childName}, light of my eyes, could you pour me a warm cup of herbal tea? My legs feel a bit tired today." But ${childName}, absorbed in play, hesitated, asking to play a little longer.`,
+        sceneSummary: `Buvijonning iltimosi va bolaning biroz erinishi`,
+        actionPrompt: `${masterAnchor}, looking momentarily torn between a colorful puzzle and grandmother, grandmother smiling patiently with loving wrinkled face`
       },
       {
-        uz: `Mushukchaning ko'zlarida cheksiz g'amginlik va qo'rquv bor edi. ${childName} unga asta yaqinlashib: "Qo'rqma mitti do'stginam, men senga zarar bermayman", deb shivirladi. Darhol oshxonaga yugurib, bir piyola iliq sut va toza suv olib chiqdi.`,
-        en: `The tiny kitten looked terrified and frail. Whispering soothing words: "Don't be afraid, little one, I won't hurt you," ${childName} gently brought a warm bowl of milk and fresh water.`,
-        sceneSummary: `Mehrli taskin va mitti jonzotga suv tutish`,
-        actionPrompt: `${masterAnchor}, gently placing a small ceramic bowl of milk before the timid little kitten, holding open comforting hands, warm compassionate expression on face`
+        uz: `Shu payt xonaga kirib kelgan dadasi ${childName}ning yoniga o'tirdi va mehr bilan qo'lidan tutdi: "Qobil bolam, bilasanmi, Payg'ambarimiz sallallohu alayhi vasallam: «Kattalarimizni hurmat qilmagan, kichiklarimizga shafqat ko'rsatmagan bizdan emasdir», deb o'rgatganlar. Oila kattalariga qilingan xizmat — eng ulug' ibodatlardandir", dedilar.`,
+        en: `Father entered, sat beside ${childName}, and gently taught: "My child, the Prophet (pbuh) said: 'He is not of us who does not respect our elders and show mercy to our young.' Serving our grandparents is one of the highest virtues."`,
+        sceneSummary: `Dadasining ibratli nasihati va Sunnat o'giti`,
+        actionPrompt: `${masterAnchor}, looking attentively at loving father who has a gentle encouraging hand on child's shoulder, atmosphere of deep spiritual warmth and respect`
       },
       {
-        uz: `Mushukcha avval cho'chib turdi, so'ng ochlikdan shoshib sutni icha boshladi. ${childName} onasini chaqirdi. Onasi kelib: "Ko'zimning nuri, Payg'ambarimiz sallallohu alayhi vasallam: «Yer yuzidagilarga rahm qiling, osmondagilar ham sizga rahm qilsin» deganlar. U Zot kiyiklarni, qushlarni ozod qilib, jonzotlarga mehr ko'rsatganlar. Bu mitti jon onasini yo'qotganga o'xshaydi, kel, onasini topamiz", dedilar.`,
-        en: `The kitten eagerly drank the milk. Mother arrived and taught the Prophetic wisdom: "Show mercy to those on earth, and Allah will show mercy to you. Let us help this kitten find its mother."`,
-        sceneSummary: `Onaning Sunnat haqidagi ta'limi va mehr sabog'i`,
-        actionPrompt: `${masterAnchor}, standing beside loving mother in garden, pointing gently at the kitten, mother smiling tenderly with hand resting on child's shoulder`
+        uz: `Dadasining bu o'giti ${childName}ning qalbini larzaga soldi. U buvijonisining yoshligidan buyon oilasi uchun qilgan cheksiz zahmatlarini, unga aytib bergan ibratli ertaklarini esladi. Uning ko'zlaridan yosh qalqib chiqdi: "Meni kechiring, buvijon! Sizga xizmat qilish — mening eng katta baxtim-ku!", dedi.`,
+        en: `Father's words resonated deeply. Remembering grandmother's lifelong sacrifices and loving bedtime stories, tears of realization welled in ${childName}'s eyes as they hurried to apologize.`,
+        sceneSummary: `${childName}ning qalbiy uyg'onishi va xatosini tushunishi`,
+        actionPrompt: `${masterAnchor}, with eyes full of tenderness and realization, quickly getting up with sincere love and devotion on their face`
       },
       {
-        uz: `Ular hovlini va bog'ni aylanib qidira boshladilar. Bog' chetidagi eski omborxona ortidan katta ona mushukning bezovta miyovlagan ovozi keldi. ${childName} mitti mushukchani ehtiyotkorlik bilan ko'tarib, uning onasi yoniga olib bordi.`,
-        en: `Searching through the garden, they heard an anxious mother cat calling near the garden shed. ${childName} gently carried the kitten to reunite the family.`,
-        sceneSummary: `Ona mushukni qidirib topish va intizorlik`,
-        actionPrompt: `${masterAnchor}, carefully cradling the small kitten in both hands walking through a sunlit courtyard garden, mother walking beside encouragingly`
+        uz: `${childName} darhol oshxonaga oshiqdi. Chinni choynakda xushbo'y tog' giyohlari bilan choy damlab, piyolaga quyib olib keldi. Buvijonisining oyog'iga issiq jun paypog'ini kiydirib, ustiga yumshoq ko'rpa yopdi va uning qo'llaridan ehtirom bilan o'pdi.`,
+        en: `${childName} rushed to brew fresh fragrant tea in an ornate porcelain teapot, carefully carried it to grandmother, wrapped her feet in warm woolen socks and a soft quilt, and kissed her hands with utmost respect.`,
+        sceneSummary: `Buvijonga mehr bilan xizmat qilish`,
+        actionPrompt: `${masterAnchor}, kneeling respectfully offering a steaming traditional tea bowl in both hands to smiling grandmother, grandmother's eyes shining with deep gratitude and love`
       },
       {
-        uz: `Mushukcha onasini ko'rib, sevinchdan uning bag'riga yugurdi. Ona mushuk bolasi boshini mehr bilan yaladi, so'ng ${childName}ga minnatdorchilik bilan qarab, oyoqlariga asta suykaldi. ${childName}ning ko'zlari quvonchdan porlab ketdi: "Allohimga shukr, topdik! Endi u yolg'iz emas!"`,
-        en: `The kitten rushed happily into its mother's paws. The mother cat lovingly nuzzled her baby, then rubbed against ${childName}'s legs in deep gratitude.`,
-        sceneSummary: `Ona-bolaning visoli va beqiyos quvonch`,
-        actionPrompt: `${masterAnchor}, kneeling joyfully as the mother cat hugs the tiny kitten, pure innocent happiness radiating on child's smiling face, magical soft sunset light`
+        uz: `Buvijonisining quvonchdan yuzlari charaqlab ketdi. U nabirasining boshini silab, kaftlarini duoga ochdi: "Allohim! Ushbu aqlli zurriyotimni ikki dunyoda aziz qilgin, qalbini Qur'on nuri bilan to'ldirgin, har qadamiga farishtalar hamroh bo'lsin. Omin!", deya uzoq duo qildi.`,
+        en: `Grandmother's face lit up with radiant joy. Stroking the child's head, she raised cupped hands in prolonged heartfelt blessings, praying for ${childName}'s success, faith, and happiness in both worlds.`,
+        sceneSummary: `Buvijonning oq fotihasi va barakali duosi`,
+        actionPrompt: `${masterAnchor}, sitting closely beside grandmother who is making Dua with raised hands, soft golden ambient light bathing them both in serenity and divine peace`
       },
       {
-        uz: `Kechki payt ${childName} onasining yoniga o'tirib o'ychan bo'lib qoldi: "Onajon, agar men uni ko'rmay o'tib ketganimda nima bo'lardi?". Onasi uning sochlarini silab: "Bilmayman, bolajonim. Lekin sen befarq bo'lmading. Kichkina yordam ham kim uchundir eng katta yaxshilik bo'ladi", dedilar.`,
-        en: `Later, ${childName} asked: "Mother, what if I hadn't stopped to help?" Mother gently stroked their hair: "You chose compassion, and even the smallest kindness can be a world of mercy to someone."`,
-        sceneSummary: `Ibratli suhbat va qalbiy mehrning ildiz otishi`,
-        actionPrompt: `${masterAnchor}, sitting cozily on a sofa beside mother, drinking warm tea, deep thoughtful expression turning into a peaceful serene smile`
+        uz: `Azon yangradi. ${childName} dadasi bilan birgalikda tahorat olib, joynamoz ustiga turdilar. Buvijonisi ham ularning ortidan namozga iqtido qildi. Xonadonga maloikalar yog'ilib, butun uyni ajib bir sakinat va qut-baraka qamrab oldi.`,
+        en: `The evening Adhan called. ${childName} performed ablution alongside father, and they stood in prayer together while grandmother joined from behind. Angelic serenity filled the blessed home.`,
+        sceneSummary: `Oilaviy namoz va maloikalar sakinatlari`,
+        actionPrompt: `${masterAnchor}, standing respectfully on an embroidered green prayer rug in prayer posture beside father, peaceful serene expression, soft glowing lantern light`
       },
       {
-        uz: `Oqshom o'z pardasini yoydi. ${childName} joynamozda ixlos bilan duo qildi: "Yo Mehribon Robbim! Qalbimni barcha maxluqotingga rahm-shafqatli qilgin, ota-onamni asragin. Omin!". So'ng shirin tushlar og'ushida, maloikalar qanoti ostida xotirjam uyquga ketdi.`,
-        en: `Night fell in complete peace. ${childName} prayed with sincere cupped hands for a merciful heart, then fell into the sweetest sleep under the watchful care of angels.`,
-        sceneSummary: `Mehribon qalbning sokin oromi va tunda farishtalar panohi`,
-        actionPrompt: `${masterAnchor}, sleeping peacefully under a warm quilt with an angelic innocent smile, glowing crescent moon visible through window, ultimate bedtime calm`
+        uz: `Namozdan so'ng ${childName} o'rniga yotar ekan, qalbida beqiyos halovat his qildi. U endi har kuni buvijonisi va ota-onasining duolarini olishga, ularning ko'ngliga quvonch ulashishga ahd qildi. Shirin tushlar og'ushida, farishtalar panohida orom oldi. Xayrli tun, aziz ${childName}!`,
+        en: `Tucking into bed with a heart full of light, ${childName} resolved to always bring joy to grandparents and parents, falling asleep in divine tranquility under the protection of angels.`,
+        sceneSummary: `Iymon nuri bilan yo'g'rilgan shirin uyqu`,
+        actionPrompt: `${masterAnchor}, sleeping peacefully under a warm quilt with a sweet innocent smile, moonlight softly filtering through curtain, ultimate peace and calm`
       }
     ];
   }
@@ -201,7 +200,7 @@ export function generateDynamicIslamicStory(
     };
   });
 
-  const coverPrompt = `${masterAnchor}, smiling radiantly with beloved companion ${animal} in cozy warm glowing ${color} room, soft ambient sunlight, title banner, 8k resolution, cinematic lighting, masterpiece, ${stylePrompt}, ${negativeEnhancers}`;
+  const coverPrompt = `${masterAnchor}, smiling radiantly with loving family in cozy warm glowing ${color} room, soft ambient sunlight, title banner, 8k resolution, cinematic lighting, masterpiece, ${stylePrompt}, ${negativeEnhancers}`;
 
   return {
     id: storyId,
@@ -209,7 +208,7 @@ export function generateDynamicIslamicStory(
     child_profile: profile,
     title_uz: `${childName} va Nurli Hikmat Sayohati`,
     title_en: `${childName} and the Radiant Tale of Wisdom`,
-    prologue_uz: `Erka farzandimiz — ${childName}ning sevimli ${animal}i bilan birgalikdagi ibratli, mehr-oqibat va ezgulik bilan yo'g'rilgan nurli oqshom qissasi...`,
+    prologue_uz: `Farzandimiz — ${childName}ning Islomiy odoblar, kattalarga hurmat va ezgulik bilan yo'g'rilgan nurli oqshom qissasi...`,
     prologue_en: `A heartwarming bedtime journey of young ${childName} discovering the profound beauty of noble Islamic character and deeds...`,
     cover_image_url: `/api/story-image?storyId=${encodeURIComponent(storyId)}&page=0&prompt=${encodeURIComponent(coverPrompt)}&style=${encodeURIComponent(profile.illustration_style || 'pixar_3d')}`,
     theme_color: isBoy ? "#013E37" : "#D97706",

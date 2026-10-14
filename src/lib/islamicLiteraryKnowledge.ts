@@ -40,17 +40,17 @@ export const ISLAMIC_STORY_ARCHETYPES: StoryArchetype[] = [
     dua_arabic: 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ'
   },
   {
-    id: 'mercy_animals',
-    theme: 'Mitti Jonzotlarga Shafqat va Mehribonlik',
-    matched_goals: ['kindness', 'mercy', 'compassion', 'animals', 'tabiat', 'shafqat', 'mehr_oqibat'],
-    core_conflict: 'O\'ynab yurgan paytda kutilmaganda sovuqda titrab turgan, adashib qolgan yoki qutiga tushib qiynalayotgan mitti jonzotni (mushukcha, qushcha, kiyikcha) uchratadi.',
-    prophetic_guidance: '«Payg\'ambarimiz sallallohu alayhi vasallam bu vaziyatda nima qilgan bo\'lardilar?» U Zot daraxtga bog\'langan kiyikni bolasining oldiga qo\'yib yuborganlar, yo\'ldan adashgan qushchani onasiga qaytarganlar, chanqagan itga suv bergan odamning barcha gunohlari kechirilganini aytganlar.',
-    hadith_sharif_uz: '«Siz yer yuzidagilarga rahm-shafqat qilingki, osmondagilar ham sizga rahm qilsin!» (Imom Termiziy rivoyati)',
-    hadith_sharif_en: '«Be merciful to those on the earth, and the One in the heavens will have mercy upon you.» (Tirmidhi)',
-    inner_realization: '«Ba\'zan juda kichkina yordam ham kim uchundir eng katta yaxshilik bo\'lishi mumkin. Men uni ko\'rib, befarq o\'tib keta olmayman!» degan oliyjanoblik tuyg\'usi jo\'sh uradi.',
-    action_resolution: 'O\'yinini chetga surib, jonzotga suv va taom beradi, uning onasini qidirib topib bag\'riga topshiradi va qalbida cheksiz halovat topadi.',
-    dua_uz: 'Ey mehribon Parvardigorim! Qalbimizni barcha maxluqotingga nisbatan shafqatli va mehrli qilgin, bizni O\'zing suygan solih bandalaring safiga qo\'shgin. Omin!',
-    dua_arabic: 'رَبَّنَا آتِنَا مِن لَّدُنكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا'
+    id: 'kindness_elders',
+    theme: 'Kattalarga va Yaqinlarga Mehr-Oqibat, Buvijon va Bobojonga Xizmat',
+    matched_goals: ['kindness', 'mercy', 'compassion', 'shafqat', 'mehr_oqibat', 'sila_i_rahm', 'qarindoshlik', 'buvijon'],
+    core_conflict: 'Bolajon o\'yiniga yoki o\'yinchoqlariga berilib, xonadondagi keksa buvijonisining yoki yordamga muhtoj yaqinlarining holidan xabar olishga beparvo bo\'ladi.',
+    prophetic_guidance: 'Payg\'ambarimiz sallallohu alayhi vasallam: «Kattalarimizni hurmat qilmagan, kichiklarimizga rahm-shafqat ko\'rsatmagan bizdan emasdir», deb ta\'lim berganlar. Nuroniy buvijon va bobojonlarning ko\'nglini olish, ularga issiq choy quyib berish, hassasini olib kelish va duolarini olish xonadonga Allohning ulug\' fayz va barakasini yog\'diradi.',
+    hadith_sharif_uz: '«Kattalarimizni ulug\'lamagan va kichiklarimizga rahm-shafqat qilmagan kishi bizdan emasdir.» (Imom Termiziy rivoyati)',
+    hadith_sharif_en: '«He is not one of us who does not show mercy to our young ones and respect to our elders.» (Tirmidhi)',
+    inner_realization: 'Buvijonisining mehnatdan qavarib ketgan, ammo mehr to\'la nufuzli qo\'llarini ko\'rib, dunyodagi eng katta boylik — qariyalarning oq fotihasi va mehr-oqibat ekanligini yurakdan his qiladi.',
+    action_resolution: 'O\'yinchoqlarini chetga surib, buvijonisining yoniga boradi, uning quchog\'iga bosh qo\'yadi, oyog\'iga issiq paypog\'ini kiygizib, qo\'llarini o\'padi va duolarini oladi.',
+    dua_uz: 'Yo Robbim! Bizni kattalarni e\'zozlaydigan, ularning duolariga erishadigan, mehr-oqibatli va soliha/solih farzandlardan qilgin. Omin!',
+    dua_arabic: 'رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ'
   },
   {
     id: 'tidiness_sharing',

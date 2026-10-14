@@ -26,9 +26,7 @@ function buildMasterCharacterAnchor(profile: ChildProfile): string {
     ? profile.character_appearance_description.trim()
     : defaultAppearance;
 
-  const companion = profile.favorite_animal ? `accompanied by a cute friendly ${translateAnimalToEnglish(profile.favorite_animal)}` : '';
-
-  return `${baseAppearance}, wearing ${defaultClothing}${companion ? `, ${companion}` : ''}`;
+  return `${baseAppearance}, wearing ${defaultClothing}`;
 }
 
 const STYLE_PROMPTS: Record<string, string> = {
@@ -40,17 +38,6 @@ const STYLE_PROMPTS: Record<string, string> = {
 };
 
 const NEGATIVE_ENHANCERS = "strictly no hats, no wizard hats, no witch hats, no giant caps, no costumes, no floating head, no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus";
-
-function translateAnimalToEnglish(animalStr: string): string {
-  const lower = (animalStr || '').toLowerCase();
-  if (lower.includes('quyon')) return 'a cute little white fluffy bunny rabbit';
-  if (lower.includes('kabutar') || lower.includes('kaptar')) return 'a gentle friendly white dove bird';
-  if (lower.includes('mushuk')) return 'an adorable sweet fluffy little kitten';
-  if (lower.includes('bo\'taloq') || lower.includes('tuya')) return 'a cute gentle baby camel';
-  if (lower.includes('qo\'zi') || lower.includes('qozi')) return 'a sweet little white fluffy baby lamb';
-  if (lower.includes('bulbul') || lower.includes('qush')) return 'a cheerful little colorful songbird';
-  return 'a lovely cute companion animal';
-}
 
 function translateColorToEnglish(colorStr: string): string {
   const lower = (colorStr || '').toLowerCase();
@@ -181,7 +168,6 @@ async function generateStoryWithAi(profile: ChildProfile, masterAnchor: string, 
     const childName = profile.child_name;
     const virtue = profile.parent_goal || 'kindness';
     const setting = profile.story_setting || 'cozy_home';
-    const animal = profile.favorite_animal || (isBoy ? 'oq kabutar' : 'mitti quyoncha');
     const color = profile.favorite_color || 'zumrad yashil va oltin rang';
     const age = profile.age || 6;
     const readingTime = profile.reading_time_context || 'bedtime';
@@ -194,10 +180,9 @@ async function generateStoryWithAi(profile: ChildProfile, masterAnchor: string, 
 Your mission is to craft an authentic, heartwarming, deeply meaningful ${targetPageCount}-page children's story in rich literary Uzbek (primary) and English (secondary).
 Strictly draw from the proven narrative models of classical and modern Islamic children's masterworks:
 - "Payg'ambarimiz sallallohu alayhi vasallam nima qilgan bo'lardilar" (Mo'tabar Xamrayeva)
-- "Zahro va yo'qolgan mushukcha" (Ummu Zahro)
 - "Onajon bugun nima ovqat yeymiz" (Ummu Zakariyya)
-- "Imron va xafa bo'lgan o'yinchoqlar" (Umida Bahodir qizi)
 - "Aqilli bola Yusuf" & "Bolalar uchun 40 Hadis hikoyalari"
+- "Farishtalar va Iymon saboqlari"
 
 TARGET CHILD & STORY CONTEXT:
 - Child Name: "${childName}"
@@ -207,30 +192,32 @@ TARGET CHILD & STORY CONTEXT:
 - Reading Context: "${readingTime}"
 - Today's Activity: "${activity}"
 - Child Mood: "${mood}"
-- Companion: "${animal}"
 - Setting: "${setting}"
-- Core Moral Virtue: "${virtue}" (Islomiy fazilatlar: Shukronalik, Taom odobi, Poklik va tartib, Jonzotlarga shafqat, Isrofga yo'l qo'ymaslik, Saxovat va muhtojlarga ehson, Ota-onani e'zozlash, Qalb sakinati va namoz).
+- Core Moral Virtue: "${virtue}" (Islomiy fazilatlar: Shukronalik, Taom odobi, Poklik va tartib, Kattalarga va buvijonga hurmat, Ota-onani e'zozlash, Namoz va masjid odoblari, Saxovat va muhtojlarga ehson, Isrofga yo'l qo'ymaslik, Qalb sakinati).
 - LOCKED CHARACTER VISUAL ANCHOR: "${masterAnchor}"
 
-MANDATORY NARRATIVE & LITERARY QUALITY RULES:
-1. RICH DEPTH & LENGTH (NO SUPERFICIAL 1-SENTENCE PAGES):
+MANDATORY NARRATIVE & ISLAMIC PEDAGOGY RULES:
+1. STRICTLY HUMAN CHARACTERS & NO ANIMAL PROTAGONISTS:
+   - The characters MUST be real human beings: the child (${childName}), loving mother (Onajonisi), caring father (Dadasi), wise luminous grandmother (Buvijonisi) or grandfather (Bobojonisi), siblings, and elders.
+   - Do NOT use animals as main characters, talking creatures, or constant pet companions. The story revolves around human moral choices, Islamic family bonds, and spiritual growth.
+2. RICH DEPTH & LENGTH (NO SUPERFICIAL 1-SENTENCE PAGES):
    - Every single page MUST contain 3 to 5 richly developed sentences (minimum 50-70 words per page in Uzbek).
-   - Weave in sensory descriptions: the warm aroma of home cooking, the amber twilight light, the trembling whimper of a cold kitten, the colorful scattered blocks on the carpet, the soft whisper of evening prayer.
-2. NATURAL DIALOGUE & RESPECTFUL UZBEK SPEECH:
+   - Weave in sensory Islamic descriptions: the melodious call of the evening Adhan, the soft aroma of fresh bread and tea, the gentle turning of Quran pages, the warm amber glow of lantern light over prayer rugs, the whisper of heartfelt Duas.
+3. NATURAL DIALOGUE & RESPECTFUL UZBEK SPEECH:
    - Dialogue is MANDATORY on most pages.
    - Use warm Uzbek affectionate terms: «Ko'zimning oqi», «Jon bolam», «Onajon», «Dadajon», «Buvijon».
    - Use proper quotes («...») for speech.
-3. THE PROPHETIC SUNNAH PEDAGOGICAL FORMULA:
-   - Start with a realistic childhood friction: reluctance to clean up, wanting a new snack instead of wholesome food, noticing an animal in need, or hesitation.
+4. THE PROPHETIC SUNNAH PEDAGOGICAL FORMULA:
+   - Start with a realistic childhood friction: reluctance to share, impatience, hesitation to help grandmother, complaining about food, or getting distracted during prayer time.
    - The loving parent or elder gently guides with the central question:
      «Payg'ambarimiz sallallohu alayhi vasallam bu vaziyatda nima qilgan bo'lardilar?»
-   - Cite an authentic Sunnah or Hadith (e.g. mercy to the deer/kitten, not criticizing food, tidiness being half of faith, sharing what you love).
-4. INNER EMOTIONAL TRANSFORMATION (REALIZATION):
-   - The child reflects deeply: «Men xatoyimni tushundim...», «Kichkina yaxshilik ham kim uchundir eng katta yordam bo'lishi mumkin».
-   - Concrete positive action: tidying up, sharing food or toys with a needy neighbor, embracing mother with «Alhamdulillah».
-5. SAKINAT & SINCERE BEDTIME DUA:
-   - Conclude with genuine spiritual peace (Sakinat), cupping hands for Dua with parents, and drifting to sleep under the watchful care of angels.
-6. ZERO MYTHOLOGY: Strictly NO magic wands, wizards, witches, fairies, or mythological spells.
+   - Cite an authentic Sunnah or Hadith (e.g. honoring elders, kissing mother's hand, table manners, truthfulness, sharing what you love, prayer brings peace).
+5. INNER EMOTIONAL TRANSFORMATION (REALIZATION):
+   - The child reflects deeply: «Men xatoyimni tushundim...», «Alloh taolo kattalarni hurmat qilishni va yaxshilikni yaxshi ko'radi».
+   - Concrete positive action: helping grandmother, kissing mother's hand, sharing food or gifts with needy neighbors, tidying up with «Bismillah».
+6. SAKINAT & SINCERE BEDTIME DUA:
+   - Conclude with genuine spiritual peace (Sakinat), cupping hands for Dua with parents/grandparents, and drifting to sleep under the watchful care of angels.
+7. ZERO MYTHOLOGY: Strictly NO magic wands, wizards, witches, fairies, talking beasts, or mythological spells. Real Islamic reality only.
 
 CRITICAL IMAGE PROMPT CONSISTENCY INSTRUCTION:
 For EVERY page, you MUST generate an "image_prompt" in ENGLISH following this exact formula:
@@ -373,7 +360,6 @@ export async function POST(req: NextRequest) {
     const storyId = `story-${Date.now()}-${profile.child_name.toLowerCase().replace(/\s+/g, '-')}`;
     const childName = profile.child_name;
     const isBoy = profile.gender === 'boy';
-    const animal = profile.favorite_animal || (isBoy ? 'oq kabutar' : 'mitti quyoncha');
     const color = profile.favorite_color || 'zumrad yashil va oltin rang';
     const chosenStyle = profile.illustration_style || 'pixar_3d';
     const geminiApiKey = getGeminiApiKey();
@@ -392,7 +378,7 @@ export async function POST(req: NextRequest) {
     const generatedStory = await generateStoryWithAi(profile, characterPersona, geminiApiKey.trim());
 
     if (generatedStory && generatedStory.pages && generatedStory.pages.length >= 3) {
-      const coverPrompt = `${characterPersona}, together with companion ${translateAnimalToEnglish(animal)} in cozy warm glowing ${translateColorToEnglish(color)} room, gentle ambient sunlight, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
+      const coverPrompt = `${characterPersona} in a cozy warm glowing ${translateColorToEnglish(color)} room, gentle ambient sunlight, loving peaceful Islamic family ambiance, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
       
       // Generate Cover Art: OpenAI gpt-image-1-mini or stream endpoint
       const fallbackAiCoverUrl = createAiImageUrl(coverPrompt, storyId, 0, chosenStyle);
@@ -424,8 +410,8 @@ export async function POST(req: NextRequest) {
         child_profile: profile,
         title_uz: generatedStory.title_uz || `${childName} va Nurli Qissa`,
         title_en: generatedStory.title_en || `${childName} and the Radiant Tale`,
-        prologue_uz: generatedStory.prologue_uz || `Erka farzandimiz — ${childName}ning ${animal} bilan birgalikdagi nurli va ibratli oqshom sarguzashti...`,
-        prologue_en: generatedStory.prologue_en || `A heartwarming bedtime adventure of ${childName} and their beloved ${animal}...`,
+        prologue_uz: generatedStory.prologue_uz || `Erka farzandimiz — ${childName}ning oilaviy mehr-oqibat va ezgu fazilatlarga to'la nurli oqshom sarguzashti...`,
+        prologue_en: generatedStory.prologue_en || `A heartwarming bedtime journey of ${childName} filled with kindness, respect, and Islamic values...`,
         cover_image_url: coverImageUrl,
         theme_color: isBoy ? "#013E37" : "#D97706",
         pages: enhancedPages,
