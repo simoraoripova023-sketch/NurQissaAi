@@ -136,7 +136,23 @@ export default function BookReader({ story }: BookReaderProps) {
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
   const [isBookPrintModalOpen, setIsBookPrintModalOpen] = useState(false);
   const [printPaperSize, setPrintPaperSize] = useState<'A4' | 'A5'>('A4');
-  const [readerMode, setReaderMode] = useState<'single' | 'spread'>('single');
+  const [readerMode, setReaderMode] = useState<'single' | 'spread'>('spread');
+
+  // Automatically adapt reader mode based on screen width
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        if (window.innerWidth < 768) {
+          setReaderMode('single');
+        } else {
+          setReaderMode('spread');
+        }
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleGenerateAiImage = async (pageIdx: number) => {
     const page = story.pages[pageIdx - 1];
@@ -398,10 +414,10 @@ export default function BookReader({ story }: BookReaderProps) {
           </div>
 
           {/* Realistic Children's Picturebook Reader Container (Dual-Mode: 1-Page vs 2-Page Spread) */}
-          <div className={`book-container my-4 mx-auto w-full relative transition-all duration-300 ${readerMode === 'spread' ? 'max-w-5xl' : 'max-w-2xl'}`}>
+          <div className={`book-container my-2 sm:my-4 mx-auto w-full relative transition-all duration-300 ${readerMode === 'spread' ? 'max-w-5xl' : 'max-w-2xl'}`}>
             
             {/* Desktop Floating Navigation Arrows */}
-            <div className="hidden xl:flex items-center justify-between absolute inset-y-0 -left-20 -right-20 pointer-events-none z-30">
+            <div className="hidden xl:flex items-center justify-between absolute top-1/2 -translate-y-1/2 -left-8 lg:-left-12 -right-8 lg:-right-12 pointer-events-none z-30">
               {currentPageIndex > 0 ? (
                 <button
                   onClick={prevPage}
@@ -441,7 +457,7 @@ export default function BookReader({ story }: BookReaderProps) {
                     className={`w-full ${readerMode === 'spread' ? 'grid grid-cols-1 md:grid-cols-12 min-h-[480px] md:min-h-[540px]' : 'flex flex-col'}`}
                   >
                     {/* Cover Visual: Left in spread mode, Top in single mode */}
-                    <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[300px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[250px] xs:h-[300px] sm:h-[400px] md:h-[470px]'}`}>
+                    <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[300px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[220px] xs:h-[260px] sm:h-[320px] md:h-[360px] max-h-[42vh]'}`}>
                       {!loadedImages['cover'] && (
                         <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
                           <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-amber-400" />
@@ -554,7 +570,7 @@ export default function BookReader({ story }: BookReaderProps) {
                       className={`w-full ${readerMode === 'spread' ? 'grid grid-cols-1 md:grid-cols-12 min-h-[480px] md:min-h-[560px]' : 'flex flex-col'}`}
                     >
                       {/* STORY ILLUSTRATION: Left Page in spread mode, Top in single mode */}
-                      <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[300px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[250px] xs:h-[300px] sm:h-[400px] md:h-[460px]'}`}>
+                      <div className={`relative overflow-hidden bg-slate-950 group ${readerMode === 'spread' ? 'md:col-span-6 lg:col-span-7 min-h-[300px] md:min-h-full border-b md:border-b-0 md:border-r border-amber-200/60 dark:border-emerald-800/60' : 'w-full h-[220px] xs:h-[260px] sm:h-[320px] md:h-[360px] max-h-[42vh]'}`}>
                         {!loadedImages[`page_${currentPageIndex}`] && (
                           <div className="absolute inset-0 bg-gradient-to-r from-emerald-950 via-teal-900 to-emerald-950 animate-pulse flex flex-col items-center justify-center text-amber-300 gap-2 z-10">
                             <Loader2 className="w-7 h-7 sm:w-8 sm:h-8 animate-spin text-amber-400" />

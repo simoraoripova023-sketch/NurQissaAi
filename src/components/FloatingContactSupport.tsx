@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   MessageCircle, Send, X, Check, Sparkles, HelpCircle, 
@@ -18,8 +19,14 @@ interface ChatMessage {
 }
 
 export default function FloatingContactSupport() {
+  const pathname = usePathname();
   const { locale } = useAppStore();
   const isUz = locale === 'uz';
+
+  // Do not obstruct immersive storybook reading
+  if (pathname?.startsWith('/story/')) {
+    return null;
+  }
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'nur_assistant' | 'founder' | 'feedback'>('nur_assistant');
