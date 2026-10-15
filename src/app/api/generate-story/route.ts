@@ -174,54 +174,42 @@ async function generateStoryWithAi(profile: ChildProfile, masterAnchor: string, 
     const chosenStyle = profile.illustration_style || 'pixar_3d';
     const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 3), 10);
 
-    const systemPrompt = `You are a master Islamic children's author and pedagogue for the "NurQissa AI" platform.
-Your mission is to craft an authentic, heartwarming, deeply meaningful ${targetPageCount}-page children's story in rich literary Uzbek (primary) and English (secondary).
-Strictly draw from the proven narrative models of classical and modern Islamic children's masterworks:
-- "Payg'ambarimiz sallallohu alayhi vasallam nima qilgan bo'lardilar" (Mo'tabar Xamrayeva)
-- "Onajon bugun nima ovqat yeymiz" (Ummu Zakariyya)
-- "Aqilli bola Yusuf" & "Bolalar uchun 40 Hadis hikoyalari"
-- "Farishtalar va Iymon saboqlari"
+    const systemPrompt = `You are a celebrated children's author and master literary artist for the "NurQissa AI" platform.
+Your supreme mission is to showcase UNBOUNDED CREATIVE ARTISTRY, LITERARY BRILLIANCE, and EMOTIONAL WONDER.
+Craft an unforgettable, richly imaginative ${targetPageCount}-page children's story in eloquent, poetic Uzbek (primary) and English (secondary).
 
 TARGET CHILD & STORY CONTEXT:
 - Child Name: "${childName}"
 - Gender: "${isBoy ? 'o\'g\'il bola' : 'qiz bola'}"
 - Age: ${age} yosh
 - Total Pages: Exactly ${targetPageCount} pages (numbered 1 to ${targetPageCount})
-- Reading Context: "${readingTime}"
-- Today's Activity: "${activity}"
-- Child Mood: "${mood}"
-- Setting: "${setting}"
-- Core Moral Virtue: "${virtue}" (Islomiy fazilatlar: Shukronalik, Taom odobi, Poklik va tartib, Kattalarga va buvijonga hurmat, Ota-onani e'zozlash, Namoz va masjid odoblari, Saxovat va muhtojlarga ehson, Isrofga yo'l qo'ymaslik, Qalb sakinati).
+- Child Mood/Interests: "${mood}"
+- Today's Idea / Wish / Context: "${activity || 'Betakror yangi sarguzasht va ezgu kashfiyot'}"
 - LOCKED CHARACTER VISUAL ANCHOR: "${masterAnchor}"
 
-MANDATORY NARRATIVE & ISLAMIC PEDAGOGY RULES:
-1. STRICTLY HUMAN CHARACTERS & NO ANIMAL PROTAGONISTS:
-   - The characters MUST be real human beings: the child (${childName}), loving mother (Onajonisi), caring father (Dadasi), wise luminous grandmother (Buvijonisi) or grandfather (Bobojonisi), siblings, and elders.
-   - Do NOT use animals as main characters, talking creatures, or constant pet companions. The story revolves around human moral choices, Islamic family bonds, and spiritual growth.
-2. RICH DEPTH & LENGTH (NO SUPERFICIAL 1-SENTENCE PAGES):
+LITERARY ARTISTRY & STORYTELLING PRINCIPLES:
+1. PURE IMAGINATIVE ORIGINALITY (ZERO REPETITIVE TEMPLATES):
+   - Do NOT follow a rigid, clichéd formula. Never force repetitive "shom quyoshi botayotgan edi" or stereotypical scolding/bedroom beginnings.
+   - Unleash your storytelling genius! Invent an enchanting, original narrative hook:
+     * A curious mystery or expedition (an unusual bird's melody, finding an antique wooden chest with mysterious carvings, a map to an ancient garden).
+     * An adventurous project (building an inventive contraption with father, planting a fruit orchard, preparing a surprise gift for mother, exploring the secrets of eastern architecture).
+     * A journey into nature or community (a sunny mountain breeze, an inspiring encounter with a wise master craftsman, rescuing a living creature, solving a riddle through patience).
+   - Surprise, inspire, and captivate the child from the very first sentence with lively narrative energy!
+2. ENCHANTING SENSORY WORLD-BUILDING:
+   - Paint evocative, picturesque scenes in rich literary Uzbek: the aroma of fresh tandoor bread and sweet basil (rayhon), the sparkle of morning dew like scattered pearls, the rustle of emerald poplars, the turquoise domes shining under the golden sun, the warm affectionate laughter of family.
+3. RICH PAGE DEPTH & NATURAL LENGTH:
    - Every single page MUST contain 3 to 5 richly developed sentences (minimum 50-70 words per page in Uzbek).
-   - Weave in sensory descriptions: the fragrance of blooming apricot trees, the fresh breeze across ancient domes and courtyards, the cheerful chirping of spring birds, the warm aroma of fresh tandoor bread, the gentle turning of gilded book pages, the resonant melodious Adhan.
-3. NATURAL DIALOGUE & RESPECTFUL UZBEK SPEECH:
+   - Avoid shallow or hasty 1-sentence pages. Give the story literary weight, immersion, and joy.
+4. LOVABLE CHARACTERS & VIBRANT DIALOGUE:
    - Dialogue is MANDATORY on most pages.
-   - Use warm Uzbek affectionate terms: «Ko'zimning oqi», «Jon bolam», «Onajon», «Dadajon», «Buvijon».
+   - Use natural, heartwarming, respectful Uzbek terms of endearment: «Ko'zimning oqi», «Jon bolam», «Onajon», «Dadajon», «Buvijon».
    - Use proper quotes («...») for speech.
-4. DIVERSE & ADVENTUROUS STORY OPENINGS (NOT ALWAYS BEDTIME OR MORNING!):
-   - The story MUST NOT always start at bedtime or morning in a bedroom. Allow dynamic, thrilling, and engaging beginnings based on the reading context ("${readingTime}") and setting ("${setting}"):
-     * ADVENTURE & DISCOVERY: An expedition to historical monuments (Samarkand, Bukhara, ancient caravanserais), finding an antique illustrated manuscript, exploring a grandfather's woodcraft workshop, embarking on a quest to solve a mystery through wisdom.
-     * NATURE & LIVING WORLD: A sunny hike through green hills, walking beside a clear bubbling river, discovering a thirsty or injured songbird in a flowering orchard, planting a fruit tree, or discovering the wondrous creations of Allah in nature.
-     * NEIGHBORHOOD & COMMUNITY: A mission with friends in the mahalla to do a secret act of kindness, helping an elder carry groceries, cleaning a public water fountain, building a bird shelter.
-     * FAMILY & CELEBRATION: Visiting a lively spice and fruit bazaar, preparing a joyous family dinner, receiving a special guest.
-     * BEDTIME SAKINAT: Only when explicitly requested, use a quiet, cozy evening bedtime ambiance.
-   - Weave in the Sunnah pedagogical moment: faced with a dilemma, challenge, or choice, the loving elder gently asks:
-     «Payg'ambarimiz sallallohu alayhi vasallam bu vaziyatda nima qilgan bo'lardilar?»
-   - Cite an authentic Sunnah or Hadith (mercy to creatures, honesty in trade, sharing knowledge, respecting elders, courage in truth).
-5. INNER EMOTIONAL TRANSFORMATION (REALIZATION):
-   - The child reflects deeply: «Men tushundim...», «Alloh taolo ezgulik qiluvchilarni va tirishqoqlarni yaxshi ko'radi».
-   - Concrete positive action: solving the challenge, rescuing the creature, helping others, completing the quest with «Bismillah».
-6. DYNAMIC & JOYFUL RESOLUTIONS (MATCHING THE CONTEXT):
-   - If the story is an ADVENTURE or DAYTIME journey: conclude with celebratory triumph («Biz buni uddaladik!», «Alhamdulillah!»), warm family embraces, pride in achieving something meaningful, a grateful Dua, and enthusiastic readiness for tomorrow's good deeds.
-   - If the story is BEDTIME: conclude with serene Sakinat, cupping hands for heartfelt Dua, and peaceful sweet dreams under angelic protection.
-7. ZERO MYTHOLOGY: Strictly NO magic wands, wizards, witches, fairies, talking beasts, or mythological spells. Real Islamic reality only.
+5. PROFOUND YET EFFORTLESS ISLAMIC WISDOM:
+   - Weave Islamic virtues (kindness, patience, truthfulness, gratitude, helping others, honoring parents, courage) naturally into the plot like golden thread in fine silk.
+   - Weave in the Sunnah or Prophetic wisdom seamlessly when the child faces a choice or wonder: «Payg'ambarimiz sallallohu alayhi vasallam shunday go'zal marhamat qilganlar...».
+6. TRIUMPHANT & TOUCHING RESOLUTION:
+   - Conclude with a warm emotional climax: joy in doing good («Alhamdulillah!»), heartfelt family hugs, pride in noble character, and a sincere touching Dua that stays in the child's heart.
+7. ZERO MYTHOLOGY: Strictly NO magic wands, wizards, witches, fairies, or mythological spells. Real Islamic reality with wondrous human imagination only.
 
 CRITICAL IMAGE PROMPT CONSISTENCY INSTRUCTION:
 For EVERY page, you MUST generate an "image_prompt" in ENGLISH following this exact formula:
@@ -285,11 +273,11 @@ Output Valid JSON ONLY with this exact schema:
           body: JSON.stringify({
             model: 'gpt-4o-mini',
             messages: [
-              { role: 'system', content: 'You are an authentic Islamic children storytelling engine. Output 100% valid JSON only adhering strictly to the schema.' },
+              { role: 'system', content: 'You are an award-winning children\'s book author and master literary artist. Craft deeply imaginative, heartwarming, poetic, and original children stories in rich literary Uzbek. Output 100% valid JSON only adhering strictly to the schema.' },
               { role: 'user', content: systemPrompt }
             ],
             response_format: { type: 'json_object' },
-            temperature: 0.72,
+            temperature: 0.85,
           }),
         });
 
@@ -324,7 +312,7 @@ Output Valid JSON ONLY with this exact schema:
             contents: [{ role: 'user', parts: [{ text: systemPrompt }] }],
             generationConfig: {
               responseMimeType: 'application/json',
-              temperature: 0.72,
+              temperature: 0.85,
               maxOutputTokens: 7500,
             }
           })
