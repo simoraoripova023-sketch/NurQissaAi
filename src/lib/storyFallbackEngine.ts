@@ -1,12 +1,23 @@
 import { ChildProfile, StoryBook, StoryPage } from './types';
 import { ISLAMIC_STORY_ARCHETYPES, StoryArchetype } from './islamicLiteraryKnowledge';
 
-export function getMatchingArchetype(goal?: string): StoryArchetype {
+export function getMatchingArchetype(goal?: string, context?: string): StoryArchetype {
   const normGoal = (goal || '').toLowerCase().trim();
+  const normContext = (context || '').toLowerCase().trim();
+
+  if (normContext === 'adventure' || normGoal.includes('adventure') || normGoal.includes('sarguzasht') || normGoal.includes('courage')) {
+    const foundAdv = ISLAMIC_STORY_ARCHETYPES.find(a => a.id === 'nature_adventure' || a.id === 'caravan_discovery');
+    if (foundAdv) return foundAdv;
+  }
+  if (normContext === 'nature' || normGoal.includes('nature') || normGoal.includes('tabiat')) {
+    const foundNature = ISLAMIC_STORY_ARCHETYPES.find(a => a.id === 'nature_adventure');
+    if (foundNature) return foundNature;
+  }
+
   const found = ISLAMIC_STORY_ARCHETYPES.find(a => 
     a.matched_goals.some(mg => normGoal.includes(mg) || mg.includes(normGoal))
   );
-  return found || ISLAMIC_STORY_ARCHETYPES[1]; // Default to mercy to animals / kindness
+  return found || ISLAMIC_STORY_ARCHETYPES[1]; // Default to kindness
 }
 
 interface PageTemplate {
@@ -27,7 +38,7 @@ export function generateDynamicIslamicStory(
   const age = profile.age || 6;
   const color = profile.favorite_color || 'zumrad yashil va iliq tilla rang';
   const targetPageCount = Math.min(Math.max(Number(profile.page_count) || 6, 4), 10);
-  const archetype = getMatchingArchetype(profile.parent_goal);
+  const archetype = getMatchingArchetype(profile.parent_goal, profile.reading_time_context);
   const storyId = `story-${Date.now()}-${childName.toLowerCase().replace(/\s+/g, '-')}`;
 
   let templates: PageTemplate[] = [];
@@ -132,6 +143,57 @@ export function generateDynamicIslamicStory(
         en: `That evening, ${childName} made heartfelt prayer thanking Allah for generosity and clean manners, drifting into deep, peaceful sleep under angelic protection.`,
         sceneSummary: `Pokiza xonadagi sokin va barakali uyqu`,
         actionPrompt: `${masterAnchor}, sleeping peacefully under a cozy clean blanket in an immaculately organized bedroom, gentle moonbeams through window, pure tranquility`
+      }
+    ];
+  } else if (archetype.id === 'nature_adventure' || archetype.id === 'caravan_discovery') {
+    templates = [
+      {
+        uz: `Quyosh charaqlab, bahoriy mayin shabada esib turgan ajoyib kun edi. ${childName} dadasi bilan birga yam-yashil daraxtzor va gullagan bog' bo'ylab qiziqarli kashfiyot sayohatiga otlandi. Bog'da qushlar sayrar, gullar ifori anqir edi.`,
+        en: `It was a glorious sunlit day with a gentle spring breeze. ${childName} set out on an exciting nature discovery walk with father through a lush blooming garden and wooded path.`,
+        sceneSummary: `Quyoshli kunda bog' bo'ylab kashfiyot sayohati`,
+        actionPrompt: `${masterAnchor}, happily walking along a flower-lined garden path holding hands with smiling father, sunny golden daylight, blooming apricot trees and green hills`
+      },
+      {
+        uz: `Qadimiy tut daraxti yonidan o'tayotganda, ${childName} maysalar orasida mitti qanotlari pirpirab turgan jajji qushchani payqab qoldi. Qushchaning oyog'i nozik novdaga o'ralib, ucholmay qolgan, mitti ko'zchalari bilan najot kutardi.`,
+        en: `Passing an old mulberry tree, ${childName} noticed a tiny songbird fluttering helplessly in the tall grass, its little wing tangled in a twig, looking up with fragile hopeful eyes.`,
+        sceneSummary: `Maysalar orasidagi mitti yarador qushcha`,
+        actionPrompt: `${masterAnchor}, kneeling gently on the soft grass looking with compassionate wide eyes at a tiny fluffy injured bird, father kneeling beside encouragingly`
+      },
+      {
+        uz: `${childName} darhol to'xtab, unga mehr bilan qaradi: "Dadajon, bu qushchaga qanday yordam bersak bo'ladi?", deb so'radi. Dadasi qizining/o'g'lining mehr to'la nigohiga boqib: "Payg'ambarimiz sallallohu alayhi vasallam: «Yer yuzidagilarga rahm qiling, toki osmondagilar ham sizga rahm qilsin» deganlar. Jonivorlarga mehr ko'rsatish — ulug' ezgulikdir", dedilar.`,
+        en: `${childName} gently asked how to help. Father smiled warmly: "Our Prophet (pbuh) taught that showing mercy to all living beings brings divine mercy upon us. Helping this fragile creature is a noble deed."`,
+        sceneSummary: `Dadasining jonivorlarga shafqat haqidagi sabog'i`,
+        actionPrompt: `${masterAnchor}, holding the tiny bird with utmost tenderness in soft cupped hands, loving father smiling proudly, warm sunny garden ambiance`
+      },
+      {
+        uz: `Ular darhol ustaxonaga oshiqdilar. Dadasi bilan birgalikda toza silliq taxtalardan jajji yog'och in yasadilar. ${childName} qush uyasining ichiga yumshoq quruq o'tlar to'shadi va unga mayda donlar hamda toza suv qo'ydi.`,
+        en: `Together they crafted a lovely wooden bird shelter from smooth planks. ${childName} lined it with soft hay, fresh water, and scattered nourishing seeds with immense care.`,
+        sceneSummary: `Mitti qushcha uchun chiroyli yog'och in yasash`,
+        actionPrompt: `${masterAnchor}, happily painting and assembling a small wooden birdhouse on an outdoor workbench with father, bright natural daylight, sawdust and colorful tools`
+      },
+      {
+        uz: `Ular mitti qushchaning qanotini ohista ozod qilib, jarohatini ehtiyotkorlik bilan davoladilar. Qushcha qornini to'ydirib, toza suvdan ichgach, ko'zlari chaqnab, kutilmaganda quvnoq ohangda chug'urlay boshladi!`,
+        en: `Gently freeing its wing, they tended to the little bird. Nourished with water and seeds, the bird perked up, chirping a cheerful melodious tune as if saying thank you!`,
+        sceneSummary: `Qushchaning shifo topishi va quvonchli chug'urlashi`,
+        actionPrompt: `${masterAnchor}, smiling radiantly as the healed little bird sits comfortably on their finger, sparkling eyes, glowing sunbeams through leaves`
+      },
+      {
+        uz: `Qushcha qanotlarini keng yozib, moviy osmon bag'riga baland parvoz qildi. U ${childName}ning boshi uzra bir necha bor aylanib, minnatdorchilik bildirgandek sayradi. ${childName} quvonchdan sakrab: "Biz uddaladik! U sog'ayib ketdi!", deya dadasining qo'liga chapak urdi.`,
+        en: `Spreading wings, the bird soared into the bright blue sky, circling gratefully overhead before flying into the tree canopy. Overjoyed, ${childName} jumped with happiness, high-fiving father!`,
+        sceneSummary: `Moviy osmonga parvoz va g'alaba quvonchi`,
+        actionPrompt: `${masterAnchor}, with arms raised enthusiastically looking up at the bird soaring into the clear blue sky, laughing joyfully with father, open sunny meadow`
+      },
+      {
+        uz: `Uyga qaytishgach, ${childName} yuzida yorug' tabassum bilan onajonisi va buvijonisiga bugungi qahramonlik sarguzashtini aytib berdi. Buvijonisi quvonchdan nabirasining peshonasidan o'pdi: "Barakalla, mitti qutqaruvchim! Qalbingdagi mehr doimo charaqlab tursin", dedi.`,
+        en: `Returning home with glowing smiles, ${childName} excitedly recounted the heroic adventure to mother and grandmother. Grandmother kissed their forehead with immense love and pride.`,
+        sceneSummary: `Oilaviy faxr va onajonning iliq quchog'i`,
+        actionPrompt: `${masterAnchor}, being warmly hugged by mother and grandmother in a sunny Uzbek courtyard with tea and sweets on a tapchan, radiant happy faces`
+      },
+      {
+        uz: `Dasturxon atrofida jam bo'lgan oila a'zolari birgalikda kaftlarini ochdilar: "Yo Rahmli Allohim! Bizni barcha jonzotlarga mehr-shafqatli, yurtimizga va oilamizga foydali farzandlardan qilgin. Omin!", deya yuzlariga fotiha tortdilar. Bugungi sarguzasht ${childName}ning qalbida o'chmas ezgulik nuri bo'lib qoldi!`,
+        en: `Gathered together, the family raised hands in joyful gratitude: "O Allah, grant us compassionate hearts to bring mercy and kindness everywhere. Ameen!" The adventure became a cherished memory of noble deeds.`,
+        sceneSummary: `Shukrona duosi va ezgu sarguzasht yakuni`,
+        actionPrompt: `${masterAnchor}, sitting with loving family around a tea table with open cupped hands making heartfelt Dua, pure joy and warm golden sunshine filling the courtyard`
       }
     ];
   } else {

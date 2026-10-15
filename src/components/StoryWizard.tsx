@@ -461,41 +461,67 @@ export default function StoryWizard() {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  {/* 1. Reading Time Context (Only 2 Clean, Clear Options) */}
+                  {/* 1. Story Adventure Direction & Reading Context (4 Exciting Choices) */}
                   <div className="space-y-2.5">
                     <label className="text-sm font-bold text-slate-800 dark:text-emerald-100 flex items-center gap-1.5">
                       <Compass className="w-4 h-4 text-emerald-600" />
-                      <span>{locale === 'uz' ? "Ertak qachon tinglanadi?" : "Reading occasion:"}</span>
+                      <span>{locale === 'uz' ? "Qissa yo'nalishi va boshlanish muhiti:" : "Story Journey & Adventure Theme:"}</span>
                     </label>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Option 1: Adventure & Discovery */}
                       <button
                         type="button"
-                        onClick={() => updateChildProfile({ reading_time_context: 'bedtime' })}
-                        className={`p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between ${
-                          childProfile.reading_time_context === 'bedtime'
-                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/60 shadow-md ring-2 ring-indigo-400'
-                            : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950 hover:border-indigo-300'
+                        onClick={() => updateChildProfile({ reading_time_context: 'adventure', story_setting: 'ancient_city' })}
+                        className={`p-3.5 rounded-2xl border-2 text-left transition-all flex items-center justify-between ${
+                          childProfile.reading_time_context === 'adventure'
+                            ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/70 shadow-md ring-2 ring-emerald-400'
+                            : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950 hover:border-emerald-300'
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-3xl">🌙</span>
+                          <span className="text-3xl">🧭</span>
                           <div>
                             <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-butter-100">
-                              {locale === 'uz' ? "Oqshomgi Uyqu Oldi" : "Bedtime Tale"}
+                              {locale === 'uz' ? "Kashfiyot va Sarguzasht" : "Exciting Adventure"}
                             </p>
                             <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                              {locale === 'uz' ? "Sokin va orombaxsh" : "Calm & soothing"}
+                              {locale === 'uz' ? "Sayohat, sirli topilma va jasorat" : "Journeys, quests & mysteries"}
                             </p>
                           </div>
                         </div>
-                        {childProfile.reading_time_context === 'bedtime' && <span className="text-xs text-indigo-600 font-black">✓</span>}
+                        {childProfile.reading_time_context === 'adventure' && <span className="text-xs text-emerald-600 font-black">✓</span>}
                       </button>
 
+                      {/* Option 2: Nature & Animals */}
                       <button
                         type="button"
-                        onClick={() => updateChildProfile({ reading_time_context: 'daytime' })}
-                        className={`p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between ${
+                        onClick={() => updateChildProfile({ reading_time_context: 'nature', story_setting: 'blessed_garden' })}
+                        className={`p-3.5 rounded-2xl border-2 text-left transition-all flex items-center justify-between ${
+                          childProfile.reading_time_context === 'nature'
+                            ? 'border-teal-500 bg-teal-50 dark:bg-teal-950/70 shadow-md ring-2 ring-teal-400'
+                            : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950 hover:border-teal-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">🌿</span>
+                          <div>
+                            <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-butter-100">
+                              {locale === 'uz' ? "Tabiat va Jonivorlar" : "Nature & Living World"}
+                            </p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                              {locale === 'uz' ? "Bog'lar, daryolar va qushlarga mehr" : "Gardens, rivers & caring for creatures"}
+                            </p>
+                          </div>
+                        </div>
+                        {childProfile.reading_time_context === 'nature' && <span className="text-xs text-teal-600 font-black">✓</span>}
+                      </button>
+
+                      {/* Option 3: Daytime & Community */}
+                      <button
+                        type="button"
+                        onClick={() => updateChildProfile({ reading_time_context: 'daytime', story_setting: 'cozy_home' })}
+                        className={`p-3.5 rounded-2xl border-2 text-left transition-all flex items-center justify-between ${
                           childProfile.reading_time_context === 'daytime'
                             ? 'border-amber-500 bg-amber-50 dark:bg-pine-900 shadow-md ring-2 ring-amber-400'
                             : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950 hover:border-amber-300'
@@ -505,14 +531,38 @@ export default function StoryWizard() {
                           <span className="text-3xl">☀️</span>
                           <div>
                             <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-butter-100">
-                              {locale === 'uz' ? "Kunduzgi Sarguzasht" : "Daytime Adventure"}
+                              {locale === 'uz' ? "Kunduzgi Qahramonlik" : "Daytime Heroics & Home"}
                             </p>
                             <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                              {locale === 'uz' ? "Quvnoq va harakatli" : "Active & joyful"}
+                              {locale === 'uz' ? "Do'stlik, mahalla va ezgu amallar" : "Friends, good deeds & family"}
                             </p>
                           </div>
                         </div>
                         {childProfile.reading_time_context === 'daytime' && <span className="text-xs text-amber-600 font-black">✓</span>}
+                      </button>
+
+                      {/* Option 4: Bedtime Sakinat */}
+                      <button
+                        type="button"
+                        onClick={() => updateChildProfile({ reading_time_context: 'bedtime', story_setting: 'starry_reflection' })}
+                        className={`p-3.5 rounded-2xl border-2 text-left transition-all flex items-center justify-between ${
+                          childProfile.reading_time_context === 'bedtime'
+                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/60 shadow-md ring-2 ring-indigo-400'
+                            : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950 hover:border-indigo-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl">🌙</span>
+                          <div>
+                            <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-butter-100">
+                              {locale === 'uz' ? "Oqshomgi Uyqu Oldi" : "Bedtime & Sakinat"}
+                            </p>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                              {locale === 'uz' ? "Sokin, orombaxsh va shirin tushlar" : "Calm, soothing & sweet dreams"}
+                            </p>
+                          </div>
+                        </div>
+                        {childProfile.reading_time_context === 'bedtime' && <span className="text-xs text-indigo-600 font-black">✓</span>}
                       </button>
                     </div>
                   </div>

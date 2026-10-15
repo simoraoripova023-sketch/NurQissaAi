@@ -90,5 +90,31 @@ export const ISLAMIC_STORY_ARCHETYPES: StoryArchetype[] = [
     action_resolution: 'Darhol borib onasining quchog\'iga otiladi, uning qo\'llaridan o\'pib uzr so\'raydi, uydagi yumushlarda ota-onasiga ko\'maklashadi.',
     dua_uz: 'Yo Allohim! Ota-onam meni go\'dakligimda qanday mehribonlik bilan tarbiya qilgan bo\'lsalar, Sen ham ularga shunday rahm ayla. Omin!',
     dua_arabic: 'رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا'
+  },
+  {
+    id: 'nature_adventure',
+    theme: 'Tabiat Mo\'jizalari, Qushlar va Jonivorlarga Shafqat, Yashil Bog\' Sarguzashti',
+    matched_goals: ['adventure', 'nature', 'courage', 'kindness', 'tabiat', 'sarguzasht', 'qushlar', 'shafqat'],
+    core_conflict: 'Bahoriy sayr vaqtida bolajon daraxt tagida qanoti shikastlangan yoki chanqagan mitti qushchani uchratadi va unga befarq o\'tib ketish yoki yordam berish tanlovi oldida qoladi.',
+    prophetic_guidance: 'Payg\'ambarimiz sallallohu alayhi vasallam: «Yer yuzidagilarga rahm qiling, toki osmondagilar ham sizga rahm qilsin» deb ta\'lim berganlar. Jonivorlar va o\'simliklarga g\'amxo\'rlik qilish katta savobli yaxshilikdir.',
+    hadith_sharif_uz: '«Har bir tirik jonga qilingan yaxshilikda ajr-mukofot bordir.» (Imom Buxoriy rivoyati)',
+    hadith_sharif_en: '«There is a reward for serving any living being.» (Bukhari)',
+    inner_realization: 'Hatto eng mitti jonzot ham Allohning mo\'jizaviy yaratig\'i ekanligini, mehr va g\'amxo\'rlik qalbga quvonch olib kelishini anglaydi.',
+    action_resolution: 'Dadasining yordamida yog\'ochdan chiroyli qush uyasi yasab, unga toza suv va don sepadi, qushchaning sog\'ayib uchib ketganini ko\'rib cheksiz quvonadi.',
+    dua_uz: 'Yo Rahmli Robbim! Qalbimizni butun borliqqa mehr-shafqatli ayla. Yaxshilik qilishda bizga quvvat ber! Omin!',
+    dua_arabic: 'الرَّاحِمُونَ يَرْحَمُهُمُ الرَّحْمَنُ ارْحَمُوا مَنْ فِي الْأَرْضِ يَرْحَمْكُمْ مَنْ فِي السَّمَاءِ'
+  },
+  {
+    id: 'caravan_discovery',
+    theme: 'Qadimiy Shaharlar, Buyuk Allomalar Me\'rosi va Ilm Izlash Sarguzashti',
+    matched_goals: ['discovery', 'wisdom', 'travel', 'honesty', 'ilm', 'kashfiyot', 'sayohat', 'allomalar'],
+    core_conflict: 'Sayohat yoki qadimiy kitob mutolaasi chog\'ida qiyin vaziyatga tushib, maqsadga erishishda sabrsizlik qilish yoki sinovdan chekinish istagi tug\'iladi.',
+    prophetic_guidance: 'Ilm va ezgulik yo\'lidagi har bir qadam — ibodatdir. Payg\'ambarimiz sallallohu alayhi vasallam: «Beshikdan to qabrgacha ilm izlanglar» deb nasihat qilganlar. Ota-bobolarimiz sabot va sabr bilan buyuk kashfiyotlar qilganlar.',
+    hadith_sharif_uz: '«Kim ilm izlash yo\'liga qadam qo\'ysa, Alloh unga jannat yo\'lini oson qilib qo\'yadi.» (Imom Muslim rivoyati)',
+    hadith_sharif_en: '«Whoever takes a path upon which he procures knowledge, Allah will thereby make easy for him a path to Paradise.» (Muslim)',
+    inner_realization: 'Qiyinchiliklar insonni kuchli va aqlli qilishini, ilm va halol mehnat orqali har qanday to\'siqni yengish mumkinligini anglaydi.',
+    action_resolution: 'Oila a\'zolari bilan maslahatlashib, qat\'iyat bilan sirli vazifani yechadi, yangi foydali bilimlarni o\'zlashtirib, quvonch bilan Alhamdulillah deydi.',
+    dua_uz: 'Ey Ilm beruvchi Robbim! Zehnumizni o\'tkir, ilmimni ziyoda va aqlimni komil qilgin. Omin!',
+    dua_arabic: 'رَّبِّ زِدْنِي عِلْمًا'
   }
 ];

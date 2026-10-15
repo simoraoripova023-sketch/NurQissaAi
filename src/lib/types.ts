@@ -28,10 +28,12 @@ export type IllustrationStyle =
   | 'ghibli_anime';     // Ghibli Osoyishta Uslubi (Dreamy Anime Art)
 
 export type ReadingTimeContext = 
-  | 'daytime'  // Kunduzgi sarguzasht & Ilhom
-  | 'bedtime'  // Oqshomgi orom & Shirin uyqu
-  | 'travel'   // Sayohat & Yo'ldagi sarguzasht
-  | 'family';  // Oila davrasidagi shirin suhbat
+  | 'adventure' // Qiziqarli sarguzasht & Kashfiyot
+  | 'nature'    // Tabiat, bog' va jonivorlar olami
+  | 'daytime'   // Kunduzgi qahramonlik & Oila
+  | 'bedtime'   // Oqshomgi orom & Shirin uyqu
+  | 'travel'    // Sayohat & Yo'ldagi sarguzasht
+  | 'family';   // Oila davrasidagi shirin suhbat
 
 export interface ChildProfile {
   child_name: string;

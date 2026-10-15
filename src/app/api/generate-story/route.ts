@@ -200,27 +200,33 @@ MANDATORY NARRATIVE & ISLAMIC PEDAGOGY RULES:
    - Do NOT use animals as main characters, talking creatures, or constant pet companions. The story revolves around human moral choices, Islamic family bonds, and spiritual growth.
 2. RICH DEPTH & LENGTH (NO SUPERFICIAL 1-SENTENCE PAGES):
    - Every single page MUST contain 3 to 5 richly developed sentences (minimum 50-70 words per page in Uzbek).
-   - Weave in sensory Islamic descriptions: the melodious call of the evening Adhan, the soft aroma of fresh bread and tea, the gentle turning of Quran pages, the warm amber glow of lantern light over prayer rugs, the whisper of heartfelt Duas.
+   - Weave in sensory descriptions: the fragrance of blooming apricot trees, the fresh breeze across ancient domes and courtyards, the cheerful chirping of spring birds, the warm aroma of fresh tandoor bread, the gentle turning of gilded book pages, the resonant melodious Adhan.
 3. NATURAL DIALOGUE & RESPECTFUL UZBEK SPEECH:
    - Dialogue is MANDATORY on most pages.
    - Use warm Uzbek affectionate terms: «Ko'zimning oqi», «Jon bolam», «Onajon», «Dadajon», «Buvijon».
    - Use proper quotes («...») for speech.
-4. THE PROPHETIC SUNNAH PEDAGOGICAL FORMULA:
-   - Start with a realistic childhood friction: reluctance to share, impatience, hesitation to help grandmother, complaining about food, or getting distracted during prayer time.
-   - The loving parent or elder gently guides with the central question:
+4. DIVERSE & ADVENTUROUS STORY OPENINGS (NOT ALWAYS BEDTIME OR MORNING!):
+   - The story MUST NOT always start at bedtime or morning in a bedroom. Allow dynamic, thrilling, and engaging beginnings based on the reading context ("${readingTime}") and setting ("${setting}"):
+     * ADVENTURE & DISCOVERY: An expedition to historical monuments (Samarkand, Bukhara, ancient caravanserais), finding an antique illustrated manuscript, exploring a grandfather's woodcraft workshop, embarking on a quest to solve a mystery through wisdom.
+     * NATURE & LIVING WORLD: A sunny hike through green hills, walking beside a clear bubbling river, discovering a thirsty or injured songbird in a flowering orchard, planting a fruit tree, or discovering the wondrous creations of Allah in nature.
+     * NEIGHBORHOOD & COMMUNITY: A mission with friends in the mahalla to do a secret act of kindness, helping an elder carry groceries, cleaning a public water fountain, building a bird shelter.
+     * FAMILY & CELEBRATION: Visiting a lively spice and fruit bazaar, preparing a joyous family dinner, receiving a special guest.
+     * BEDTIME SAKINAT: Only when explicitly requested, use a quiet, cozy evening bedtime ambiance.
+   - Weave in the Sunnah pedagogical moment: faced with a dilemma, challenge, or choice, the loving elder gently asks:
      «Payg'ambarimiz sallallohu alayhi vasallam bu vaziyatda nima qilgan bo'lardilar?»
-   - Cite an authentic Sunnah or Hadith (e.g. honoring elders, kissing mother's hand, table manners, truthfulness, sharing what you love, prayer brings peace).
+   - Cite an authentic Sunnah or Hadith (mercy to creatures, honesty in trade, sharing knowledge, respecting elders, courage in truth).
 5. INNER EMOTIONAL TRANSFORMATION (REALIZATION):
-   - The child reflects deeply: «Men xatoyimni tushundim...», «Alloh taolo kattalarni hurmat qilishni va yaxshilikni yaxshi ko'radi».
-   - Concrete positive action: helping grandmother, kissing mother's hand, sharing food or gifts with needy neighbors, tidying up with «Bismillah».
-6. SAKINAT & SINCERE BEDTIME DUA:
-   - Conclude with genuine spiritual peace (Sakinat), cupping hands for Dua with parents/grandparents, and drifting to sleep under the watchful care of angels.
+   - The child reflects deeply: «Men tushundim...», «Alloh taolo ezgulik qiluvchilarni va tirishqoqlarni yaxshi ko'radi».
+   - Concrete positive action: solving the challenge, rescuing the creature, helping others, completing the quest with «Bismillah».
+6. DYNAMIC & JOYFUL RESOLUTIONS (MATCHING THE CONTEXT):
+   - If the story is an ADVENTURE or DAYTIME journey: conclude with celebratory triumph («Biz buni uddaladik!», «Alhamdulillah!»), warm family embraces, pride in achieving something meaningful, a grateful Dua, and enthusiastic readiness for tomorrow's good deeds.
+   - If the story is BEDTIME: conclude with serene Sakinat, cupping hands for heartfelt Dua, and peaceful sweet dreams under angelic protection.
 7. ZERO MYTHOLOGY: Strictly NO magic wands, wizards, witches, fairies, talking beasts, or mythological spells. Real Islamic reality only.
 
 CRITICAL IMAGE PROMPT CONSISTENCY INSTRUCTION:
 For EVERY page, you MUST generate an "image_prompt" in ENGLISH following this exact formula:
-Formula: [LOCKED CHARACTER ANCHOR] + [PRECISE SCENE ACTION & EXPRESSION] + [ENVIRONMENT & OBJECTS] + [LIGHTING & 3D PIXAR RENDER STYLE]
-Example: "${masterAnchor} is sitting at a low wooden dining table holding hands with smiling mother wearing pastel hijab, looking remorseful yet enlightened over a steaming bowl of soup, warm golden sunset light, traditional Uzbek home interior, 3D Pixar animation storybook masterpiece, 8k render"
+Formula: [LOCKED CHARACTER ANCHOR] + [PRECISE SCENE ACTION & EXPRESSION] + [ENVIRONMENT & OBJECTS] + [LIGHTING & STORYBOOK ART STYLE]
+Example: "${masterAnchor} is standing happily in a sunlit blooming orchard holding a crafted wooden birdhouse with smiling father, sunny golden daylight, delightful 3D Disney Pixar style children's picturebook illustration, crisp clean details, vibrant cheerful colors, masterpiece"
 
 Output Valid JSON ONLY with this exact schema:
 {
