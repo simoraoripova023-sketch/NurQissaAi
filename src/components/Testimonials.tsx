@@ -38,16 +38,16 @@ export default function Testimonials() {
   ];
 
   return (
-    <section className="py-20 bg-[#FFFDF5] dark:bg-[#1B200B] relative overflow-hidden transition-colors duration-300">
+    <section className="py-20 bg-[#FFFDF5] dark:bg-[#002621] relative overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-butter-200 text-pine-900 border border-pine-800 text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-950 dark:text-emerald-200 border border-emerald-700/60 text-xs font-bold uppercase tracking-wider">
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
             <span>{locale === 'uz' ? "Ota-onalar fikri" : "Parent Reviews"}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-pine-900 dark:text-butter-200 font-display">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-pine-900 dark:text-emerald-100 font-display">
             {locale === 'uz' ? "Mehr bilan aytilgan samimiy so'zlar" : "Loved by 10,000+ Happy Families"}
           </h2>
         </div>
@@ -57,7 +57,7 @@ export default function Testimonials() {
           {reviews.map((rev, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-[#283013] p-8 rounded-3xl border border-amber-200/70 dark:border-pine-700/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+              className="bg-white dark:bg-[#012A25] p-8 rounded-3xl border border-emerald-200/70 dark:border-emerald-700/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
             >
               <div className="space-y-4">
                 {/* Rating stars */}

@@ -41,18 +41,18 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section className="py-20 bg-white dark:bg-[#1B200B] relative overflow-hidden border-y border-amber-100 dark:border-pine-800 transition-colors duration-300">
+    <section className="py-20 bg-white dark:bg-[#002621] relative overflow-hidden border-y border-emerald-100 dark:border-emerald-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Heading */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-butter-200 text-pine-900 border border-pine-800 text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-950 dark:text-emerald-200 border border-emerald-700/60 text-xs font-bold uppercase tracking-wider">
             {locale === 'uz' ? "Oson va Qulay Jarayon" : "Simple 3-Step Process"}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-pine-900 dark:text-butter-200 font-display">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-pine-900 dark:text-emerald-100 font-display">
             {t.howItWorks}
           </h2>
-          <p className="text-base sm:text-lg text-pine-700/80 dark:text-butter-100/80 font-medium">
+          <p className="text-base sm:text-lg text-pine-700/80 dark:text-emerald-200/80 font-medium">
             {t.howItWorksSub}
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function HowItWorks() {
             return (
               <div
                 key={index}
-                className="relative bg-[#FFFDF5] dark:bg-[#283013] p-8 rounded-3xl border border-amber-200/70 dark:border-pine-700/60 shadow-md hover:shadow-xl transition-all duration-300 group hover:-translate-y-1.5"
+                className="relative bg-[#FFFDF5] dark:bg-[#012A25] p-8 rounded-3xl border border-emerald-200/70 dark:border-emerald-700/60 shadow-md hover:shadow-xl transition-all duration-300 group hover:-translate-y-1.5"
               >
                 {/* Step badge */}
                 <div className="flex items-center justify-between mb-6">

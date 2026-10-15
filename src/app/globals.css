@@ -10,14 +10,14 @@
    ========================================================================== */
 
 :root {
-  --background: #FAF7EE; /* Warm fairy parchment / sunlight cream */
-  --foreground: #3E451B; /* User Palette: Deep warm forest olive (#3E451B) */
-  --butter: #FFEB7C;     /* User Palette: Glowing fairy butter (#FFEB7C) */
-  --pine: #3E451B;       /* User Palette: Warm forest olive (#3E451B) */
-  --moss: #61642F;       /* User Palette: Warm moss olive (#61642F) */
-  --khaki: #8F7F47;      /* User Palette: Warm golden olive (#8F7F47) */
-  --amber: #D0A44A;      /* User Palette: Luminous honey amber (#D0A44A) */
-  --bark: #392908;       /* User Palette: Darkest warm forest bark (#392908) */
+  --background: #F4FBF7; /* Fresh Islamic cream / light mint tint */
+  --foreground: #013E37; /* Pure Islamic deep emerald pine (#013E37) */
+  --butter: #FFEFB3;     /* Warm fairy butter (#FFEFB3) */
+  --pine: #013E37;       /* Pure Islamic deep emerald (#013E37) */
+  --moss: #045E54;       /* Rich emerald moss (#045E54) */
+  --khaki: #0A7A6E;      /* Fresh teal emerald (#0A7A6E) */
+  --amber: #D0A44A;      /* Warm honey gold (#D0A44A) */
+  --bark: #002621;       /* Deepest emerald night (#002621) */
   --font-outfit: 'Outfit', sans-serif;
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;
   --font-caveat: 'Caveat', cursive;
@@ -30,14 +30,14 @@
 }
 
 .dark {
-  --background: #1B200B; /* Enchanted warm forest night base (#1B200B) */
-  --foreground: #FFEB7C; /* Glowing warm fairy text (#FFEB7C) */
-  --butter: #FFEB7C;
-  --pine: #3E451B;
-  --moss: #61642F;
-  --khaki: #8F7F47;
+  --background: #002621; /* Enchanted Islamic emerald night (#002621) */
+  --foreground: #D1FAE5; /* Glowing soft mint text (#D1FAE5) */
+  --butter: #FFEFB3;
+  --pine: #013E37;
+  --moss: #045E54;
+  --khaki: #0A7A6E;
   --amber: #D0A44A;
-  --bark: #392908;
+  --bark: #001714;
 }
 
 /* Global Reset & Touch Optimization */
@@ -133,53 +133,53 @@ img, video, canvas, svg {
   padding-top: max(1rem, env(safe-area-inset-top, 0px));
 }
 
-/* Custom Islamic Geometric Pattern Background Overlay with Warm Butter & Warm Forest Olive */
+/* Custom Islamic Geometric Pattern Background Overlay with Fresh Mint & Emerald */
 .islamic-pattern {
-  background-color: #FAF7EE;
-  background-image: radial-gradient(#3E451B 0.85px, transparent 0.85px), radial-gradient(#FFEB7C 0.85px, #FAF7EE 0.85px);
+  background-color: #F4FBF7;
+  background-image: radial-gradient(#013E37 0.75px, transparent 0.75px), radial-gradient(#6EE7B7 0.75px, #F4FBF7 0.75px);
   background-size: 30px 30px;
   background-position: 0 0, 15px 15px;
   opacity: 0.95;
 }
 
 .dark .islamic-pattern {
-  background-color: #1B200B;
-  background-image: radial-gradient(#FFEB7C 0.75px, transparent 0.75px), radial-gradient(#61642F 0.75px, #1B200B 0.75px);
+  background-color: #002621;
+  background-image: radial-gradient(#34D399 0.75px, transparent 0.75px), radial-gradient(#045E54 0.75px, #002621 0.75px);
   opacity: 0.95;
 }
 
-/* Luxury Butter-Pine Capsule Pills */
+/* Luxury Capsule Pills */
 .pill-butter {
-  background-color: #FFEB7C;
-  color: #3E451B;
-  border: 1.5px solid #3E451B;
+  background-color: #D1FAE5;
+  color: #013E37;
+  border: 1.5px solid #013E37;
   font-weight: 700;
 }
 
 .pill-pine {
-  background-color: #3E451B;
-  color: #FFEB7C;
-  border: 1.5px solid #D0A44A;
+  background-color: #013E37;
+  color: #D1FAE5;
+  border: 1.5px solid #34D399;
   font-weight: 700;
 }
 
 .night-sky-pattern {
-  background: radial-gradient(ellipse at bottom, #3E451B 0%, #1B200B 100%);
+  background: radial-gradient(ellipse at bottom, #013E37 0%, #001714 100%);
 }
 
 /* Glassmorphism */
 .glass-card {
-  background: rgba(255, 253, 245, 0.88);
+  background: rgba(244, 251, 247, 0.9);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 235, 124, 0.6);
+  border: 1px solid rgba(110, 231, 183, 0.4);
 }
 
 .glass-dark {
-  background: rgba(27, 32, 11, 0.85);
+  background: rgba(0, 38, 33, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(208, 164, 74, 0.25);
+  border: 1px solid rgba(52, 211, 153, 0.25);
 }
 
 /* Realistic 3D Book Spine & Shadows */
@@ -189,7 +189,7 @@ img, video, canvas, svg {
 
 .book-spread {
   transform-style: preserve-3d;
-  box-shadow: 0 30px 60px -15px rgba(57, 41, 8, 0.35), 0 0 0 1px rgba(208, 164, 74, 0.2);
+  box-shadow: 0 30px 60px -15px rgba(0, 38, 33, 0.4), 0 0 0 1px rgba(16, 185, 129, 0.2);
 }
 
 .book-spine-gradient {
@@ -203,24 +203,24 @@ img, video, canvas, svg {
 }
 
 ::-webkit-scrollbar-track {
-  background: #FDFBF7;
+  background: #F4FBF7;
 }
 
 .dark ::-webkit-scrollbar-track {
-  background: #1B200B;
+  background: #002621;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #FFEB7C;
+  background: #A7F3D0;
   border-radius: 9999px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #61642F;
+  background: #047857;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D0A44A;
+  background: #10B981;
 }
 
 /* Glow effects */

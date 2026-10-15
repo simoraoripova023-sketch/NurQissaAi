@@ -64,19 +64,19 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-20 bg-white dark:bg-[#1B200B] relative overflow-hidden border-t border-amber-100 dark:border-pine-800 transition-colors duration-300">
+    <section id="pricing" className="py-20 bg-white dark:bg-[#002621] relative overflow-hidden border-t border-emerald-100 dark:border-emerald-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-butter-200 text-pine-900 border border-pine-800 text-xs font-bold uppercase tracking-wider">
-            <Crown className="w-3.5 h-3.5 text-pine-800" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-950 dark:text-emerald-200 border border-emerald-700/60 text-xs font-bold uppercase tracking-wider">
+            <Crown className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300" />
             <span>{t.pricing}</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-pine-900 dark:text-butter-200 font-display">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-pine-900 dark:text-emerald-100 font-display">
             {t.pricingTitle}
           </h2>
-          <p className="text-base sm:text-lg text-pine-700/80 dark:text-butter-100/80 font-medium">
+          <p className="text-base sm:text-lg text-pine-700/80 dark:text-emerald-200/80 font-medium">
             {t.pricingSub}
           </p>
         </div>
@@ -88,8 +88,8 @@ export default function PricingSection() {
               key={index}
               className={`relative rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 ${
                 plan.popular
-                  ? 'bg-gradient-to-b from-[#2B3113] to-[#1B200B] text-white shadow-2xl scale-105 border-2 border-amber-400 z-10'
-                  : 'bg-[#FFFDF5] dark:bg-[#283013] text-slate-900 dark:text-slate-100 border border-amber-200/80 dark:border-pine-700/60 shadow-md hover:shadow-xl'
+                  ? 'bg-gradient-to-b from-[#012E29] to-[#001D19] text-white shadow-2xl scale-105 border-2 border-emerald-400 z-10'
+                  : 'bg-[#FFFDF5] dark:bg-[#012A25] text-slate-900 dark:text-slate-100 border border-emerald-200/80 dark:border-emerald-700/60 shadow-md hover:shadow-xl'
               }`}
             >
               {plan.popular && (

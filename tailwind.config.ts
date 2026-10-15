@@ -50,29 +50,29 @@ const config: Config = {
           950: '#1e1b4b',
         },
         butter: {
-          50: '#fffdf2',
-          100: '#fff8d4',
-          200: '#ffeb7c', // User Palette: Soft glowing fairy butter (#FFEB7C)
-          300: '#f8de66',
-          400: '#e5c052',
-          500: '#d0a44a', // User Palette: Luminous warm amber / honey (#D0A44A)
-          600: '#b28532',
-          700: '#8d641d',
-          800: '#5f4110',
-          900: '#392908', // User Palette: Darkest warm forest bark (#392908)
+          50: '#fffdf5',
+          100: '#fff7d6',
+          200: '#ffefb3', // Soft warm cream butter
+          300: '#f5dc8a',
+          400: '#e8c460',
+          500: '#d9ac36',
+          600: '#b88924',
+          700: '#94661c',
+          800: '#7a521c',
+          900: '#67441c',
         },
         pine: {
-          50: '#f6f7ed',
-          100: '#ebeee0',
-          200: '#d6dcc0',
-          300: '#b5c18f',
-          400: '#8f7f47', // User Palette: Warm golden olive (#8F7F47)
-          500: '#747b35',
-          600: '#61642f', // User Palette: Warm moss olive (#61642F)
-          700: '#4d5322',
-          800: '#3e451b', // User Palette: Deep warm forest olive (#3E451B)
-          900: '#2a3013', // Warm dark olive forest
-          950: '#1b200b', // Deep enchanted warm night forest (#1B200B)
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#10b981',
+          600: '#059669',
+          700: '#047857',
+          800: '#013e37', // Primary Deep Islamic Green
+          900: '#002621', // Dark Night Forest
+          950: '#001714',
         },
         parchment: {
           50: '#fffdf9',
@@ -89,11 +89,11 @@ const config: Config = {
         storybook: ['var(--font-caveat)', 'cursive', 'sans-serif'],
       },
       boxShadow: {
-        'book': '0 20px 40px -15px rgba(57, 41, 8, 0.35), 0 0 0 1px rgba(208, 164, 74, 0.15)',
-        'book-lg': '0 25px 50px -12px rgba(27, 32, 11, 0.45), 0 0 0 1px rgba(255, 235, 124, 0.15)',
-        'glow-amber': '0 0 35px -5px rgba(208, 164, 74, 0.45)',
-        'glow-emerald': '0 0 35px -5px rgba(97, 100, 47, 0.45)',
-        'glow-fairy': '0 0 30px -3px rgba(255, 235, 124, 0.55)',
+        'book': '0 20px 40px -15px rgba(0, 38, 33, 0.35), 0 0 0 1px rgba(16, 185, 129, 0.15)',
+        'book-lg': '0 25px 50px -12px rgba(0, 23, 20, 0.45), 0 0 0 1px rgba(52, 211, 153, 0.2)',
+        'glow-amber': '0 0 35px -5px rgba(245, 158, 11, 0.35)',
+        'glow-emerald': '0 0 35px -5px rgba(16, 185, 129, 0.45)',
+        'glow-fairy': '0 0 30px -3px rgba(110, 231, 183, 0.45)',
       },
       animation: {
         'float-slow': 'float 6s ease-in-out infinite',

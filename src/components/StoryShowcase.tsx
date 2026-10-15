@@ -12,20 +12,20 @@ export default function StoryShowcase() {
   const t = translations[locale];
 
   return (
-    <section className="py-20 bg-[#FFFDF5] dark:bg-[#1B200B] relative overflow-hidden transition-colors duration-300">
+    <section className="py-20 bg-[#FFFDF5] dark:bg-[#002621] relative overflow-hidden transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-butter-200 text-pine-900 border border-pine-800 text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5 text-pine-800" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-950 dark:text-emerald-200 border border-emerald-700/60 text-xs font-bold uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300" />
               <span>{locale === 'uz' ? "Namunaviy Ertaklar" : "Featured Stories"}</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-pine-900 dark:text-butter-200 font-display">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-pine-900 dark:text-emerald-100 font-display">
               {t.featuredStories}
             </h2>
-            <p className="text-base text-pine-700/80 dark:text-butter-100/80 max-w-xl font-medium">
+            <p className="text-base text-pine-700/80 dark:text-emerald-200/80 max-w-xl font-medium">
               {locale === 'uz'
                 ? "Har bir ertak bolajonlarga ezgu qadriyatlarni singdirish bilan birga, ularning tasavvur olamini kengaytiradi."
                 : "Every story nurtures noble moral virtues while expanding your child's imagination."}
@@ -34,7 +34,7 @@ export default function StoryShowcase() {
 
           <Link
             href="/create"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-pine-800 hover:bg-pine-700 text-butter-200 border-2 border-butter-200 font-extrabold text-sm shadow-md hover:shadow-lg transition-all self-start md:self-auto"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-700 hover:bg-emerald-600 text-white border-2 border-emerald-400 font-extrabold text-sm shadow-md hover:shadow-lg transition-all self-start md:self-auto"
           >
             <span>{t.ctaCreate}</span>
             <ArrowRight className="w-4 h-4" />
@@ -51,7 +51,7 @@ export default function StoryShowcase() {
             return (
               <div
                 key={story.id}
-                className="bg-white dark:bg-[#283013] rounded-3xl overflow-hidden border border-amber-200/80 dark:border-pine-700/60 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col group"
+                className="bg-white dark:bg-[#012A25] rounded-3xl overflow-hidden border border-emerald-200/80 dark:border-emerald-700/60 shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col group"
               >
                 {/* Cover Banner */}
                 <div className="relative h-64 sm:h-72 overflow-hidden bg-slate-900">
