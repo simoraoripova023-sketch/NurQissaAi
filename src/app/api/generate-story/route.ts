@@ -381,16 +381,10 @@ export async function POST(req: NextRequest) {
       
       const authenticCoverUrl = isBoy ? '/stories/yusuf/cover.jpeg' : '/stories/asmo_cover_custom.jpeg';
 
-      // Generate Cover Art: OpenAI DALL-E 3 HD or pristine authentic cover
-      const coverImageUrl = await generateDallEImage(
-        `${coverPrompt}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`,
-        authenticCoverUrl
-      );
+      // Generate Cover Art using dynamic multi-tier AI image generator
+      const coverImageUrl = createAiImageUrl(coverPrompt, storyId, 0, chosenStyle, profile.gender);
 
-      // Check if OpenAI has active credits; if not, immediately provide authentic high-definition page illustrations
-      const isOpenAiActive = !!getOpenAiApiKey() && Date.now() >= openAiQuotaExhaustedUntil;
-
-      // Generate pristine illustrations for every single page
+      // Generate pristine AI illustrations for every single page
       const enhancedPages = generatedStory.pages.map((p, idx) => {
         const pageNum = idx + 1;
         const actionText = p.scene_summary || p.text_uz?.slice(0, 150) || 'heartwarming bedtime moment';
@@ -399,13 +393,7 @@ export async function POST(req: NextRequest) {
           ? p.image_prompt
           : `${characterPersona} in ${actionText}, ${translateColorToEnglish(color)} setting, soft warm golden lighting, adorable cheerful expression`;
 
-        const authenticPageUrl = isBoy
-          ? `/stories/yusuf/page_${((pageNum - 1) % 8) + 1}.jpeg`
-          : `/stories/fotima/page_${((pageNum - 1) % 8) + 1}.jpeg`;
-
-        const pageImageUrl = isOpenAiActive
-          ? createAiImageUrl(pagePrompt, storyId, pageNum, chosenStyle, profile.gender)
-          : authenticPageUrl;
+        const pageImageUrl = createAiImageUrl(pagePrompt, storyId, pageNum, chosenStyle, profile.gender);
 
         return {
           page_number: pageNum,

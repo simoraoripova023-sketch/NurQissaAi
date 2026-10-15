@@ -18,3 +18,11 @@ export function getGeminiApiKey(): string {
   }
   return '';
 }
+
+export function getNanoBananaApiKey(): string {
+  const envKey = (process.env.NANO_BANANA_API_KEY || process.env.GEMINI_API_KEY)?.trim();
+  if (envKey && envKey.length > 10) {
+    return envKey;
+  }
+  return '';
+}

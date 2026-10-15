@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -64,6 +65,7 @@ export default function RootLayout({
     <html lang="uz" className="scroll-smooth">
       <head>
         <meta name="google-site-verification" content="2DCVJSLKJUChp0trw_SSZbtgT773khiackvzFK8zo9Q" />
+        <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
       </head>
       <body className="min-h-screen flex flex-col bg-[#FDFBF7] dark:bg-[#0B0E1B] text-[#1E1B4B] dark:text-slate-100 antialiased selection:bg-amber-200 transition-colors duration-300">
         <ThemeProvider>

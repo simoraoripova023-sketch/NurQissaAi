@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { 
   Sparkles, Home, PlusCircle, Target, Library, Trophy, Palette,
-  X, ChevronRight, CreditCard, Gift
+  X, ChevronRight, CreditCard, Gift, Award, Gamepad2
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
@@ -53,10 +53,17 @@ export default function MagicUmbrellaMenu({ onMenuToggle }: MagicUmbrellaMenuPro
       badge: undefined,
     },
     { 
+      href: '/rewards', 
+      label: locale === 'uz' ? 'Haftalik Mukofotlar' : 'Weekly Rewards', 
+      desc: locale === 'uz' ? 'Faxriy yorliq, Sandiq va Sertifikat' : 'Honor certificate & golden chest',
+      icon: Award, 
+      badge: '🏆 Yorliq',
+    },
+    { 
       href: '/games', 
       label: locale === 'uz' ? 'Hikmatli O\'yinlar' : 'Wisdom Games', 
       desc: locale === 'uz' ? 'Montessori, Poklik, Ozuqachi & Mozaika' : 'Montessori sorting, I Spy & Puzzles',
-      icon: Trophy, 
+      icon: Gamepad2, 
       badge: '🎮 O\'yin',
     },
     { 

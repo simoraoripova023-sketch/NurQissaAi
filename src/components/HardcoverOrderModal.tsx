@@ -10,15 +10,23 @@ import { CONTACT_CONFIG } from '@/lib/contact';
 import confetti from 'canvas-confetti';
 
 export default function HardcoverOrderModal() {
-  const { locale, isOrderModalOpen, setIsOrderModalOpen, activeStory } = useAppStore();
+  const { locale, isOrderModalOpen, setIsOrderModalOpen, activeStory, currentUser } = useAppStore();
   const t = translations[locale];
 
   const [coverFinish, setCoverFinish] = useState<'glossy' | 'matte'>('glossy');
   const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('+998 ');
-  const [recipientName, setRecipientName] = useState('');
+  const [phone, setPhone] = useState(currentUser?.phone ? cleanUzbekPhoneDigits(currentUser.phone) : '');
+  const [recipientName, setRecipientName] = useState(currentUser?.name || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Sync recipient and phone if currentUser logs in
+  React.useEffect(() => {
+    if (currentUser) {
+      if (!recipientName && currentUser.name) setRecipientName(currentUser.name);
+      if (!phone && currentUser.phone) setPhone(cleanUzbekPhoneDigits(currentUser.phone));
+    }
+  }, [currentUser]);
 
   if (!isOrderModalOpen) return null;
 

@@ -22,10 +22,11 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
         if (session?.user) {
           const user = session.user;
           const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
+          const existingChild = useAppStore.getState().childProfile.child_name || useAppStore.getState().currentUser?.childName || '';
           loginUser({
             name: fullName,
             phone: user.email || user.phone || '',
-            childName: 'Alijon',
+            childName: existingChild,
           });
         }
       }).catch(() => {});
@@ -34,10 +35,11 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
         if (session?.user) {
           const user = session.user;
           const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || 'Ota-ona';
+          const existingChild = useAppStore.getState().childProfile.child_name || useAppStore.getState().currentUser?.childName || '';
           loginUser({
             name: fullName,
             phone: user.email || user.phone || '',
-            childName: 'Alijon',
+            childName: existingChild,
           });
         } else if (_event === 'SIGNED_OUT') {
           useAppStore.setState({ currentUser: null });

@@ -96,6 +96,7 @@ interface AppState {
   currentUser: { name: string; phone: string; childName: string; isLoggedIn: boolean } | null;
   loginUser: (data: { name: string; phone: string; childName?: string }) => void;
   logoutUser: () => void;
+  updateCurrentUserChildName: (childName: string) => void;
 
   // Nur Do'koni (Gamification Virtual Shop)
   isNurShopOpen: boolean;
@@ -325,16 +326,25 @@ export const useAppStore = create<AppState>()(
       setIsAuthModalOpen: (isAuthModalOpen) => set({ isAuthModalOpen }),
       currentUser: null,
       loginUser: (data) =>
-        set((state) => ({
-          currentUser: {
-            name: data.name,
-            phone: data.phone,
-            childName: data.childName || 'Ali',
-            isLoggedIn: true,
-          },
-          isAuthModalOpen: false,
-          nurCoins: state.nurCoins + 50,
-        })),
+        set((state) => {
+          const childName = (data.childName && data.childName !== 'Alijon' && data.childName !== 'Ali')
+            ? data.childName
+            : (state.currentUser?.childName || state.childProfile.child_name || '');
+          return {
+            currentUser: {
+              name: data.name,
+              phone: data.phone,
+              childName: childName,
+              isLoggedIn: true,
+            },
+            childProfile: {
+              ...state.childProfile,
+              child_name: childName || state.childProfile.child_name,
+            },
+            isAuthModalOpen: false,
+            nurCoins: state.nurCoins + 50,
+          };
+        }),
       logoutUser: () =>
         set(() => {
           if (typeof window !== 'undefined') {
@@ -344,6 +354,11 @@ export const useAppStore = create<AppState>()(
           }
           return { currentUser: null };
         }),
+      updateCurrentUserChildName: (childName: string) =>
+        set((state) => ({
+          currentUser: state.currentUser ? { ...state.currentUser, childName } : null,
+          childProfile: { ...state.childProfile, child_name: childName },
+        })),
 
       // Paid System & Story Credit Limits
       freeStoriesLeft: 2,
@@ -403,6 +418,7 @@ export const useAppStore = create<AppState>()(
         badges: state.badges,
         foundHiddenObjects: state.foundHiddenObjects,
         familyNotes: state.familyNotes,
+        childProfile: state.childProfile,
         stories: state.stories,
         currentUser: state.currentUser,
         freeStoriesLeft: state.freeStoriesLeft,

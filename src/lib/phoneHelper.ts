@@ -12,6 +12,8 @@ export function cleanUzbekPhoneDigits(input: string): string {
   // If user pasted full international number with 998 (e.g. 998901234567 -> 12 digits), strip the 998 prefix
   if (digits.startsWith('998') && digits.length > 9) {
     digits = digits.slice(3);
+  } else if (digits === '998') {
+    return '';
   }
 
   // Strictly enforce maximum 9 digits

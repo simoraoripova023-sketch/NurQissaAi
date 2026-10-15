@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   X, Sparkles, User, Phone, Lock, Heart, CheckCircle2, 
   ArrowRight, ShieldCheck, AlertCircle, KeyRound, RotateCcw, 
-  ArrowLeft, Check, Smartphone, Mail
+  ArrowLeft, Check, Smartphone, Mail, Edit2
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
@@ -14,7 +14,7 @@ import { CONTACT_CONFIG } from '@/lib/contact';
 import confetti from 'canvas-confetti';
 
 export default function AuthModal() {
-  const { locale, isAuthModalOpen, setIsAuthModalOpen, loginUser, logoutUser, currentUser, nurCoins } = useAppStore();
+  const { locale, isAuthModalOpen, setIsAuthModalOpen, loginUser, logoutUser, currentUser, updateCurrentUserChildName, nurCoins } = useAppStore();
   const t = translations[locale];
 
   // Auth flow states: 'form' (main phone/options), 'otp' (SMS code), 'google' (Google account), 'github' (GitHub account)
@@ -23,7 +23,8 @@ export default function AuthModal() {
   const [parentName, setParentName] = useState('');
   const [phoneDigits, setPhoneDigits] = useState('');
   const [childName, setChildName] = useState('');
-  const [password, setPassword] = useState('');
+  const [isEditingChild, setIsEditingChild] = useState(false);
+  const [childEditInput, setChildEditInput] = useState('');
 
   // Google specific states
   const [googleEmail, setGoogleEmail] = useState('');
@@ -48,6 +49,10 @@ export default function AuthModal() {
   const [isGithubLoading, setIsGithubLoading] = useState(false);
   const [isSendingSms, setIsSendingSms] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [hasGsiRendered, setHasGsiRendered] = useState(false);
+
+  // Google Identity Services button ref
+  const googleBtnRef = useRef<HTMLDivElement>(null);
 
   // OTP input references
   const otpInputRefs = [
@@ -83,6 +88,71 @@ export default function AuthModal() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authStep]);
+
+  // Google Identity Services (GSI) Native 1-Click integration without Supabase redirects
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (typeof window === 'undefined' || !isAuthModalOpen) return;
+
+    const initGsi = () => {
+      const google = (window as any).google;
+      if (google?.accounts?.id && clientId) {
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response: any) => {
+            if (response?.credential) {
+              try {
+                const base64Url = response.credential.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(
+                  atob(base64)
+                    .split('')
+                    .map((c: string) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                    .join('')
+                );
+                const payload = JSON.parse(jsonPayload);
+                if (payload) {
+                  const name = payload.name || payload.given_name || payload.email?.split('@')[0] || 'Ota-ona';
+                  const email = payload.email || '';
+                  loginUser({
+                    name,
+                    phone: email,
+                    childName: childName || '',
+                  });
+                  confetti({
+                    particleCount: 75,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#4285F4', '#34A853', '#FBBC05', '#EA4335'],
+                  });
+                }
+              } catch (e) {
+                console.warn('Decode GSI token error:', e);
+              }
+            }
+          },
+        });
+
+        if (googleBtnRef.current) {
+          google.accounts.id.renderButton(googleBtnRef.current, {
+            theme: 'outline',
+            size: 'large',
+            text: 'continue_with',
+            shape: 'pill',
+            width: 320,
+          });
+          setHasGsiRendered(true);
+        }
+      }
+    };
+
+    if ((window as any).google) {
+      initGsi();
+    } else {
+      const timer = setTimeout(initGsi, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthModalOpen, childName, loginUser]);
 
   // Reset states when modal is closed
   useEffect(() => {
@@ -229,7 +299,7 @@ export default function AuthModal() {
       loginUser({
         name: parentName || (locale === 'uz' ? "Aziz Ota-ona" : "Dear Parent"),
         phone: formattedPhone,
-        childName: childName || "Ali",
+        childName: childName || '',
       });
 
       // Confetti celebration
@@ -285,32 +355,25 @@ export default function AuthModal() {
     }
   };
 
-  // Handle Google OAuth or initiate authentic Google Account flow
-  const handleGoogleLogin = async () => {
+  // Handle Google Login directly within NurQissa AI, avoiding ugly external Supabase redirects
+  const handleGoogleLogin = () => {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const google = typeof window !== 'undefined' ? (window as any).google : null;
+
+    if (google?.accounts?.id && clientId) {
+      try {
+        google.accounts.id.prompt();
+        return;
+      } catch (e) {
+        console.warn('Google One-Tap prompt notice:', e);
+      }
+    }
+
     setErrorMsg('');
     setSuccessMsg('');
-    setIsGoogleLoading(true);
-
-    try {
-      const { supabase } = await import('@/lib/supabase');
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            prompt: 'select_account',
-          },
-        },
-      });
-      if (error) throw error;
-      return;
-    } catch (err: any) {
-      setIsGoogleLoading(false);
-      setGoogleName(parentName || '');
-      setGoogleChildName(childName || '');
-      setAuthStep('google');
-      return;
-    }
+    setGoogleName(parentName || '');
+    setGoogleChildName(childName || '');
+    setAuthStep('google');
   };
 
   // Confirm Google Account credentials
@@ -336,7 +399,7 @@ export default function AuthModal() {
     }
 
     const finalName = googleName.trim() || email.split('@')[0];
-    const finalChild = googleChildName.trim() || (locale === 'uz' ? "Alijon" : "Ali");
+    const finalChild = googleChildName.trim() || '';
 
     loginUser({
       name: finalName,
@@ -406,7 +469,7 @@ export default function AuthModal() {
     }
 
     const finalName = username;
-    const finalChild = githubChildName.trim() || (locale === 'uz' ? "Alijon" : "Ali");
+    const finalChild = githubChildName.trim() || '';
 
     loginUser({
       name: finalName,
@@ -460,13 +523,75 @@ export default function AuthModal() {
 
             <div className="grid grid-cols-2 gap-3 text-left">
               <div className="p-3 rounded-2xl bg-amber-50 dark:bg-pine-900 border border-amber-300 dark:border-pine-700">
-                <span className="text-[10px] font-bold text-pine-600 dark:text-butter-300 block mb-0.5">
-                  {locale === 'uz' ? "Bosh qahramon:" : "Child Name:"}
-                </span>
-                <span className="text-xs font-black text-pine-950 dark:text-butter-200 flex items-center gap-1">
-                  <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-                  <span>{currentUser.childName}</span>
-                </span>
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-[10px] font-bold text-pine-600 dark:text-butter-300">
+                    {locale === 'uz' ? "Bosh qahramon:" : "Child Name:"}
+                  </span>
+                  {!isEditingChild && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setChildEditInput(currentUser.childName || '');
+                        setIsEditingChild(true);
+                      }}
+                      className="text-[10px] font-extrabold text-pine-800 dark:text-butter-200 hover:underline flex items-center gap-0.5 cursor-pointer"
+                    >
+                      <Edit2 className="w-2.5 h-2.5" />
+                      <span>{locale === 'uz' ? "O'zgartirish" : "Edit"}</span>
+                    </button>
+                  )}
+                </div>
+
+                {isEditingChild ? (
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <input
+                      type="text"
+                      autoFocus
+                      value={childEditInput}
+                      onChange={(e) => setChildEditInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const trimmed = childEditInput.trim();
+                          if (trimmed) {
+                            updateCurrentUserChildName(trimmed);
+                            setIsEditingChild(false);
+                          }
+                        } else if (e.key === 'Escape') {
+                          setIsEditingChild(false);
+                        }
+                      }}
+                      placeholder={locale === 'uz' ? "Farzandingiz ismi" : "Child name"}
+                      className="w-full px-2 py-1 text-xs font-bold rounded-lg bg-white dark:bg-pine-800 border border-pine-800 text-pine-900 dark:text-butter-100 focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const trimmed = childEditInput.trim();
+                        if (trimmed) {
+                          updateCurrentUserChildName(trimmed);
+                          setIsEditingChild(false);
+                        }
+                      }}
+                      className="p-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 shrink-0 cursor-pointer"
+                      title={locale === 'uz' ? "Saqlash" : "Save"}
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingChild(false)}
+                      className="p-1 rounded-lg bg-slate-300 dark:bg-pine-700 text-slate-700 dark:text-butter-200 hover:bg-slate-400 shrink-0 cursor-pointer"
+                      title={locale === 'uz' ? "Bekor qilish" : "Cancel"}
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-xs font-black text-pine-950 dark:text-butter-200 flex items-center gap-1">
+                    <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+                    <span>{currentUser.childName || (locale === 'uz' ? "Kiritilmagan (O'zgartirishni bosing)" : "Not set (Click edit)")}</span>
+                  </span>
+                )}
               </div>
 
               <div className="p-3 rounded-2xl bg-amber-50 dark:bg-pine-900 border border-amber-300 dark:border-pine-700">
@@ -812,24 +937,24 @@ export default function AuthModal() {
 
             {/* 1-Click Google OAuth Button */}
             <div className="space-y-3 mb-4">
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={isGoogleLoading}
-                className="w-full py-3 px-4 rounded-2xl border-2 border-slate-300 dark:border-pine-700 bg-white dark:bg-pine-900 hover:bg-slate-50 dark:hover:bg-pine-800 text-slate-800 dark:text-butter-100 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all disabled:opacity-50 cursor-pointer"
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                </svg>
-                <span>
-                  {isGoogleLoading
-                    ? (locale === 'uz' ? "Google'ga ulanmoqda..." : "Connecting to Google...")
-                    : (locale === 'uz' ? "Google orqali davom etish" : "Continue with Google")}
-                </span>
-              </button>
+              <div ref={googleBtnRef} className="flex justify-center w-full [&>div]:w-full empty:hidden" />
+              {!hasGsiRendered && (
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="w-full py-3 px-4 rounded-2xl border-2 border-slate-300 dark:border-pine-700 bg-white dark:bg-pine-900 hover:bg-slate-50 dark:hover:bg-pine-800 text-slate-800 dark:text-butter-100 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 shadow-sm hover:shadow transition-all cursor-pointer"
+                >
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                  </svg>
+                  <span>
+                    {locale === 'uz' ? "Google orqali davom etish" : "Continue with Google"}
+                  </span>
+                </button>
+              )}
 
               {/* Divider */}
               <div className="flex items-center gap-3">
@@ -951,22 +1076,7 @@ export default function AuthModal() {
                 </div>
               )}
 
-              <div>
-                <label className="block text-xs font-bold text-pine-900 dark:text-butter-200 mb-1">
-                  {locale === 'uz' ? "Parol" : "Password"}
-                </label>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-pine-700 dark:text-butter-300 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white dark:bg-pine-900 border-2 border-pine-800/40 dark:border-butter-300/40 text-pine-900 dark:text-butter-200 text-xs font-medium focus:outline-none focus:border-pine-800 dark:focus:border-butter-200"
-                  />
-                </div>
-              </div>
+
 
               <button
                 type="submit"

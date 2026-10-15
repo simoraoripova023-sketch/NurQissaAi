@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -25,7 +25,8 @@ export default function StoryWizard() {
     setActiveStory,
     freeStoriesLeft,
     hasPaidSubscription,
-    setIsPricingModalOpen 
+    setIsPricingModalOpen,
+    currentUser
   } = useAppStore();
   const t = translations[locale];
 
@@ -34,6 +35,13 @@ export default function StoryWizard() {
   const [generationStep, setGenerationStep] = useState(0);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto pre-fill child's name from currentUser account if available and not yet set
+  useEffect(() => {
+    if (!childProfile.child_name && currentUser?.childName) {
+      updateChildProfile({ child_name: currentUser.childName });
+    }
+  }, [currentUser, childProfile.child_name, updateChildProfile]);
 
   const totalSteps = 2;
 

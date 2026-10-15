@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOpenAiApiKey } from '@/lib/serverKeys';
+import { getOpenAiApiKey, getGeminiApiKey, getNanoBananaApiKey } from '@/lib/serverKeys';
 import fs from 'fs';
 import path from 'path';
 
@@ -54,10 +54,128 @@ export async function GET(req: NextRequest) {
 
     const isBoy = gender === 'boy' || rawPrompt.toLowerCase().includes('boy') || rawPrompt.toLowerCase().includes("o'g'il") || rawPrompt.toLowerCase().includes('yusuf');
 
-    const apiKey = getOpenAiApiKey();
+    // -------------------------------------------------------------
+    // TIER 1: Nano Banana API (if key configured)
+    // -------------------------------------------------------------
+    const nanoKey = getNanoBananaApiKey();
+    if (nanoKey) {
+      try {
+        const nanoRes = await fetch('https://nanobnana.com/api/generate', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${nanoKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            prompt: fullPrompt.slice(0, 850),
+            model: 'nano2',
+            width: 1024,
+            height: 1024
+          }),
+          signal: AbortSignal.timeout(12000)
+        });
+
+        if (nanoRes.ok) {
+          const nanoData = await nanoRes.json();
+          const imgUrl = nanoData?.output?.[0] || nanoData?.imageUrl || nanoData?.data?.[0]?.url;
+          if (imgUrl) {
+            const imgFetch = await fetch(imgUrl, { signal: AbortSignal.timeout(15000) });
+            if (imgFetch.ok) {
+              const buf = Buffer.from(await imgFetch.arrayBuffer());
+              if (buf.length > 5000) {
+                imageCache.set(cacheKey, { buffer: buf, contentType: 'image/jpeg' });
+                return new NextResponse(new Uint8Array(buf), {
+                  headers: {
+                    'Content-Type': 'image/jpeg',
+                    'Cache-Control': 'public, max-age=86400, immutable',
+                  },
+                });
+              }
+            }
+          }
+        }
+      } catch (nanoErr) {
+        console.warn('Nano Banana API notice:', nanoErr);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // TIER 2: Google Imagen 3 API (via Gemini API key)
+    // -------------------------------------------------------------
+    const geminiKey = getGeminiApiKey();
+    if (geminiKey) {
+      try {
+        const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${geminiKey}`;
+        const imgRes = await fetch(imagenUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            instances: [{ prompt: fullPrompt.slice(0, 950) }],
+            parameters: {
+              sampleCount: 1,
+              aspectRatio: '1:1',
+              outputOptions: { mimeType: 'image/jpeg' }
+            }
+          }),
+          signal: AbortSignal.timeout(15000)
+        });
+
+        if (imgRes.ok) {
+          const data = await imgRes.json();
+          const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
+          if (b64) {
+            const buf = Buffer.from(b64, 'base64');
+            imageCache.set(cacheKey, { buffer: buf, contentType: 'image/jpeg' });
+            return new NextResponse(new Uint8Array(buf), {
+              headers: {
+                'Content-Type': 'image/jpeg',
+                'Cache-Control': 'public, max-age=86400, immutable',
+              },
+            });
+          }
+        }
+      } catch (imagenErr) {
+        console.warn('Google Imagen 3 API notice:', imagenErr);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // TIER 3: Real-time Flux Engine (100% Free, Reliable & Instant)
+    // -------------------------------------------------------------
+    try {
+      let hash = 0;
+      const seedStr = `${storyId}_p${pageStr}_${cleanedBasePrompt}`;
+      for (let i = 0; i < seedStr.length; i++) {
+        hash = (hash * 31 + seedStr.charCodeAt(i)) & 0x7fffffff;
+      }
+      const seed = hash % 999999;
+      const cleanFluxPrompt = encodeURIComponent(`${cleanedBasePrompt}, 3D Disney Pixar style picturebook illustration, bright sunny daylight, cheerful child character, fairytale atmosphere, crisp clean lines`.slice(0, 750));
+      const pollUrl = `https://image.pollinations.ai/prompt/${cleanFluxPrompt}?width=1024&height=1024&model=flux&nologo=true&seed=${seed}`;
+
+      const pRes = await fetch(pollUrl, { signal: AbortSignal.timeout(18000) });
+      if (pRes.ok) {
+        const buf = Buffer.from(await pRes.arrayBuffer());
+        if (buf.length > 5000) {
+          imageCache.set(cacheKey, { buffer: buf, contentType: 'image/jpeg' });
+          return new NextResponse(new Uint8Array(buf), {
+            headers: {
+              'Content-Type': 'image/jpeg',
+              'Cache-Control': 'public, max-age=86400, immutable',
+            },
+          });
+        }
+      }
+    } catch (pErr) {
+      console.warn('Flux engine notice:', pErr);
+    }
+
+    // -------------------------------------------------------------
+    // TIER 4: OpenAI DALL-E 3 / DALL-E 2 (if quota is healthy)
+    // -------------------------------------------------------------
+    const openAiApiKey = getOpenAiApiKey();
     const isQuotaExhausted = Date.now() < openAiQuotaExhaustedUntil;
 
-    if (apiKey && !isQuotaExhausted) {
+    if (openAiApiKey && !isQuotaExhausted) {
       const modelsToTry = ['dall-e-3', 'dall-e-2'];
       
       for (const model of modelsToTry) {
@@ -75,10 +193,11 @@ export async function GET(req: NextRequest) {
           const res = await fetch('https://api.openai.com/v1/images/generations', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${apiKey}`,
+              'Authorization': `Bearer ${openAiApiKey}`,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(bodyPayload)
+            body: JSON.stringify(bodyPayload),
+            signal: AbortSignal.timeout(20000)
           });
 
           if (res.ok) {
@@ -112,9 +231,7 @@ export async function GET(req: NextRequest) {
           } else {
             const err = await res.json().catch(() => ({}));
             const errMsg = err?.error?.message || '';
-            console.warn(`OpenAI image notice (${model}):`, errMsg || res.status);
             if (res.status === 429 || errMsg.includes('credits') || errMsg.includes('quota') || errMsg.includes('billing')) {
-              // OpenAI account has $0 balance or quota exceeded; cache for 10 minutes to avoid wasted calls
               openAiQuotaExhaustedUntil = Date.now() + 10 * 60 * 1000;
               break;
             }
@@ -125,7 +242,9 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Fast-path: Local authentic storybook masterpiece from curated high-definition assets
+    // -------------------------------------------------------------
+    // TIER 5: Curated HD Fairytale Storybook Assets
+    // -------------------------------------------------------------
     try {
       let samplePath = '';
       if (pageNum === 0) {
@@ -139,7 +258,6 @@ export async function GET(req: NextRequest) {
       }
 
       if (!fs.existsSync(samplePath)) {
-        // Fallback to alternative sample
         samplePath = isBoy
           ? path.join(process.cwd(), 'public', 'stories', 'yusuf', 'cover.jpeg')
           : path.join(process.cwd(), 'public', 'stories', 'fotima', 'page_1.jpeg');
@@ -159,7 +277,7 @@ export async function GET(req: NextRequest) {
       console.warn('Local sample storybook read notice:', fsErr);
     }
 
-    // Fallback: Return a warm glowing bedtime scene placeholder
+    // Final Fallback: Bedtime scene SVG
     const title = decodeURIComponent(rawPrompt).slice(0, 45);
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768">
