@@ -264,7 +264,7 @@ export default function BookReader({ story }: BookReaderProps) {
   return (
     <>
       {/* On-screen interactive reader - hidden during PDF print */}
-      <div className="no-print print:hidden min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] islamic-pattern pb-16 pt-4 transition-colors duration-300">
+      <div className="no-print print:hidden min-h-screen bg-[#FFFDF5] dark:bg-[#002621] islamic-pattern pb-16 pt-4 transition-colors duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           
           {/* Top Control Bar */}
@@ -423,7 +423,7 @@ export default function BookReader({ story }: BookReaderProps) {
               ) : <div />}
             </div>
 
-            <div className="relative bg-[#FFFDF5] dark:bg-[#1B200B] rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-2xl border-2 sm:border-4 border-amber-300/80 dark:border-pine-700/80 flex flex-col justify-between">
+            <div className="relative bg-[#FFFDF5] dark:bg-[#002621] rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-2xl border-2 sm:border-4 border-amber-300/80 dark:border-emerald-700/80 flex flex-col justify-between">
               
               {/* Book Pages with Page Transitions */}
               <AnimatePresence mode="wait">
@@ -903,7 +903,7 @@ export default function BookReader({ story }: BookReaderProps) {
                 initial={{ scale: 0.95, y: 15 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 15 }}
-                className="relative w-full max-w-4xl max-h-[92vh] bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl shadow-2xl border-2 sm:border-4 border-amber-300 dark:border-pine-700 flex flex-col overflow-hidden text-slate-900 dark:text-amber-100"
+                className="relative w-full max-w-4xl max-h-[92vh] bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl shadow-2xl border-2 sm:border-4 border-amber-300 dark:border-emerald-700 flex flex-col overflow-hidden text-slate-900 dark:text-amber-100"
               >
                 {/* Modal Top Control Bar */}
                 <div className="p-4 sm:p-5 bg-white/95 dark:bg-emerald-950/95 border-b border-amber-200 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-3 shrink-0">
@@ -987,7 +987,7 @@ export default function BookReader({ story }: BookReaderProps) {
                     </div>
 
                     {/* PAGE 1: PREVIEW COVER */}
-                    <div className="bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
+                    <div className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
                       <div className="px-4 py-2 bg-amber-100 dark:bg-pine-950 border-b border-amber-200 dark:border-pine-800 flex items-center justify-between text-xs font-black text-amber-950 dark:text-amber-200">
                         <span>📖 1-sahifa: Kitob Muqovasi</span>
                         <span>NurQissa AI</span>
@@ -995,7 +995,7 @@ export default function BookReader({ story }: BookReaderProps) {
                       <div className="relative w-full h-72 sm:h-80 overflow-hidden bg-slate-900">
                         <img src={story.cover_image_url} alt={title} className="w-full h-full object-cover" />
                       </div>
-                      <div className="p-5 sm:p-6 bg-[#FFFDF0] dark:bg-[#283013]">
+                      <div className="p-5 sm:p-6 bg-[#FFFDF0] dark:bg-[#012A25]">
                         <div className="relative rounded-2xl border-2 border-dashed border-emerald-500/70 p-5 bg-[#FFFDF5] dark:bg-pine-950/40 text-center">
                           <h2 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-amber-200 font-display mb-2">{title}</h2>
                           <p className="text-xs text-amber-800 dark:text-amber-300 font-bold mb-2">
@@ -1004,7 +1004,7 @@ export default function BookReader({ story }: BookReaderProps) {
                           <p className="text-xs italic text-slate-700 dark:text-amber-100 max-w-md mx-auto">"{prologue}"</p>
                         </div>
                       </div>
-                      <div className="bg-gradient-to-t from-[#438321] to-[#5FA832] py-2.5 flex items-center justify-center">
+                      <div className="bg-gradient-to-t from-[#013E37] to-[#047857] py-2.5 flex items-center justify-center">
                         <GoldenRosetteMedal pageNumber="⭐" />
                       </div>
                     </div>
@@ -1013,7 +1013,7 @@ export default function BookReader({ story }: BookReaderProps) {
                     {story.pages.map((p) => {
                       const dualTitle = getDualToneTitle(p.scene_summary, title);
                       return (
-                        <div key={p.page_number} className="bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
+                        <div key={p.page_number} className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-amber-300/80 shadow-xl overflow-hidden flex flex-col">
                           <div className="px-4 py-2 bg-amber-100 dark:bg-pine-950 border-b border-amber-200 dark:border-pine-800 flex items-center justify-between text-xs font-black text-amber-950 dark:text-amber-200">
                             <span>📄 Sahifa {p.page_number} / {totalPages}</span>
                             <span className="truncate max-w-[200px]">{p.scene_summary || title}</span>
@@ -1029,7 +1029,7 @@ export default function BookReader({ story }: BookReaderProps) {
                           </div>
 
                           {/* Scalloped Framed Card */}
-                          <div className="p-4 sm:p-6 bg-[#FFFDF0] dark:bg-[#283013]">
+                          <div className="p-4 sm:p-6 bg-[#FFFDF0] dark:bg-[#012A25]">
                             <div className="relative rounded-2xl border-2 border-dashed border-emerald-500/70 p-5 bg-[#FFFDF5] dark:bg-pine-950/40 text-center">
                               <div className="absolute -top-3 -left-2 pointer-events-none">
                                 <LaurelBranch className="w-8 h-8 text-emerald-600" />
@@ -1058,7 +1058,7 @@ export default function BookReader({ story }: BookReaderProps) {
                           </div>
 
                           {/* Grassy Meadow Base & Rosette */}
-                          <div className="bg-gradient-to-t from-[#438321] to-[#5FA832] py-2 flex items-center justify-center">
+                          <div className="bg-gradient-to-t from-[#013E37] to-[#047857] py-2 flex items-center justify-center">
                             <GoldenRosetteMedal pageNumber={p.page_number} />
                           </div>
                         </div>
@@ -1066,7 +1066,7 @@ export default function BookReader({ story }: BookReaderProps) {
                     })}
 
                     {/* FINAL REFLECTION PREVIEW */}
-                    <div className="bg-[#FFFDF5] dark:bg-[#1B200B] rounded-3xl border-2 sm:border-4 border-emerald-400/80 shadow-xl overflow-hidden flex flex-col">
+                    <div className="bg-[#FFFDF5] dark:bg-[#002621] rounded-3xl border-2 sm:border-4 border-emerald-400/80 shadow-xl overflow-hidden flex flex-col">
                       <div className="px-4 py-2 bg-emerald-100 dark:bg-emerald-950 border-b border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-black text-emerald-950 dark:text-emerald-200">
                         <span>🌙 Yakuniy Saboq & Duo</span>
                         <span>NurQissa AI</span>

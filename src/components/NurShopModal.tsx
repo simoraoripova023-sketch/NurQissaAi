@@ -196,7 +196,7 @@ export default function NurShopModal() {
         initial={{ opacity: 0, scale: 0.94, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.94, y: 20 }}
-        className="bg-[#FFFDF5] dark:bg-[#1B200B] w-full max-w-4xl rounded-3xl border-2 sm:border-4 border-amber-300 dark:border-pine-700 shadow-2xl overflow-hidden my-6 flex flex-col max-h-[92vh]"
+        className="bg-[#FFFDF5] dark:bg-[#002621] w-full max-w-4xl rounded-3xl border-2 sm:border-4 border-amber-300 dark:border-emerald-700 shadow-2xl overflow-hidden my-6 flex flex-col max-h-[92vh]"
       >
         {/* Top Header */}
         <div className="p-5 sm:p-6 bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-600 text-slate-950 flex items-center justify-between shadow-md shrink-0">
@@ -240,7 +240,7 @@ export default function NurShopModal() {
         </div>
 
         {/* Categories Bar */}
-        <div className="p-3 sm:p-4 bg-white/95 dark:bg-[#283013] border-b border-amber-200 dark:border-pine-800 flex items-center justify-between gap-2 overflow-x-auto shrink-0">
+        <div className="p-3 sm:p-4 bg-white/95 dark:bg-[#012A25] border-b border-amber-200 dark:border-emerald-800 flex items-center justify-between gap-2 overflow-x-auto shrink-0">
           <div className="flex items-center gap-1.5 sm:gap-2">
             {[
               { id: 'all', label: isUz ? "🌟 Barchasi" : "🌟 All" },
@@ -284,7 +284,7 @@ export default function NurShopModal() {
                     isUnlocked
                       ? 'bg-emerald-50/80 dark:bg-emerald-950/70 border-emerald-400 shadow-sm'
                       : canAfford
-                        ? 'bg-white dark:bg-[#283013] border-amber-300 hover:border-amber-400 hover:shadow-lg'
+                        ? 'bg-white dark:bg-[#012A25] border-amber-300 hover:border-amber-400 hover:shadow-lg'
                         : 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-80'
                   }`}
                 >

@@ -136,8 +136,8 @@ function CallbackContent() {
   }, [searchParams, loginUser, router]);
 
   return (
-    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white dark:bg-pine-900 border-2 border-pine-800/30 dark:border-butter-300/30 rounded-3xl p-8 text-center shadow-2xl space-y-5">
+    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#002621] flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white dark:bg-[#012A25] border-2 border-emerald-800/30 dark:border-emerald-600/30 rounded-3xl p-8 text-center shadow-2xl space-y-5">
         
         {/* Google Icon */}
         <div className="w-16 h-16 rounded-2xl bg-white dark:bg-pine-950 border-2 border-slate-200 dark:border-butter-300 mx-auto flex items-center justify-center shadow-md p-3">
@@ -200,7 +200,7 @@ function CallbackContent() {
 export default function AuthCallbackPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#002621] flex items-center justify-center p-4">
         <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
       </div>
     }>

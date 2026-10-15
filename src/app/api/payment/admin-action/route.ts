@@ -49,18 +49,18 @@ export async function GET(req: NextRequest) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>To'lov Tasdiqlandi — NurQissa AI</title>
         <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1B200B; color: #FFFDF5; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
-          .card { background: #283013; border: 2px solid #D0A44A; border-radius: 24px; padding: 32px; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-          .icon { width: 64px; height: 64px; background: #3E451B; color: #FFEB7C; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 32px; }
-          h1 { margin: 0 0 8px; font-size: 22px; color: #FFEB7C; }
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #002621; color: #FFFDF5; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
+          .card { background: #012A25; border: 2px solid #D0A44A; border-radius: 24px; padding: 32px; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+          .icon { width: 64px; height: 64px; background: #013E37; color: #10B981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 32px; }
+          h1 { margin: 0 0 8px; font-size: 22px; color: #FDE047; }
           p { margin: 8px 0; font-size: 14px; color: #E4DCB8; line-height: 1.5; }
-          .badge { display: inline-block; background: rgba(208, 164, 74, 0.2); border: 1px solid #D0A44A; color: #FFEB7C; padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: bold; margin: 12px 0; }
+          .badge { display: inline-block; background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; color: #34D399; padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: bold; margin: 12px 0; }
           .details { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 16px; margin: 20px 0; text-align: left; font-size: 13px; }
           .row { display: flex; justify-content: space-between; margin-bottom: 8px; }
           .row:last-child { margin-bottom: 0; }
           .label { color: #8F7F47; }
           .val { font-weight: bold; color: #FFF; }
-          .btn { display: inline-block; background: #D0A44A; color: #1B200B; text-decoration: none; padding: 12px 24px; border-radius: 12px; font-weight: bold; font-size: 14px; margin-top: 10px; }
+          .btn { display: inline-block; background: #10B981; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 12px; font-weight: bold; font-size: 14px; margin-top: 10px; }
         </style>
       </head>
       <body>

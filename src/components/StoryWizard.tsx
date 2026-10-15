@@ -173,7 +173,7 @@ export default function StoryWizard() {
       )}
 
       {/* Main Wizard Form Card */}
-      <div className="bg-white dark:bg-[#1B200B] rounded-3xl border-2 border-pine-800/30 dark:border-butter-300/30 shadow-2xl p-6 sm:p-9 relative overflow-hidden">
+      <div className="bg-white dark:bg-[#002621] rounded-3xl border-2 border-emerald-800/30 dark:border-emerald-700/40 shadow-2xl p-6 sm:p-9 relative overflow-hidden">
         
         {/* If Generating: Full-Screen Animated Step Loader */}
         {isGenerating ? (
@@ -624,13 +624,9 @@ export default function StoryWizard() {
                       alert(locale === 'uz' ? "Iltimos, bolaning ismini kiriting" : "Please enter child's name");
                       return;
                     }
-                    if (!childProfile.child_photo_url) {
-                      const defaultAvatar = PIXAR_AVATARS.find(a => a.gender === childProfile.gender) || PIXAR_AVATARS[0];
-                      updateChildProfile({ child_photo_url: defaultAvatar.url });
-                    }
                     setStep(2);
                   }}
-                  className="px-7 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-md shadow-amber-500/25 transition-all"
+                  className="px-7 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs sm:text-sm flex items-center gap-2 shadow-md shadow-emerald-600/25 transition-all"
                 >
                   <span>{locale === 'uz' ? "Keyingi qadam" : "Next Step"}</span>
                   <ArrowRight className="w-4 h-4" />

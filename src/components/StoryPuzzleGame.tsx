@@ -172,7 +172,7 @@ export default function StoryPuzzleGame({ initialImageUrl, storyTitle, onGameCom
   };
 
   return (
-    <div className="relative w-full rounded-3xl bg-[#FFFDF5] dark:bg-[#1B200B] border-2 border-pine-800/40 dark:border-butter-200/40 shadow-2xl p-6 sm:p-8 overflow-hidden">
+    <div className="relative w-full rounded-3xl bg-[#FFFDF5] dark:bg-[#002621] border-2 border-emerald-800/40 dark:border-emerald-600/40 shadow-2xl p-6 sm:p-8 overflow-hidden">
       
       {/* Header with Game Switcher Tabs */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-pine-800/20 dark:border-butter-200/20">
@@ -466,7 +466,7 @@ export default function StoryPuzzleGame({ initialImageUrl, storyTitle, onGameCom
             )}
 
             {/* Maze Grid (5x5) */}
-            <div className="relative w-full max-w-sm sm:max-w-md aspect-square bg-[#283013] rounded-3xl p-4 shadow-2xl border-4 border-pine-800/60 dark:border-butter-300/60">
+            <div className="relative w-full max-w-sm sm:max-w-md aspect-square bg-[#012A25] rounded-3xl p-4 shadow-2xl border-4 border-emerald-800/60 dark:border-emerald-600/60">
               <div className="w-full h-full grid grid-cols-5 grid-rows-5 gap-2 rounded-2xl overflow-hidden bg-pine-950 p-2">
                 {MAZE_GRID.map((row, rIdx) =>
                   row.map((cell, cIdx) => {

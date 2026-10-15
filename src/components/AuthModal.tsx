@@ -428,7 +428,7 @@ export default function AuthModal() {
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="relative w-full max-w-md bg-[#FFFDF5] dark:bg-[#1B200B] border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-4 sm:p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[88dvh] sm:max-h-[92dvh] my-auto"
+        className="relative w-full max-w-md bg-[#FFFDF5] dark:bg-[#002621] border-2 border-emerald-800 dark:border-emerald-600/50 rounded-3xl p-4 sm:p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[88dvh] sm:max-h-[92dvh] my-auto"
       >
         {/* Close Button */}
         <button

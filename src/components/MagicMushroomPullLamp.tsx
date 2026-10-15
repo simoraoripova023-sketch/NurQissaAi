@@ -101,7 +101,7 @@ export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPul
         particleCount: 22,
         spread: 50,
         origin: { y: 0.15, x: 0.24 },
-        colors: ['#FFEB7C', '#3E451B', '#D0A44A', '#61642F'],
+        colors: ['#10B981', '#013E37', '#D0A44A', '#059669'],
       });
     }
   };
@@ -166,21 +166,21 @@ export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPul
               {/* Mushroom Dome Cap */}
               <path
                 d="M3 24C3 12.402 11.5066 3 22 3C32.4934 3 41 12.402 41 24C41 25.5 39.8 26.5 38 26.5C31.5 26.5 27 25 22 25C17 25 12.5 26.5 6 26.5C4.2 26.5 3 25.5 3 24Z"
-                fill="#3E451B"
-                stroke="#FFEB7C"
+                fill="#013E37"
+                stroke="#FDE047"
                 strokeWidth="2.4"
               />
               {/* Fairytale Warm Cream Spots */}
-              <circle cx="14" cy="14" r="3.2" fill="#FFEB7C" />
-              <circle cx="28" cy="11" r="2.6" fill="#FFEB7C" />
-              <circle cx="22" cy="19" r="2.2" fill="#FFEB7C" />
-              <circle cx="34" cy="19" r="2" fill="#FFEB7C" />
+              <circle cx="14" cy="14" r="3.2" fill="#FDE047" />
+              <circle cx="28" cy="11" r="2.6" fill="#FDE047" />
+              <circle cx="22" cy="19" r="2.2" fill="#FDE047" />
+              <circle cx="34" cy="19" r="2" fill="#FDE047" />
 
               {/* Glowing Base / Stem */}
               <path
                 d="M17 26.5V32C17 33.5 19 34.5 22 34.5C25 34.5 27 33.5 27 32V26.5"
-                fill="#FFEB7C"
-                stroke="#3E451B"
+                fill="#FDE047"
+                stroke="#013E37"
                 strokeWidth="1.8"
               />
             </svg>
@@ -226,7 +226,7 @@ export default function MagicMushroomPullLamp({ onMenuToggle }: MagicMushroomPul
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute left-0 top-full mt-3 w-80 sm:w-84 bg-[#FFFDF5]/95 dark:bg-[#1B200B]/95 backdrop-blur-xl border-2 border-pine-800 dark:border-butter-300 rounded-3xl p-4 sm:p-5 shadow-2xl space-y-3 z-50 overflow-hidden"
+            className="absolute left-0 top-full mt-3 w-80 sm:w-84 bg-[#FFFDF5]/95 dark:bg-[#002621]/95 backdrop-blur-xl border-2 border-emerald-800 dark:border-emerald-600/50 rounded-3xl p-4 sm:p-5 shadow-2xl space-y-3 z-50 overflow-hidden"
           >
             {/* Fairytale Background Glow */}
             <div className="absolute -top-12 -left-12 w-36 h-36 bg-amber-400/20 dark:bg-butter-300/10 rounded-full blur-2xl pointer-events-none" />

@@ -26,7 +26,7 @@ export default function LibraryPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#1B200B] islamic-pattern py-12 transition-colors duration-300">
+    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#002621] islamic-pattern py-12 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Banner */}
@@ -56,7 +56,7 @@ export default function LibraryPage() {
         </div>
 
         {/* Filters Bar */}
-        <div className="bg-white dark:bg-[#283013] p-4 rounded-2xl border border-amber-200/80 dark:border-pine-700/60 shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="bg-white dark:bg-[#012A25] p-4 rounded-2xl border border-amber-200/80 dark:border-emerald-700/60 shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="relative w-full sm:w-80">
             <Search className="w-4 h-4 text-slate-400 dark:text-emerald-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -88,7 +88,7 @@ export default function LibraryPage() {
 
         {/* Books Grid */}
         {filteredStories.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-[#283013] rounded-3xl border border-amber-200/80 dark:border-pine-700/60 p-8 space-y-4">
+          <div className="text-center py-16 bg-white dark:bg-[#012A25] rounded-3xl border border-amber-200/80 dark:border-emerald-700/60 p-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-emerald-950 text-amber-700 dark:text-amber-300 flex items-center justify-center mx-auto text-2xl">
               📚
             </div>
@@ -117,7 +117,7 @@ export default function LibraryPage() {
               return (
                 <div
                   key={story.id}
-                  className="bg-white dark:bg-[#283013] rounded-3xl overflow-hidden border border-amber-200/80 dark:border-pine-700/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white dark:bg-[#012A25] rounded-3xl overflow-hidden border border-amber-200/80 dark:border-emerald-700/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     {/* Cover Preview */}
