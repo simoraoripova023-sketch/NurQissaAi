@@ -13,7 +13,7 @@ import { translations } from '@/lib/translations';
 import { MoralVirtue, StorySetting, Gender, ReadingTimeContext } from '@/lib/types';
 import confetti from 'canvas-confetti';
 
-import { ILLUSTRATION_STYLES, PIXAR_AVATARS } from '@/lib/illustrationHelper';
+import { ILLUSTRATION_STYLES } from '@/lib/illustrationHelper';
 
 export default function StoryWizard() {
   const router = useRouter();
@@ -324,16 +324,11 @@ export default function StoryWizard() {
                           key={g}
                           type="button"
                           onClick={() => {
-                            const isCustomPhoto = childProfile.child_photo_url && !PIXAR_AVATARS.some(a => a.url === childProfile.child_photo_url);
-                            const matchingAvatar = PIXAR_AVATARS.find(a => a.gender === g) || PIXAR_AVATARS[0];
-                            updateChildProfile({ 
-                              gender: g,
-                              child_photo_url: isCustomPhoto ? childProfile.child_photo_url : matchingAvatar.url
-                            });
+                            updateChildProfile({ gender: g });
                           }}
                           className={`p-3.5 rounded-2xl border-2 font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                             childProfile.gender === g
-                              ? 'border-amber-500 bg-amber-50 dark:bg-pine-900 text-amber-950 dark:text-amber-200 shadow-sm'
+                              ? 'border-emerald-600 bg-emerald-50 dark:bg-pine-900 text-emerald-950 dark:text-emerald-200 shadow-sm'
                               : 'border-slate-200 dark:border-pine-800 text-slate-700 dark:text-slate-300 bg-white dark:bg-pine-950'
                           }`}
                         >
@@ -344,118 +339,77 @@ export default function StoryWizard() {
                     </div>
                   </div>
 
-                  {/* 3D Character Avatars & Photo */}
-                  <div className="space-y-3 pt-1">
+                  {/* Optional Custom Photo Upload */}
+                  <div className="space-y-2 pt-2">
                     <label className="text-sm font-bold text-slate-800 dark:text-emerald-100 flex items-center justify-between">
                       <span className="flex items-center gap-1.5">
-                        <Sparkles className="w-4 h-4 text-amber-500" />
-                        <span>{locale === 'uz' ? "Bosh Qahramon Qiyofasini Tanlang:" : "Choose Character Appearance:"}</span>
+                        <Camera className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <span>{locale === 'uz' ? "Farzandingiz suratini yuklang (Ixtiyoriy):" : "Upload child's photo (Optional):"}</span>
                       </span>
                       <span className="text-[11px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                        {locale === 'uz' ? "3D Islomiy San'at" : "3D Pixar Art"}
+                        {locale === 'uz' ? "AI Shaxsiylashtirish" : "AI Personalization"}
                       </span>
                     </label>
 
-                    {/* Pre-made 3D Avatars */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {PIXAR_AVATARS.map((char) => {
-                        const isSelected = childProfile.child_photo_url === char.url || (!childProfile.child_photo_url && char.gender === childProfile.gender && char.id.includes(childProfile.gender === 'boy' ? 'yusuf' : 'fotima'));
-                        return (
-                          <button
-                            key={char.id}
-                            type="button"
-                            onClick={() => {
-                              updateChildProfile({ 
-                                child_photo_url: char.url,
-                                gender: char.gender as Gender
-                              });
-                            }}
-                            className={`p-2 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 relative overflow-hidden ${
-                              isSelected
-                                ? 'border-amber-500 bg-amber-50 dark:bg-pine-900 shadow-md ring-2 ring-amber-400 scale-[1.03]'
-                                : 'border-slate-200 dark:border-pine-800 bg-white dark:bg-pine-950 hover:border-amber-300'
-                            }`}
-                          >
-                            <img
-                              src={char.url}
-                              alt={char.label_uz}
-                              className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover shadow-sm"
-                            />
-                            <span className="text-xs font-extrabold text-slate-800 dark:text-butter-100 text-center leading-tight">
-                              {locale === 'uz' ? char.label_uz.split(' ')[0] : char.label_en.split(' ')[0]}
-                            </span>
-                            {isSelected && (
-                              <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center text-[10px] font-black shadow-xs">
-                                ✓
-                              </div>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all flex items-center justify-between ${
+                        childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
+                          ? 'border-emerald-500 bg-emerald-50/70 dark:bg-pine-900/70 ring-2 ring-emerald-300'
+                          : 'border-slate-300 dark:border-pine-700 hover:border-emerald-400 bg-slate-50/60 dark:bg-pine-950/60'
+                      }`}
+                    >
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handlePhotoUpload}
+                        accept="image/*"
+                        className="hidden"
+                      />
 
-                    {/* Custom Photo Upload Card */}
-                    <div className="space-y-2">
-                      <div
-                        onClick={() => fileInputRef.current?.click()}
-                        className={`border-2 border-dashed rounded-2xl p-4 text-center cursor-pointer transition-all flex items-center justify-between ${
-                          childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
-                            ? 'border-emerald-500 bg-emerald-50/70 dark:bg-pine-900/70 ring-2 ring-emerald-300'
-                            : 'border-slate-300 dark:border-pine-700 hover:border-amber-400 bg-slate-50/60 dark:bg-pine-950/60'
-                        }`}
-                      >
-                        <input
-                          type="file"
-                          ref={fileInputRef}
-                          onChange={handlePhotoUpload}
-                          accept="image/*"
-                          className="hidden"
-                        />
-
-                        <div className="flex items-center gap-3.5">
-                          {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image') ? (
-                            <img
-                              src={childProfile.child_photo_url}
-                              alt="Child Upload Preview"
-                              className="w-12 h-12 rounded-xl object-cover border-2 border-emerald-500 shadow-sm shrink-0"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-pine-800 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-xs text-xl">
-                              📷
-                            </div>
-                          )}
-                          <div className="text-left">
-                            <p className="text-xs font-bold text-slate-800 dark:text-butter-100">
-                              {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
-                                ? (locale === 'uz' ? "Farzandingiz surati yuklandi ✓" : "Child's photo uploaded ✓")
-                                : (locale === 'uz' ? "Farzandingiz suratini yuklang (Ixtiyoriy)" : "Upload child's photo (Optional)")}
-                            </p>
-                            <span className="text-[11px] text-slate-500 dark:text-butter-300/70">
-                              {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
-                                ? (locale === 'uz' ? "AI qahramonni ushbu yuz asosida chizadi" : "AI will personalize 3D avatar from this face")
-                                : (locale === 'uz' ? "Suratsiz ham AI matn asosida yangi 3D qahramon yaratadi" : "Without photo, AI creates unique 3D hero")}
-                            </span>
+                      <div className="flex items-center gap-3.5">
+                        {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image') ? (
+                          <img
+                            src={childProfile.child_photo_url}
+                            alt="Child Upload Preview"
+                            className="w-12 h-12 rounded-xl object-cover border-2 border-emerald-500 shadow-sm shrink-0"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-pine-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 shadow-xs text-xl">
+                            📷
                           </div>
+                        )}
+                        <div className="text-left">
+                          <p className="text-xs font-bold text-slate-800 dark:text-butter-100">
+                            {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
+                              ? (locale === 'uz' ? "Farzandingiz surati yuklandi ✓" : "Child's photo uploaded ✓")
+                              : (locale === 'uz' ? "Farzandingiz suratini yuklang (Ixtiyoriy)" : "Upload child's photo (Optional)")}
+                          </p>
+                          <span className="text-[11px] text-slate-500 dark:text-butter-300/70">
+                            {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image')
+                              ? (locale === 'uz' ? "AI qahramonni ushbu yuz asosida chizadi" : "AI will personalize 3D avatar from this face")
+                              : (locale === 'uz' ? "Suratsiz ham AI matn asosida yangi 3D qahramon yaratadi" : "Without photo, AI creates unique 3D hero")}
+                          </span>
                         </div>
+                      </div>
 
-                        <div className="flex items-center gap-2">
-                          {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image') ? (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                updateChildProfile({ child_photo_url: '', character_appearance_description: '' });
-                              }}
-                              className="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold transition-all"
-                            >
-                              ✕ {locale === 'uz' ? "O'chirish" : "Remove"}
-                            </button>
-                          ) : (
-                            <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-pine-800 px-3 py-1.5 rounded-xl shrink-0">
-                              {locale === 'uz' ? "Yuklash" : "Browse"}
-                            </span>
-                          )}
-                        </div>
+                      <div className="flex items-center gap-2">
+                        {childProfile.child_photo_url && childProfile.child_photo_url.startsWith('data:image') ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              updateChildProfile({ child_photo_url: '', character_appearance_description: '' });
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold transition-all"
+                          >
+                            ✕ {locale === 'uz' ? "O'chirish" : "Remove"}
+                          </button>
+                        ) : (
+                          <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-pine-800 px-3 py-1.5 rounded-xl shrink-0">
+                            {locale === 'uz' ? "Yuklash" : "Browse"}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
