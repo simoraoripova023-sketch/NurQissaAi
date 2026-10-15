@@ -189,18 +189,17 @@ export function generateDynamicIslamicStory(
   }
 
   const selectedPages: StoryPage[] = templates.slice(0, targetPageCount).map((t, idx) => {
-    const fullPrompt = `${t.actionPrompt}, ${stylePrompt}, ${negativeEnhancers}`;
     return {
       page_number: idx + 1,
       text_uz: t.uz,
       text_en: t.en,
-      image_prompt: fullPrompt,
-      image_url: `/api/story-image?storyId=${encodeURIComponent(storyId)}&page=${idx + 1}&prompt=${encodeURIComponent(fullPrompt)}&style=${encodeURIComponent(profile.illustration_style || 'pixar_3d')}`,
+      image_prompt: t.actionPrompt,
+      image_url: `/api/story-image?storyId=${encodeURIComponent(storyId)}&page=${idx + 1}&prompt=${encodeURIComponent(t.actionPrompt)}&style=${encodeURIComponent(profile.illustration_style || 'pixar_3d')}&gender=${encodeURIComponent(profile.gender || 'girl')}`,
       scene_summary: t.sceneSummary
     };
   });
 
-  const coverPrompt = `${masterAnchor}, smiling radiantly with loving family in cozy warm glowing ${color} room, soft ambient sunlight, title banner, 8k resolution, cinematic lighting, masterpiece, ${stylePrompt}, ${negativeEnhancers}`;
+  const coverPrompt = `${masterAnchor}, smiling radiantly with loving family in cozy warm glowing ${color} room, soft ambient sunlight, title banner, crisp clean children picturebook illustration, masterpiece`;
 
   return {
     id: storyId,
@@ -210,7 +209,7 @@ export function generateDynamicIslamicStory(
     title_en: `${childName} and the Radiant Tale of Wisdom`,
     prologue_uz: `Farzandimiz — ${childName}ning Islomiy odoblar, kattalarga hurmat va ezgulik bilan yo'g'rilgan nurli oqshom qissasi...`,
     prologue_en: `A heartwarming bedtime journey of young ${childName} discovering the profound beauty of noble Islamic character and deeds...`,
-    cover_image_url: `/api/story-image?storyId=${encodeURIComponent(storyId)}&page=0&prompt=${encodeURIComponent(coverPrompt)}&style=${encodeURIComponent(profile.illustration_style || 'pixar_3d')}`,
+    cover_image_url: `/api/story-image?storyId=${encodeURIComponent(storyId)}&page=0&prompt=${encodeURIComponent(coverPrompt)}&style=${encodeURIComponent(profile.illustration_style || 'pixar_3d')}&gender=${encodeURIComponent(profile.gender || 'girl')}`,
     theme_color: isBoy ? "#013E37" : "#D97706",
     pages: selectedPages,
     reflection: {

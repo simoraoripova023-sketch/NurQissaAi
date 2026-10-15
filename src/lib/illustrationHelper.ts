@@ -101,7 +101,7 @@ export const ILLUSTRATION_STYLES: IllustrationStyleOption[] = [
     icon: '🎬',
     badge: '3D Pixar',
     colorGradient: 'from-amber-500 to-orange-600',
-    promptModifier: '3D Disney Pixar animation storybook style, soft glowing golden bedtime lighting, vibrant cozy colors, high resolution 3D render, masterpiece'
+    promptModifier: 'delightful 3D Disney Pixar style children\'s picturebook illustration, adorable lovable cartoon child character, large expressive shining eyes, warm innocent smile, bright vibrant cheerful colors, warm sunny golden daylight, cozy fairytale atmosphere, crisp clean details, heartwarming storybook masterpiece'
   },
   {
     id: 'watercolor',
@@ -112,7 +112,7 @@ export const ILLUSTRATION_STYLES: IllustrationStyleOption[] = [
     icon: '🎨',
     badge: 'Akvarel',
     colorGradient: 'from-sky-400 to-indigo-500',
-    promptModifier: 'gentle fairytale watercolor illustration, soft dreamy watercolor washes, delicate pencil line art, charming children storybook aesthetic'
+    promptModifier: 'authentic gentle fairytale watercolor illustration, soft dreamy gouache washes, fine delicate pencil outlines, heartwarming pastel palette, clean classic children\'s book painting, bright sunny atmosphere'
   },
   {
     id: 'classic_storybook',
@@ -123,7 +123,7 @@ export const ILLUSTRATION_STYLES: IllustrationStyleOption[] = [
     icon: '📖',
     badge: 'Klassik Kitob',
     colorGradient: 'from-emerald-500 to-teal-700',
-    promptModifier: 'classic vintage children\'s book illustration, rich oil and gouache painting style, warm cozy bedtime texture, heartwarming fairytale art'
+    promptModifier: 'classical vintage children\'s book illustration, rich warm gouache and oil painting texture, golden sunbeam lighting, heartwarming moral fairytale ambiance, crisp vibrant art'
   },
   {
     id: 'disney_2d',
@@ -134,7 +134,7 @@ export const ILLUSTRATION_STYLES: IllustrationStyleOption[] = [
     icon: '✨',
     badge: 'Disney 2D',
     colorGradient: 'from-rose-400 to-pink-600',
-    promptModifier: 'classic Disney 2D hand-drawn animation style, expressive lively lines, bright fairytale colors, charming cartoon art'
+    promptModifier: 'classic Disney 2D hand-drawn animation style, crisp clean lines, vibrant storybook colors, joyful animated child character, charming fairytale illustration'
   },
   {
     id: 'ghibli_anime',
@@ -145,7 +145,7 @@ export const ILLUSTRATION_STYLES: IllustrationStyleOption[] = [
     icon: '🌸',
     badge: 'Ghibli Uslub',
     colorGradient: 'from-teal-400 to-emerald-600',
-    promptModifier: 'Studio Ghibli aesthetic, Hayao Miyazaki inspired whimsical anime art, lush vibrant background, gentle emotive lighting'
+    promptModifier: 'Studio Ghibli nature-filled anime aesthetic, lush vibrant blooming garden background, gentle morning sunlight, whimsical peaceful fairytale atmosphere, vivid colors'
   }
 ];
 

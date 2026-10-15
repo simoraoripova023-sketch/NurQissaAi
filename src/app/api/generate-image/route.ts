@@ -3,7 +3,7 @@ import { getOpenAiApiKey } from '@/lib/serverKeys';
 
 export const runtime = 'edge';
 
-const NEGATIVE_ENHANCERS = "strictly no hats, no wizard hats, no witch hats, no giant caps, no costumes, no floating head, no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus, 8k render, masterpiece";
+const NEGATIVE_ENHANCERS = "strictly no photorealism, no realistic human skin, no uncanny valley, no wax figure, no creepy doll face, no adult features, no mature face, no teenagers, no dark moody shadows, no gloomy lighting, no dull muddy colors, no blur, no low resolution, no artifacts, no extra fingers, no distorted anatomy, no text, no watermark, no hats, no wizard hats, no witch hats, no giant caps";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,14 +21,14 @@ export async function POST(req: NextRequest) {
       : `adorable sweet 5-year-old Uzbek girl named ${name}, shiny dark hair with soft bangs, sparkling luminous brown eyes, sweet joyful smile, wearing a lovely elegant pastel dress`;
 
     const styleDescriptor = style === 'watercolor'
-      ? "authentic gentle fairytale watercolor storybook painting, soft dreamy gouache washes, delicate fine pencil lines"
+      ? "authentic gentle fairytale watercolor storybook painting, soft dreamy gouache washes, delicate fine pencil lines, bright sunny day"
       : style === 'classic_storybook'
-      ? "classical vintage children's book illustration, rich warm gouache and oil textures, golden sunbeam lighting"
+      ? "classical vintage children's book illustration, rich warm gouache and oil textures, golden sunbeam lighting, crisp vibrant art"
       : style === 'disney_2d'
-      ? "classic Disney 2D hand-drawn animation style, expressive clean lines, vivid storybook colors"
+      ? "classic Disney 2D hand-drawn animation style, expressive clean lines, vivid storybook colors, joyful child character"
       : style === 'ghibli_anime'
-      ? "Studio Ghibli nature-filled anime aesthetic, lush blooming background, whimsical fairytale lighting"
-      : "3D Disney Pixar animation storybook masterpiece, ultra-smooth character rendering, soft glowing golden hour bedtime lighting, vivid rich colors, 8k render";
+      ? "Studio Ghibli nature-filled anime aesthetic, lush blooming background, whimsical fairytale lighting, vivid colors"
+      : "delightful 3D Disney Pixar style children's picturebook illustration, adorable lovable cartoon child character, large expressive shining eyes, warm innocent smile, bright vibrant cheerful colors, warm sunny golden daylight, crisp clean details, heartwarming storybook masterpiece";
 
     const enhancedPrompt = prompt.includes(name)
       ? `${prompt}, ${styleDescriptor}, ${NEGATIVE_ENHANCERS}`
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
             size: model === 'dall-e-3' ? '1024x1024' : '512x512',
           };
           if (model === 'dall-e-3') {
-            bodyPayload.quality = 'standard';
+            bodyPayload.quality = 'hd';
           }
 
           const response = await fetch('https://api.openai.com/v1/images/generations', {

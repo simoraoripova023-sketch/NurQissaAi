@@ -19,8 +19,8 @@ function buildMasterCharacterAnchor(profile: ChildProfile): string {
     : "a lovely modest pastel-colored floral dress with gentle long sleeves, delicate embroidery, and a cute little flower clip in hair";
 
   const defaultAppearance = isBoy
-    ? `adorable handsome ${age}-year-old Uzbek boy named ${name}, neat short dark wavy hair, large sparkling expressive warm brown eyes, cute round rosy cheeks, sweet gentle innocent smile`
-    : `adorable sweet ${age}-year-old Uzbek girl named ${name}, shiny dark shoulder-length hair with neat bangs, large sparkling luminous brown eyes, rosy cute cheeks, gentle radiant smile`;
+    ? `adorable handsome ${age}-year-old Uzbek boy named ${name}, cute young child, neat short dark wavy hair, large sparkling expressive warm brown cartoon eyes, cute round rosy cheeks, sweet gentle innocent smile`
+    : `adorable sweet ${age}-year-old Uzbek girl named ${name}, cute young child, shiny dark shoulder-length hair with neat bangs, large sparkling luminous brown cartoon eyes, rosy cute cheeks, gentle radiant smile`;
 
   const baseAppearance = profile.character_appearance_description && profile.character_appearance_description.trim().length > 10
     ? profile.character_appearance_description.trim()
@@ -30,14 +30,14 @@ function buildMasterCharacterAnchor(profile: ChildProfile): string {
 }
 
 const STYLE_PROMPTS: Record<string, string> = {
-  pixar_3d: "3D Disney Pixar animation storybook masterpiece, ultra-smooth character rendering, soft glowing golden hour bedtime lighting, rich warm cinematic colors, 8k resolution, highly detailed texture, lovable expressive facial features",
-  watercolor: "authentic gentle fairytale watercolor illustration, soft dreamy gouache washes, fine delicate pencil outlines, heartwarming pastel palette, clean classic children's book painting",
-  classic_storybook: "classical vintage children's book illustration, rich warm gouache and oil painting texture, golden sunbeam lighting, heartwarming moral fairytale ambiance",
-  disney_2d: "classic Disney 2D hand-drawn animation style, crisp clean lines, vibrant storybook colors, joyful animated child character",
-  ghibli_anime: "Studio Ghibli nature-filled anime aesthetic, lush vibrant blooming garden background, gentle morning sunlight, whimsical peaceful fairytale atmosphere"
+  pixar_3d: "delightful 3D Disney Pixar style children's picturebook illustration, adorable lovable cartoon child character, large expressive shining eyes, warm innocent smile, bright vibrant cheerful colors, warm sunny golden daylight, cozy fairytale atmosphere, crisp clean details, heartwarming storybook masterpiece",
+  watercolor: "authentic gentle fairytale watercolor illustration, soft dreamy gouache washes, fine delicate pencil outlines, heartwarming pastel palette, clean classic children's book painting, bright sunny atmosphere",
+  classic_storybook: "classical vintage children's book illustration, rich warm gouache and oil painting texture, golden sunbeam lighting, heartwarming moral fairytale ambiance, crisp vibrant art",
+  disney_2d: "classic Disney 2D hand-drawn animation style, crisp clean lines, vibrant storybook colors, joyful animated child character, charming fairytale illustration",
+  ghibli_anime: "Studio Ghibli nature-filled anime aesthetic, lush vibrant blooming garden background, gentle morning sunlight, whimsical peaceful fairytale atmosphere, vivid colors"
 };
 
-const NEGATIVE_ENHANCERS = "strictly no hats, no wizard hats, no witch hats, no giant caps, no costumes, no floating head, no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus";
+const NEGATIVE_ENHANCERS = "strictly no photorealism, no realistic human skin, no uncanny valley, no wax figure, no creepy doll face, no adult features, no mature face, no teenagers, no dark moody shadows, no gloomy lighting, no dull muddy colors, no blur, no low resolution, no artifacts, no extra fingers, no distorted anatomy, no text, no watermark, no hats, no wizard hats, no witch hats, no giant caps";
 
 function translateColorToEnglish(colorStr: string): string {
   const lower = (colorStr || '').toLowerCase();
@@ -65,7 +65,7 @@ async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<
           size: model === 'dall-e-3' ? '1024x1024' : '512x512',
         };
         if (model === 'dall-e-3') {
-          bodyPayload.quality = 'standard';
+          bodyPayload.quality = 'hd';
         }
 
         const res = await fetch('https://api.openai.com/v1/images/generations', {
@@ -102,10 +102,8 @@ async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<
 /**
  * Creates dynamic high-definition AI image URL using the server-side story-image endpoint
  */
-function createAiImageUrl(prompt: string, storyId: string, pageNum: number, style: string = 'pixar_3d'): string {
-  const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.pixar_3d;
-  const fullPrompt = `${prompt}, ${stylePrompt}, ${NEGATIVE_ENHANCERS}`;
-  return `/api/story-image?storyId=${encodeURIComponent(storyId)}&page=${pageNum}&prompt=${encodeURIComponent(fullPrompt)}&style=${encodeURIComponent(style)}`;
+function createAiImageUrl(cleanPrompt: string, storyId: string, pageNum: number, style: string = 'pixar_3d', gender: string = 'girl'): string {
+  return `/api/story-image?storyId=${encodeURIComponent(storyId)}&page=${pageNum}&prompt=${encodeURIComponent(cleanPrompt)}&style=${encodeURIComponent(style)}&gender=${encodeURIComponent(gender)}`;
 }
 
 /**
@@ -378,21 +376,24 @@ export async function POST(req: NextRequest) {
     const generatedStory = await generateStoryWithAi(profile, characterPersona, geminiApiKey.trim());
 
     if (generatedStory && generatedStory.pages && generatedStory.pages.length >= 3) {
-      const coverPrompt = `${characterPersona} in a cozy warm glowing ${translateColorToEnglish(color)} room, gentle ambient sunlight, loving peaceful Islamic family ambiance, smiling warmly with joyful eyes, title banner, 8k resolution, cinematic lighting, masterpiece`;
+      const coverPrompt = `${characterPersona} in a cozy warm glowing ${translateColorToEnglish(color)} room, gentle ambient sunlight, loving peaceful Islamic family ambiance, smiling warmly with joyful eyes, title banner, crisp clean children picturebook illustration, masterpiece`;
       
-      // Generate Cover Art: OpenAI gpt-image-1-mini or stream endpoint
-      const fallbackAiCoverUrl = createAiImageUrl(coverPrompt, storyId, 0, chosenStyle);
-      const coverImageUrl = await generateDallEImage(coverPrompt, fallbackAiCoverUrl);
+      // Generate Cover Art: OpenAI DALL-E 3 HD or stream endpoint
+      const fallbackAiCoverUrl = createAiImageUrl(coverPrompt, storyId, 0, chosenStyle, profile.gender);
+      const coverImageUrl = await generateDallEImage(
+        `${coverPrompt}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`,
+        fallbackAiCoverUrl
+      );
 
       // Generate 100% new, unique AI illustrations for every single page
       const enhancedPages = generatedStory.pages.map((p, idx) => {
         const actionText = p.scene_summary || p.text_uz?.slice(0, 150) || 'heartwarming bedtime moment';
         
         const pagePrompt = p.image_prompt && p.image_prompt.includes(childName)
-          ? `${p.image_prompt}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`
-          : `${characterPersona} in ${actionText}, ${translateColorToEnglish(color)} setting, soft warm golden lighting, adorable cheerful expression, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`;
+          ? p.image_prompt
+          : `${characterPersona} in ${actionText}, ${translateColorToEnglish(color)} setting, soft warm golden lighting, adorable cheerful expression`;
 
-        const pageImageUrl = createAiImageUrl(pagePrompt, storyId, idx + 1, chosenStyle);
+        const pageImageUrl = createAiImageUrl(pagePrompt, storyId, idx + 1, chosenStyle, profile.gender);
 
         return {
           page_number: idx + 1,

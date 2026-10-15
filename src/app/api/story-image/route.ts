@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAiApiKey } from '@/lib/serverKeys';
+import fs from 'fs';
+import path from 'path';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -8,14 +10,14 @@ export const maxDuration = 60;
 const imageCache = new Map<string, { buffer: Buffer; contentType: string }>();
 
 const STYLE_PROMPTS: Record<string, string> = {
-  pixar_3d: "3D Disney Pixar animation storybook masterpiece, ultra-smooth character rendering, soft glowing golden hour bedtime lighting, rich warm cinematic colors, 8k resolution, highly detailed texture, lovable expressive facial features",
-  watercolor: "authentic gentle fairytale watercolor illustration, soft dreamy gouache washes, fine delicate pencil outlines, heartwarming pastel palette, clean classic children's book painting",
-  classic_storybook: "classical vintage children's book illustration, rich warm gouache and oil painting texture, golden sunbeam lighting, heartwarming moral fairytale ambiance",
-  disney_2d: "classic Disney 2D hand-drawn animation style, crisp clean lines, vibrant storybook colors, joyful animated child character",
-  ghibli_anime: "Studio Ghibli nature-filled anime aesthetic, lush vibrant blooming garden background, gentle morning sunlight, whimsical peaceful fairytale atmosphere"
+  pixar_3d: "delightful 3D Disney Pixar style children's picturebook illustration, adorable lovable cartoon child character, large expressive shining eyes, warm innocent smile, bright vibrant cheerful colors, warm sunny golden daylight, cozy fairytale atmosphere, crisp clean details, heartwarming storybook masterpiece",
+  watercolor: "authentic gentle fairytale watercolor illustration, soft dreamy gouache washes, fine delicate pencil outlines, heartwarming pastel palette, clean classic children's book painting, bright sunny atmosphere",
+  classic_storybook: "classical vintage children's book illustration, rich warm gouache and oil painting texture, golden sunbeam lighting, heartwarming moral fairytale ambiance, crisp vibrant art",
+  disney_2d: "classic Disney 2D hand-drawn animation style, crisp clean lines, vibrant storybook colors, joyful animated child character, charming fairytale illustration",
+  ghibli_anime: "Studio Ghibli nature-filled anime aesthetic, lush vibrant blooming garden background, gentle morning sunlight, whimsical peaceful fairytale atmosphere, vivid colors"
 };
 
-const NEGATIVE_ENHANCERS = "strictly no hats, no wizard hats, no witch hats, no giant caps, no costumes, no floating head, no blurry faces, no distorted eyes, no deformed fingers or extra limbs, no adult features on child, no creepy doll face, no smeared features, no scary elements, high definition sharp focus";
+const NEGATIVE_ENHANCERS = "strictly no photorealism, no realistic human skin, no uncanny valley, no wax figure, no creepy doll face, no adult features, no mature face, no teenagers, no dark moody shadows, no gloomy lighting, no dull muddy colors, no blur, no low resolution, no artifacts, no extra fingers, no distorted anatomy, no text, no watermark, no hats, no wizard hats, no witch hats, no giant caps";
 
 export async function GET(req: NextRequest) {
   try {
@@ -23,9 +25,11 @@ export async function GET(req: NextRequest) {
     const rawPrompt = searchParams.get('prompt') || 'Islamic bedtime story for children';
     const style = searchParams.get('style') || 'pixar_3d';
     const storyId = searchParams.get('storyId') || '';
-    const page = searchParams.get('page') || '1';
+    const pageStr = searchParams.get('page') || '1';
+    const pageNum = parseInt(pageStr, 10) || 1;
+    const gender = searchParams.get('gender') || (rawPrompt.toLowerCase().includes('boy') || rawPrompt.toLowerCase().includes("o'g'il") || rawPrompt.toLowerCase().includes('yusuf') ? 'boy' : 'girl');
 
-    const cacheKey = `${storyId}_p${page}_${rawPrompt.slice(0, 60)}`;
+    const cacheKey = `${storyId}_p${pageStr}_${rawPrompt.slice(0, 60)}`;
     if (imageCache.has(cacheKey)) {
       const cached = imageCache.get(cacheKey)!;
       return new NextResponse(new Uint8Array(cached.buffer), {
@@ -36,8 +40,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Clean duplicate enhancers if caller already included some
+    const cleanedBasePrompt = rawPrompt
+      .replace(/strictly no photorealism.*$/gi, '')
+      .replace(/strictly no hats.*$/gi, '')
+      .replace(/delightful 3D Disney Pixar.*$/gi, '')
+      .replace(/3D Disney Pixar animation.*$/gi, '')
+      .trim();
+
     const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.pixar_3d;
-    const fullPrompt = `${rawPrompt}, ${stylePrompt}, ${NEGATIVE_ENHANCERS}`;
+    const fullPrompt = `${cleanedBasePrompt}, ${stylePrompt}, ${NEGATIVE_ENHANCERS}`;
 
     const apiKey = getOpenAiApiKey();
 
@@ -53,7 +65,7 @@ export async function GET(req: NextRequest) {
             size: model === 'dall-e-3' ? '1024x1024' : '512x512',
           };
           if (model === 'dall-e-3') {
-            bodyPayload.quality = 'standard';
+            bodyPayload.quality = 'hd';
           }
 
           const res = await fetch('https://api.openai.com/v1/images/generations', {
@@ -103,9 +115,10 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Secondary AI Fallback: Pollinations AI Flux Generator
+    // Secondary AI Fallback: Pollinations AI Flux Generator with high quality modifiers
     try {
-      const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt.slice(0, 600))}?width=1024&height=1024&model=flux&nologo=true`;
+      const pollinationsCleanPrompt = `${cleanedBasePrompt}, children picturebook illustration, vibrant storybook art, bright sunny warm colors, crisp clear focus, highly detailed, cute cartoon child`;
+      const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(pollinationsCleanPrompt.slice(0, 480))}?width=1024&height=1024&model=flux&nologo=true&enhance=true`;
       const pollinationsRes = await fetch(pollinationsUrl, { signal: AbortSignal.timeout(12000) });
       if (pollinationsRes.ok) {
         const imgBuf = Buffer.from(await pollinationsRes.arrayBuffer());
@@ -121,6 +134,25 @@ export async function GET(req: NextRequest) {
       }
     } catch (pollinationsErr) {
       console.warn('Pollinations AI image fallback notice:', pollinationsErr);
+    }
+
+    // Local authentic storybook fallback from curated high-definition samples
+    try {
+      const safePage = Math.max(1, Math.min(pageNum || 1, 8));
+      const folder = gender === 'boy' ? 'yusuf' : 'fotima';
+      const samplePath = path.join(process.cwd(), 'public', 'stories', folder, `page_${safePage}.jpeg`);
+      if (fs.existsSync(samplePath)) {
+        const fileBuf = fs.readFileSync(samplePath);
+        imageCache.set(cacheKey, { buffer: fileBuf, contentType: 'image/jpeg' });
+        return new NextResponse(new Uint8Array(fileBuf), {
+          headers: {
+            'Content-Type': 'image/jpeg',
+            'Cache-Control': 'public, max-age=86400, immutable',
+          },
+        });
+      }
+    } catch (fsErr) {
+      console.warn('Local sample storybook read notice:', fsErr);
     }
 
     // Fallback: Return a warm glowing bedtime scene placeholder
