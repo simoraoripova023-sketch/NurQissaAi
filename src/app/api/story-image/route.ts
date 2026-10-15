@@ -8,6 +8,7 @@ export const maxDuration = 60;
 
 // In-memory cache for generated images during runtime
 const imageCache = new Map<string, { buffer: Buffer; contentType: string }>();
+let openAiQuotaExhaustedUntil = 0;
 
 const STYLE_PROMPTS: Record<string, string> = {
   pixar_3d: "delightful 3D Disney Pixar style children's picturebook illustration, adorable lovable cartoon child character, large expressive shining eyes, warm innocent smile, bright vibrant cheerful colors, warm sunny golden daylight, cozy fairytale atmosphere, crisp clean details, heartwarming storybook masterpiece",
@@ -51,9 +52,12 @@ export async function GET(req: NextRequest) {
     const stylePrompt = STYLE_PROMPTS[style] || STYLE_PROMPTS.pixar_3d;
     const fullPrompt = `${cleanedBasePrompt}, ${stylePrompt}, ${NEGATIVE_ENHANCERS}`;
 
-    const apiKey = getOpenAiApiKey();
+    const isBoy = gender === 'boy' || rawPrompt.toLowerCase().includes('boy') || rawPrompt.toLowerCase().includes("o'g'il") || rawPrompt.toLowerCase().includes('yusuf');
 
-    if (apiKey) {
+    const apiKey = getOpenAiApiKey();
+    const isQuotaExhausted = Date.now() < openAiQuotaExhaustedUntil;
+
+    if (apiKey && !isQuotaExhausted) {
       const modelsToTry = ['dall-e-3', 'dall-e-2'];
       
       for (const model of modelsToTry) {
@@ -107,7 +111,13 @@ export async function GET(req: NextRequest) {
             }
           } else {
             const err = await res.json().catch(() => ({}));
-            console.warn(`OpenAI image notice (${model}):`, err?.error?.message || res.status);
+            const errMsg = err?.error?.message || '';
+            console.warn(`OpenAI image notice (${model}):`, errMsg || res.status);
+            if (res.status === 429 || errMsg.includes('credits') || errMsg.includes('quota') || errMsg.includes('billing')) {
+              // OpenAI account has $0 balance or quota exceeded; cache for 10 minutes to avoid wasted calls
+              openAiQuotaExhaustedUntil = Date.now() + 10 * 60 * 1000;
+              break;
+            }
           }
         } catch (err) {
           console.warn(`Error generating image with ${model}:`, err);
@@ -115,32 +125,26 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Secondary AI Fallback: Pollinations AI Flux Generator with high quality modifiers
+    // Fast-path: Local authentic storybook masterpiece from curated high-definition assets
     try {
-      const pollinationsCleanPrompt = `${cleanedBasePrompt}, children picturebook illustration, vibrant storybook art, bright sunny warm colors, crisp clear focus, highly detailed, cute cartoon child`;
-      const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(pollinationsCleanPrompt.slice(0, 480))}?width=1024&height=1024&model=flux&nologo=true&enhance=true`;
-      const pollinationsRes = await fetch(pollinationsUrl, { signal: AbortSignal.timeout(12000) });
-      if (pollinationsRes.ok) {
-        const imgBuf = Buffer.from(await pollinationsRes.arrayBuffer());
-        if (imgBuf.length > 5000) {
-          imageCache.set(cacheKey, { buffer: imgBuf, contentType: 'image/jpeg' });
-          return new NextResponse(new Uint8Array(imgBuf), {
-            headers: {
-              'Content-Type': 'image/jpeg',
-              'Cache-Control': 'public, max-age=86400, immutable',
-            },
-          });
-        }
+      let samplePath = '';
+      if (pageNum === 0) {
+        samplePath = isBoy
+          ? path.join(process.cwd(), 'public', 'stories', 'yusuf', 'cover.jpeg')
+          : path.join(process.cwd(), 'public', 'stories', 'asmo_cover_custom.jpeg');
+      } else {
+        const safePage = ((Math.max(1, pageNum) - 1) % 8) + 1;
+        const folder = isBoy ? 'yusuf' : 'fotima';
+        samplePath = path.join(process.cwd(), 'public', 'stories', folder, `page_${safePage}.jpeg`);
       }
-    } catch (pollinationsErr) {
-      console.warn('Pollinations AI image fallback notice:', pollinationsErr);
-    }
 
-    // Local authentic storybook fallback from curated high-definition samples
-    try {
-      const safePage = Math.max(1, Math.min(pageNum || 1, 8));
-      const folder = gender === 'boy' ? 'yusuf' : 'fotima';
-      const samplePath = path.join(process.cwd(), 'public', 'stories', folder, `page_${safePage}.jpeg`);
+      if (!fs.existsSync(samplePath)) {
+        // Fallback to alternative sample
+        samplePath = isBoy
+          ? path.join(process.cwd(), 'public', 'stories', 'yusuf', 'cover.jpeg')
+          : path.join(process.cwd(), 'public', 'stories', 'fotima', 'page_1.jpeg');
+      }
+
       if (fs.existsSync(samplePath)) {
         const fileBuf = fs.readFileSync(samplePath);
         imageCache.set(cacheKey, { buffer: fileBuf, contentType: 'image/jpeg' });

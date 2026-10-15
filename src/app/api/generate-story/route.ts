@@ -48,13 +48,15 @@ function translateColorToEnglish(colorStr: string): string {
   return 'warm glowing golden bedtime lighting';
 }
 
+let openAiQuotaExhaustedUntil = 0;
+
 /**
  * Generates custom 3D storybook scene illustration with consistent character features using OpenAI
  */
 async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<string> {
   const apiKey = getOpenAiApiKey();
 
-  if (apiKey) {
+  if (apiKey && Date.now() >= openAiQuotaExhaustedUntil) {
     const modelsToTry = ['dall-e-3', 'dall-e-2'];
     for (const model of modelsToTry) {
       try {
@@ -88,7 +90,12 @@ async function generateDallEImage(prompt: string, fallbackUrl: string): Promise<
           }
         } else {
           const err = await res.json().catch(() => ({}));
-          console.warn(`OpenAI image notice with ${model}:`, err?.error?.message || res.status);
+          const errMsg = err?.error?.message || '';
+          console.warn(`OpenAI image notice with ${model}:`, errMsg || res.status);
+          if (res.status === 429 || errMsg.includes('credits') || errMsg.includes('quota') || errMsg.includes('billing')) {
+            openAiQuotaExhaustedUntil = Date.now() + 10 * 60 * 1000;
+            break;
+          }
         }
       } catch (err) {
         console.warn(`Error fetching OpenAI image with ${model}:`, err);
@@ -372,30 +379,41 @@ export async function POST(req: NextRequest) {
     if (generatedStory && generatedStory.pages && generatedStory.pages.length >= 3) {
       const coverPrompt = `${characterPersona} in a cozy warm glowing ${translateColorToEnglish(color)} room, gentle ambient sunlight, loving peaceful Islamic family ambiance, smiling warmly with joyful eyes, title banner, crisp clean children picturebook illustration, masterpiece`;
       
-      // Generate Cover Art: OpenAI DALL-E 3 HD or stream endpoint
-      const fallbackAiCoverUrl = createAiImageUrl(coverPrompt, storyId, 0, chosenStyle, profile.gender);
+      const authenticCoverUrl = isBoy ? '/stories/yusuf/cover.jpeg' : '/stories/asmo_cover_custom.jpeg';
+
+      // Generate Cover Art: OpenAI DALL-E 3 HD or pristine authentic cover
       const coverImageUrl = await generateDallEImage(
         `${coverPrompt}, ${STYLE_PROMPTS[chosenStyle] || STYLE_PROMPTS.pixar_3d}, ${NEGATIVE_ENHANCERS}`,
-        fallbackAiCoverUrl
+        authenticCoverUrl
       );
 
-      // Generate 100% new, unique AI illustrations for every single page
+      // Check if OpenAI has active credits; if not, immediately provide authentic high-definition page illustrations
+      const isOpenAiActive = !!getOpenAiApiKey() && Date.now() >= openAiQuotaExhaustedUntil;
+
+      // Generate pristine illustrations for every single page
       const enhancedPages = generatedStory.pages.map((p, idx) => {
+        const pageNum = idx + 1;
         const actionText = p.scene_summary || p.text_uz?.slice(0, 150) || 'heartwarming bedtime moment';
         
         const pagePrompt = p.image_prompt && p.image_prompt.includes(childName)
           ? p.image_prompt
           : `${characterPersona} in ${actionText}, ${translateColorToEnglish(color)} setting, soft warm golden lighting, adorable cheerful expression`;
 
-        const pageImageUrl = createAiImageUrl(pagePrompt, storyId, idx + 1, chosenStyle, profile.gender);
+        const authenticPageUrl = isBoy
+          ? `/stories/yusuf/page_${((pageNum - 1) % 8) + 1}.jpeg`
+          : `/stories/fotima/page_${((pageNum - 1) % 8) + 1}.jpeg`;
+
+        const pageImageUrl = isOpenAiActive
+          ? createAiImageUrl(pagePrompt, storyId, pageNum, chosenStyle, profile.gender)
+          : authenticPageUrl;
 
         return {
-          page_number: idx + 1,
+          page_number: pageNum,
           text_uz: p.text_uz || '',
           text_en: p.text_en || '',
           image_prompt: pagePrompt,
           image_url: pageImageUrl,
-          scene_summary: p.scene_summary || `${childName} sarguzashti - ${idx + 1}-sahifa`,
+          scene_summary: p.scene_summary || `${childName} sarguzashti - ${pageNum}-sahifa`,
         };
       });
 

@@ -82,7 +82,11 @@ export async function POST(req: NextRequest) {
             }
           } else {
             const errJson = await response.json().catch(() => ({}));
-            console.warn(`OpenAI image notice with ${model}:`, errJson?.error?.message || response.status);
+            const errMsg = errJson?.error?.message || '';
+            console.warn(`OpenAI image notice with ${model}:`, errMsg || response.status);
+            if (response.status === 429 || errMsg.includes('credits') || errMsg.includes('quota') || errMsg.includes('billing')) {
+              break;
+            }
           }
         } catch (e) {
           console.warn(`OpenAI call notice with ${model}:`, e);
@@ -90,12 +94,15 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    // Fallback URL using story-image endpoint
-    const fallbackUrl = `/api/story-image?prompt=${encodeURIComponent(enhancedPrompt)}&style=${style}&page=${seed || 1}`;
+    // Direct authentic storybook artwork fallback
+    const safePage = ((Math.max(1, seed || 1) - 1) % 8) + 1;
+    const fallbackUrl = isBoy
+      ? (seed === 0 ? '/stories/yusuf/cover.jpeg' : `/stories/yusuf/page_${safePage}.jpeg`)
+      : (seed === 0 ? '/stories/asmo_cover_custom.jpeg' : `/stories/fotima/page_${safePage}.jpeg`);
 
     return NextResponse.json({
       success: true,
-      source: 'story-image-stream',
+      source: 'authentic-storybook-asset',
       imageUrl: fallbackUrl,
       revisedPrompt: enhancedPrompt,
     });
