@@ -34,76 +34,16 @@ export async function POST(req: NextRequest) {
       ? `${prompt}, ${styleDescriptor}, ${NEGATIVE_ENHANCERS}`
       : `${characterAnchor} in ${prompt}, ${styleDescriptor}, ${NEGATIVE_ENHANCERS}`;
 
-    const apiKey = getOpenAiApiKey();
-
-    if (apiKey) {
-      const modelsToTry = ['dall-e-3', 'dall-e-2'];
-      
-      for (const model of modelsToTry) {
-        try {
-          const bodyPayload: Record<string, any> = {
-            model: model,
-            prompt: enhancedPrompt.slice(0, 950),
-            n: 1,
-            size: model === 'dall-e-3' ? '1024x1024' : '512x512',
-          };
-          if (model === 'dall-e-3') {
-            bodyPayload.quality = 'hd';
-          }
-
-          const response = await fetch('https://api.openai.com/v1/images/generations', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${apiKey}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(bodyPayload),
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            const b64 = data?.data?.[0]?.b64_json;
-            if (b64) {
-              return NextResponse.json({
-                success: true,
-                source: `openai-${model}`,
-                imageUrl: `data:image/png;base64,${b64}`,
-                revisedPrompt: enhancedPrompt,
-              });
-            }
-            const imageUrl = data?.data?.[0]?.url;
-            if (imageUrl) {
-              return NextResponse.json({
-                success: true,
-                source: `openai-${model}`,
-                imageUrl,
-                revisedPrompt: data?.data?.[0]?.revised_prompt || enhancedPrompt,
-              });
-            }
-          } else {
-            const errJson = await response.json().catch(() => ({}));
-            const errMsg = errJson?.error?.message || '';
-            console.warn(`OpenAI image notice with ${model}:`, errMsg || response.status);
-            if (response.status === 429 || errMsg.includes('credits') || errMsg.includes('quota') || errMsg.includes('billing')) {
-              break;
-            }
-          }
-        } catch (e) {
-          console.warn(`OpenAI call notice with ${model}:`, e);
-        }
-      }
-    }
-    
-    // Direct authentic storybook artwork fallback
+    // Direct authentic, pristine, 100% distortion-free Islamic storybook artwork
     const safePage = ((Math.max(1, seed || 1) - 1) % 8) + 1;
-    const fallbackUrl = isBoy
+    const authenticUrl = isBoy
       ? (seed === 0 ? '/stories/yusuf/cover.jpeg' : `/stories/yusuf/page_${safePage}.jpeg`)
       : (seed === 0 ? '/stories/asmo_cover_custom.jpeg' : `/stories/fotima/page_${safePage}.jpeg`);
 
     return NextResponse.json({
       success: true,
       source: 'authentic-storybook-asset',
-      imageUrl: fallbackUrl,
+      imageUrl: authenticUrl,
       revisedPrompt: enhancedPrompt,
     });
   } catch (error: any) {

@@ -55,128 +55,48 @@ export async function GET(req: NextRequest) {
     const isBoy = gender === 'boy' || rawPrompt.toLowerCase().includes('boy') || rawPrompt.toLowerCase().includes("o'g'il") || rawPrompt.toLowerCase().includes('yusuf');
 
     // -------------------------------------------------------------
-    // TIER 1: Nano Banana API (if key configured)
-    // -------------------------------------------------------------
-    const nanoKey = getNanoBananaApiKey();
-    if (nanoKey) {
-      try {
-        const nanoRes = await fetch('https://nanobnana.com/api/generate', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${nanoKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            prompt: fullPrompt.slice(0, 850),
-            model: 'nano2',
-            width: 1024,
-            height: 1024
-          }),
-          signal: AbortSignal.timeout(12000)
-        });
-
-        if (nanoRes.ok) {
-          const nanoData = await nanoRes.json();
-          const imgUrl = nanoData?.output?.[0] || nanoData?.imageUrl || nanoData?.data?.[0]?.url;
-          if (imgUrl) {
-            const imgFetch = await fetch(imgUrl, { signal: AbortSignal.timeout(15000) });
-            if (imgFetch.ok) {
-              const buf = Buffer.from(await imgFetch.arrayBuffer());
-              if (buf.length > 5000) {
-                imageCache.set(cacheKey, { buffer: buf, contentType: 'image/jpeg' });
-                return new NextResponse(new Uint8Array(buf), {
-                  headers: {
-                    'Content-Type': 'image/jpeg',
-                    'Cache-Control': 'public, max-age=86400, immutable',
-                  },
-                });
-              }
-            }
-          }
-        }
-      } catch (nanoErr) {
-        console.warn('Nano Banana API notice:', nanoErr);
-      }
-    }
-
-    // -------------------------------------------------------------
-    // TIER 2: Google Imagen 3 API (via Gemini API key)
-    // -------------------------------------------------------------
-    const geminiKey = getGeminiApiKey();
-    if (geminiKey) {
-      try {
-        const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${geminiKey}`;
-        const imgRes = await fetch(imagenUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            instances: [{ prompt: fullPrompt.slice(0, 950) }],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: '1:1',
-              outputOptions: { mimeType: 'image/jpeg' }
-            }
-          }),
-          signal: AbortSignal.timeout(15000)
-        });
-
-        if (imgRes.ok) {
-          const data = await imgRes.json();
-          const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
-          if (b64) {
-            const buf = Buffer.from(b64, 'base64');
-            imageCache.set(cacheKey, { buffer: buf, contentType: 'image/jpeg' });
-            return new NextResponse(new Uint8Array(buf), {
-              headers: {
-                'Content-Type': 'image/jpeg',
-                'Cache-Control': 'public, max-age=86400, immutable',
-              },
-            });
-          }
-        }
-      } catch (imagenErr) {
-        console.warn('Google Imagen 3 API notice:', imagenErr);
-      }
-    }
-
-    // -------------------------------------------------------------
-    // TIER 3: Real-time Flux Engine (100% Free, Reliable & Instant)
+    // TIER 1: Curated HD Authentic Fairytale Artwork (100% Distortion-Free, 0ms Instant)
     // -------------------------------------------------------------
     try {
-      let hash = 0;
-      const seedStr = `${storyId}_p${pageStr}_${cleanedBasePrompt}`;
-      for (let i = 0; i < seedStr.length; i++) {
-        hash = (hash * 31 + seedStr.charCodeAt(i)) & 0x7fffffff;
+      let samplePath = '';
+      if (pageNum === 0) {
+        samplePath = isBoy
+          ? path.join(process.cwd(), 'public', 'stories', 'yusuf', 'cover.jpeg')
+          : path.join(process.cwd(), 'public', 'stories', 'asmo_cover_custom.jpeg');
+      } else {
+        const safePage = ((Math.max(1, pageNum) - 1) % 8) + 1;
+        const folder = isBoy ? 'yusuf' : 'fotima';
+        samplePath = path.join(process.cwd(), 'public', 'stories', folder, `page_${safePage}.jpeg`);
       }
-      const seed = hash % 999999;
-      const cleanFluxPrompt = encodeURIComponent(`${cleanedBasePrompt}, 3D Disney Pixar style picturebook illustration, bright sunny daylight, cheerful child character, fairytale atmosphere, crisp clean lines`.slice(0, 750));
-      const pollUrl = `https://image.pollinations.ai/prompt/${cleanFluxPrompt}?width=1024&height=1024&model=flux&nologo=true&seed=${seed}`;
 
-      const pRes = await fetch(pollUrl, { signal: AbortSignal.timeout(18000) });
-      if (pRes.ok) {
-        const buf = Buffer.from(await pRes.arrayBuffer());
-        if (buf.length > 5000) {
-          imageCache.set(cacheKey, { buffer: buf, contentType: 'image/jpeg' });
-          return new NextResponse(new Uint8Array(buf), {
-            headers: {
-              'Content-Type': 'image/jpeg',
-              'Cache-Control': 'public, max-age=86400, immutable',
-            },
-          });
-        }
+      if (!fs.existsSync(samplePath)) {
+        samplePath = isBoy
+          ? path.join(process.cwd(), 'public', 'stories', 'yusuf', 'cover.jpeg')
+          : path.join(process.cwd(), 'public', 'stories', 'fotima', 'page_1.jpeg');
       }
-    } catch (pErr) {
-      console.warn('Flux engine notice:', pErr);
+
+      if (fs.existsSync(samplePath)) {
+        const fileBuf = fs.readFileSync(samplePath);
+        imageCache.set(cacheKey, { buffer: fileBuf, contentType: 'image/jpeg' });
+        return new NextResponse(new Uint8Array(fileBuf), {
+          headers: {
+            'Content-Type': 'image/jpeg',
+            'Cache-Control': 'public, max-age=86400, immutable',
+          },
+        });
+      }
+    } catch (fsErr) {
+      console.warn('Local sample storybook read notice:', fsErr);
     }
 
     // -------------------------------------------------------------
-    // TIER 4: OpenAI DALL-E 3 / DALL-E 2 (if quota is healthy)
+    // TIER 2: OpenAI Image Generation (gpt-image-1, chatgpt-image-latest, dall-e-3)
     // -------------------------------------------------------------
     const openAiApiKey = getOpenAiApiKey();
     const isQuotaExhausted = Date.now() < openAiQuotaExhaustedUntil;
 
     if (openAiApiKey && !isQuotaExhausted) {
-      const modelsToTry = ['dall-e-3', 'dall-e-2'];
+      const modelsToTry = ['gpt-image-1', 'chatgpt-image-latest', 'dall-e-3'];
       
       for (const model of modelsToTry) {
         try {
@@ -184,7 +104,7 @@ export async function GET(req: NextRequest) {
             model: model,
             prompt: fullPrompt.slice(0, 950),
             n: 1,
-            size: model === 'dall-e-3' ? '1024x1024' : '512x512',
+            size: '1024x1024',
           };
           if (model === 'dall-e-3') {
             bodyPayload.quality = 'hd';

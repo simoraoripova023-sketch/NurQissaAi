@@ -380,20 +380,21 @@ export async function POST(req: NextRequest) {
       const coverPrompt = `${characterPersona} in a cozy warm glowing ${translateColorToEnglish(color)} room, gentle ambient sunlight, loving peaceful Islamic family ambiance, smiling warmly with joyful eyes, title banner, crisp clean children picturebook illustration, masterpiece`;
       
       const authenticCoverUrl = isBoy ? '/stories/yusuf/cover.jpeg' : '/stories/asmo_cover_custom.jpeg';
+      const coverImageUrl = authenticCoverUrl;
 
-      // Generate Cover Art using dynamic multi-tier AI image generator
-      const coverImageUrl = createAiImageUrl(coverPrompt, storyId, 0, chosenStyle, profile.gender);
-
-      // Generate pristine AI illustrations for every single page
+      // Assign authentic, 100% clean, distortion-free HD fairytale illustrations for every page
       const enhancedPages = generatedStory.pages.map((p, idx) => {
         const pageNum = idx + 1;
+        const safePage = ((pageNum - 1) % 8) + 1;
+        const pageImageUrl = isBoy
+          ? `/stories/yusuf/page_${safePage}.jpeg`
+          : `/stories/fotima/page_${safePage}.jpeg`;
+
         const actionText = p.scene_summary || p.text_uz?.slice(0, 150) || 'heartwarming bedtime moment';
         
         const pagePrompt = p.image_prompt && p.image_prompt.includes(childName)
           ? p.image_prompt
           : `${characterPersona} in ${actionText}, ${translateColorToEnglish(color)} setting, soft warm golden lighting, adorable cheerful expression`;
-
-        const pageImageUrl = createAiImageUrl(pagePrompt, storyId, pageNum, chosenStyle, profile.gender);
 
         return {
           page_number: pageNum,

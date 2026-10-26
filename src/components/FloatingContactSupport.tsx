@@ -23,10 +23,6 @@ export default function FloatingContactSupport() {
   const { locale } = useAppStore();
   const isUz = locale === 'uz';
 
-  // Do not obstruct immersive storybook reading
-  if (pathname?.startsWith('/story/')) {
-    return null;
-  }
 
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'nur_assistant' | 'founder' | 'feedback'>('nur_assistant');
@@ -215,6 +211,11 @@ export default function FloatingContactSupport() {
       setIsSubmitting(false);
     }
   };
+
+  // Do not obstruct immersive storybook reading
+  if (pathname?.startsWith('/story/')) {
+    return null;
+  }
 
   return (
     <>

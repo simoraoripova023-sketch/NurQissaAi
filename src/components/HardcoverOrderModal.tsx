@@ -23,8 +23,8 @@ export default function HardcoverOrderModal() {
   // Sync recipient and phone if currentUser logs in
   React.useEffect(() => {
     if (currentUser) {
-      if (!recipientName && currentUser.name) setRecipientName(currentUser.name);
-      if (!phone && currentUser.phone) setPhone(cleanUzbekPhoneDigits(currentUser.phone));
+      setRecipientName((prev) => prev || currentUser.name || '');
+      setPhone((prev) => prev || (currentUser.phone ? cleanUzbekPhoneDigits(currentUser.phone) : ''));
     }
   }, [currentUser]);
 

@@ -99,9 +99,20 @@ export default function AuthModal() {
       if (google?.accounts?.id && clientId) {
         google.accounts.id.initialize({
           client_id: clientId,
-          callback: (response: any) => {
+          callback: async (response: any) => {
             if (response?.credential) {
               try {
+                // Also create authentic Supabase session via native Google ID token
+                try {
+                  const { supabase } = await import('@/lib/supabase');
+                  await supabase.auth.signInWithIdToken({
+                    provider: 'google',
+                    token: response.credential,
+                  });
+                } catch (sErr) {
+                  console.warn('Supabase signInWithIdToken notice:', sErr);
+                }
+
                 const base64Url = response.credential.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                 const jsonPayload = decodeURIComponent(
