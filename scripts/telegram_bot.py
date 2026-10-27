@@ -10,7 +10,7 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='repla
 
 TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4')
 BASE_URL = f"https://api.telegram.org/bot{TOKEN}"
-ADMIN_CHAT_ID = 5636799086  # Owner's confidential Chat ID
+ADMIN_CHAT_ID = int(os.environ.get('ADMIN_TELEGRAM_ID', 5636799086))  # Owner's Chat ID
 WEB_APP_URL = "https://nur-qissa.uz"
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -126,10 +126,7 @@ def start_polling():
                                 chat_id, 
                                 "⚠️ <b>Shikoyat yoki muammoingizni yozing:</b>\n\n"
                                 "Saytda duch kelgan xatolik yoki noqulaylik haqida batafsil yozib yuboring 👇"
-                            )
-                        continue
-
-                    # 2. Handle Text Messages
+                            )                    # 2. Handle Text Messages & Media
                     message = update.get("message")
                     if not message:
                         continue
@@ -139,7 +136,51 @@ def start_polling():
                     first_name = message.get("from", {}).get("first_name", "Foydalanuvchi")
                     username = message.get("from", {}).get("username", "")
                     contact_info = f"@{username}" if username else f"ID: {chat_id}"
+
+                    # Check for voice or audio files
+                    audio_obj = message.get("voice") or message.get("audio")
+                    if audio_obj:
+                        file_id = audio_obj.get("file_id")
+                        duration = audio_obj.get("duration", 0)
+                        try:
+                            file_res = requests.get(f"{BASE_URL}/getFile", params={"file_id": file_id}, timeout=10).json()
+                            if file_res.get("ok"):
+                                file_path = file_res["result"]["file_path"]
+                                ext = os.path.splitext(file_path)[1] or (".ogg" if message.get("voice") else ".mp3")
+                                samples_dir = os.path.join(BASE_DIR, 'data', 'voice_samples')
+                                os.makedirs(samples_dir, exist_ok=True)
+                                clean_name = first_name.replace(" ", "_").lower()
+                                save_name = f"voice_{int(time.time())}_{clean_name}{ext}"
+                                dest_path = os.path.join(samples_dir, save_name)
+
+                                down_res = requests.get(f"https://api.telegram.org/file/bot{TOKEN}/{file_path}", timeout=30)
+                                if down_res.status_code == 200:
+                                    with open(dest_path, "wb") as f:
+                                        f.write(down_res.content)
+                                    print(f"🎤 Ovoz saqlandi: {dest_path}", flush=True)
+
+                                notify_owner(
+                                    f"🎤 <b>[YANGI OVOZLI XABAR]</b> (NurQissa AI)\n\n"
+                                    f"👤 <b>Yuboruvchi:</b> {first_name} ({contact_info})\n"
+                                    f"⏱ <b>Davomiyligi:</b> {duration} soniya\n"
+                                    f"📁 <b>Saqlangan fayl:</b> <code>{save_name}</code>\n"
+                                    f"🕒 <b>Vaqt:</b> {time.strftime('%Y-%m-%d %H:%M:%S')}"
+                                )
+
+                                send_message(chat_id, (
+                                    f"🎤 <b>Ovozli xabaringiz qabul qilindi!</b>\n\n"
+                                    f"Hurmatli <b>{first_name}</b>, audio yozuvingiz NurQissa AI ma'muriyatiga yetkazildi. Rahmat! 🙏"
+                                ))
+                                continue
+                        except Exception as a_err:
+                            print(f"Audio yuklash xatosi: {a_err}", flush=True)
                     
+                    # Empty text guard
+                    if not text:
+                        if message.get("photo") or message.get("document"):
+                            send_message(chat_id, "Iltimos, rasm yoki hujjat bilan birga taklif yoki shikoyat matnini ham yozib yuboring.")
+                        continue
+
                     print(f"📩 [{first_name} ({contact_info})]: {text}", flush=True)
                     
                     # /start command
@@ -203,18 +244,23 @@ def start_polling():
                         if chat_id == ADMIN_CHAT_ID:
                             if os.path.exists(FEEDBACKS_FILE):
                                 with open(FEEDBACKS_FILE, 'r', encoding='utf-8') as f:
-                                    fbs = json.load(f)[:10]
+                                    fbs = json.load(f)[:15]
                                 if fbs:
                                     report = "📋 <b>Oxirgi Taklif va Shikoyatlar:</b>\n\n"
                                     for idx, item in enumerate(fbs, 1):
                                         t_icon = "💡" if item.get('type') == 'taklif' else "⚠️"
-                                        report += (
+                                        entry_text = (
                                             f"{idx}. {t_icon} <b>[{item.get('type', 'taklif').upper()}]</b>\n"
                                             f"👤 Kimdan: {item.get('name')} ({item.get('contact')})\n"
                                             f"🕒 Vaqt: {item.get('created_at')}\n"
                                             f"📝 Matn: {item.get('message')}\n\n"
                                         )
-                                    send_message(chat_id, report)
+                                        if len(report) + len(entry_text) > 3800:
+                                            send_message(chat_id, report)
+                                            report = ""
+                                        report += entry_text
+                                    if report:
+                                        send_message(chat_id, report)
                                 else:
                                     send_message(chat_id, "Hozircha hech qanday murojaat kelib tushmadi.")
                             else:
@@ -260,7 +306,6 @@ def start_polling():
                             ]
                         }
                         send_message(chat_id, resp, markup)
-                        
         except Exception as e:
             print(f"Polling xatosi: {e}", flush=True)
             time.sleep(3)
