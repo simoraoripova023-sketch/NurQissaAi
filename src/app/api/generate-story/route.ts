@@ -348,6 +348,29 @@ Output Valid JSON ONLY with this exact schema:
   }
 }
 
+
+async function persistStoryToSupabase(story: any) {
+  if (!story || !story.id) return;
+  try {
+    const { supabaseAdmin } = await import('@/lib/supabase');
+    await supabaseAdmin.from('stories').upsert([{
+      id: story.id,
+      title_uz: story.title_uz,
+      title_en: story.title_en || story.title_uz,
+      child_name: story.child_profile?.child_name,
+      child_age: story.child_profile?.age,
+      theme: story.child_profile?.parent_goal,
+      cover_image_url: story.cover_image_url,
+      pages: story.pages,
+      reflection: story.reflection,
+      quiz: story.quiz || [],
+      created_at: story.created_at || new Date().toISOString(),
+    }]);
+  } catch (err) {
+    console.warn('Could not persist story to Supabase:', err);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const profile: ChildProfile = await req.json();
@@ -439,6 +462,8 @@ export async function POST(req: NextRequest) {
         quiz: generatedStory.quiz || [],
       };
 
+      await persistStoryToSupabase(dynamicStory);
+
       return NextResponse.json({
         success: true,
         source: 'ai-consistent-engine',
@@ -454,6 +479,8 @@ export async function POST(req: NextRequest) {
       chosenStylePrompt,
       NEGATIVE_ENHANCERS
     );
+
+    await persistStoryToSupabase(dynamicIslamicFallback);
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   BookOpen, Plus, Heart, Trash2, Sparkles, Volume2, 
@@ -10,11 +10,64 @@ import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
 
 export default function LibraryPage() {
-  const { locale, stories, toggleFavorite, removeStoryFromLibrary, setIsOrderModalOpen, setActiveStory } = useAppStore();
+  const { locale, stories, toggleFavorite, removeStoryFromLibrary, setIsOrderModalOpen, setActiveStory, addStoryToLibrary } = useAppStore();
   const t = translations[locale];
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterFavorites, setFilterFavorites] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function syncStories() {
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { data } = await supabase
+          .from('stories')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (data && data.length > 0 && isMounted) {
+          data.forEach((row) => {
+            const exists = useAppStore.getState().stories.some((s) => s.id === row.id);
+            if (!exists) {
+              addStoryToLibrary({
+                id: row.id,
+                created_at: row.created_at,
+                title_uz: row.title_uz,
+                title_en: row.title_en || row.title_uz,
+                cover_image_url: row.cover_image_url,
+                theme_color: '#013E37',
+                child_profile: {
+                  child_name: row.child_name || 'Farzand',
+                  age: row.child_age || 6,
+                  gender: 'boy',
+                  daily_activity: '',
+                  emotional_state: '',
+                  parent_goal: (row.theme as any) || 'kindness',
+                  favorite_animal: 'Qushcha',
+                  favorite_color: 'Zumrad yashil',
+                  story_setting: 'blessed_garden',
+                },
+                prologue_uz: row.title_uz,
+                prologue_en: row.title_en || row.title_uz,
+                pages: row.pages || [],
+                reflection: row.reflection || {},
+                quiz: row.quiz || [],
+              });
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Library cloud sync notice:', err);
+      }
+    }
+    syncStories();
+    return () => {
+      isMounted = false;
+    };
+  }, [addStoryToLibrary]);
+
 
   const filteredStories = stories.filter((story) => {
     const title = (locale === 'uz' ? story.title_uz : story.title_en).toLowerCase();

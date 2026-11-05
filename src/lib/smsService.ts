@@ -1,3 +1,5 @@
+import { supabaseAdmin } from './supabase';
+
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const ADMIN_CHAT_ID = process.env.ADMIN_TELEGRAM_ID;
 
@@ -30,22 +32,15 @@ export async function sendSMSVerification(phoneDigits: string, code: string, par
   otpStore.set(cleanPhone, { code, expiresAt });
   otpStore.set(fullPhone, { code, expiresAt });
 
-  // Sync with Supabase for persistent serverless reliability
+  // Sync with Supabase otps table via supabaseAdmin for serverless reliability
   try {
-    const { supabase } = await import('@/lib/supabase');
-    await supabase.from('otps').upsert([
+    await supabaseAdmin.from('otps').upsert([
       { phone: cleanPhone, code, expires_at: expiresAt },
       { phone: fullPhone, code, expires_at: expiresAt },
     ]);
-  } catch {}
-
-  try {
-    const { supabase } = await import('@/lib/supabase');
-    await supabase.from('feedbacks').insert([
-      { type: 'otp', contact: cleanPhone, name: code, message: expiresAt.toString() },
-      { type: 'otp', contact: fullPhone, name: code, message: expiresAt.toString() },
-    ]);
-  } catch {}
+  } catch (err) {
+    console.warn('OTP Supabase sync notice:', err);
+  }
 
   let sentViaEskiz = false;
   let eskizError: string | null = null;
@@ -56,7 +51,6 @@ export async function sendSMSVerification(phoneDigits: string, code: string, par
 
   if (eskizEmail && eskizPassword) {
     try {
-      // Login to Eskiz to get token
       const authRes = await fetch('https://notify.eskiz.uz/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -125,7 +119,7 @@ export async function sendSMSVerification(phoneDigits: string, code: string, par
 }
 
 /**
- * Validates the entered OTP code (checks in-memory store and Supabase database)
+ * Validates the entered OTP code (checks in-memory store and Supabase otps table)
  */
 export async function verifyOTPCode(phoneDigits: string, inputCode: string): Promise<{ valid: boolean; message: string }> {
   const cleanPhone = phoneDigits.replace(/\D/g, '');
@@ -138,11 +132,10 @@ export async function verifyOTPCode(phoneDigits: string, inputCode: string): Pro
 
   let stored = otpStore.get(cleanPhone) || otpStore.get(fullPhone);
 
-  // If not found in memory (e.g. serverless cold start), check Supabase primary table
+  // If not found in memory (e.g. serverless cold start), check Supabase primary table via supabaseAdmin
   if (!stored) {
     try {
-      const { supabase } = await import('@/lib/supabase');
-      const { data } = await supabase
+      const { data } = await supabaseAdmin
         .from('otps')
         .select('*')
         .or(`phone.eq.${cleanPhone},phone.eq.${fullPhone}`)
@@ -153,26 +146,9 @@ export async function verifyOTPCode(phoneDigits: string, inputCode: string): Pro
       if (data && data.code && data.expires_at) {
         stored = { code: data.code, expiresAt: Number(data.expires_at) };
       }
-    } catch {}
-  }
-
-  // Fallback to feedbacks audit storage if otps table is unavailable
-  if (!stored) {
-    try {
-      const { supabase } = await import('@/lib/supabase');
-      const { data } = await supabase
-        .from('feedbacks')
-        .select('*')
-        .eq('type', 'otp')
-        .or(`contact.eq.${cleanPhone},contact.eq.${fullPhone}`)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (data && data.name && data.message) {
-        stored = { code: data.name, expiresAt: Number(data.message) };
-      }
-    } catch {}
+    } catch (err) {
+      console.warn('Verify OTP database read notice:', err);
+    }
   }
 
   if (!stored) {
@@ -183,8 +159,7 @@ export async function verifyOTPCode(phoneDigits: string, inputCode: string): Pro
     otpStore.delete(cleanPhone);
     otpStore.delete(fullPhone);
     try {
-      const { supabase } = await import('@/lib/supabase');
-      await supabase.from('otps').delete().or(`phone.eq.${cleanPhone},phone.eq.${fullPhone}`);
+      await supabaseAdmin.from('otps').delete().or(`phone.eq.${cleanPhone},phone.eq.${fullPhone}`);
     } catch {}
     return { valid: false, message: "Kodni amal qilish muddati (5 daqiqa) tugagan. Yangi kod so'rang." };
   }
@@ -197,8 +172,8 @@ export async function verifyOTPCode(phoneDigits: string, inputCode: string): Pro
   otpStore.delete(cleanPhone);
   otpStore.delete(fullPhone);
   try {
-    const { supabase } = await import('@/lib/supabase');
-    await supabase.from('otps').delete().or(`phone.eq.${cleanPhone},phone.eq.${fullPhone}`);
+    await supabaseAdmin.from('otps').delete().or(`phone.eq.${cleanPhone},phone.eq.${fullPhone}`);
   } catch {}
+
   return { valid: true, message: "Telefon raqamingiz muvaffaqiyatli tasdiqlandi!" };
 }

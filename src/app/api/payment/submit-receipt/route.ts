@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrder, updateOrder, generateOrderSecret } from '@/lib/orderService';
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4';
-const ADMIN_CHAT_ID = process.env.ADMIN_TELEGRAM_ID || '5636799086';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const ADMIN_CHAT_ID = process.env.ADMIN_TELEGRAM_ID;
 const DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://nur-qissa.uz';
 
 export async function POST(req: NextRequest) {
@@ -68,28 +68,30 @@ export async function POST(req: NextRequest) {
     );
 
     // Send to Telegram with 1-click inline buttons
-    try {
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: ADMIN_CHAT_ID,
-          text: tgMessage,
-          parse_mode: 'HTML',
-          reply_markup: {
-            inline_keyboard: [
-              [
-                { text: `✅ 1-bosishda Tasdiqlash (${Number(order.amount).toLocaleString('uz-UZ')} so'm)`, url: approveUrl },
-              ],
-              [
-                { text: '❌ Rad etish (Pul tushmagan / Soxta)', url: rejectUrl },
+    if (BOT_TOKEN && ADMIN_CHAT_ID) {
+      try {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: ADMIN_CHAT_ID,
+            text: tgMessage,
+            parse_mode: 'HTML',
+            reply_markup: {
+              inline_keyboard: [
+                [
+                  { text: `✅ 1-bosishda Tasdiqlash (${Number(order.amount).toLocaleString('uz-UZ')} so'm)`, url: approveUrl },
+                ],
+                [
+                  { text: '❌ Rad etish (Pul tushmagan / Soxta)', url: rejectUrl },
+                ]
               ]
-            ]
-          }
-        }),
-      });
-    } catch (tgErr) {
-      console.error('Failed to notify Telegram bot:', tgErr);
+            }
+          }),
+        });
+      } catch (tgErr) {
+        console.error('Failed to notify Telegram bot:', tgErr);
+      }
     }
 
     return NextResponse.json({

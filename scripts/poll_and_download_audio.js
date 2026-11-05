@@ -2,7 +2,17 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const TOKEN = '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4';
+function getBotToken() {
+  if (process.env.TELEGRAM_BOT_TOKEN) return process.env.TELEGRAM_BOT_TOKEN;
+  const envPath = path.join(__dirname, '..', '.env.local');
+  if (fs.existsSync(envPath)) {
+    const content = fs.readFileSync(envPath, 'utf8');
+    const match = content.match(/TELEGRAM_BOT_TOKEN=([^\r\n]+)/);
+    if (match) return match[1].trim();
+  }
+  return '';
+}
+const TOKEN = getBotToken();
 const BASE_URL = `https://api.telegram.org/bot${TOKEN}`;
 
 function apiRequest(endpoint, params = {}) {

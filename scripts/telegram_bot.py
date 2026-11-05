@@ -8,17 +8,44 @@ import io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4')
-BASE_URL = f"https://api.telegram.org/bot{TOKEN}"
-ADMIN_CHAT_ID = int(os.environ.get('ADMIN_TELEGRAM_ID', 5636799086))  # Owner's Chat ID
-WEB_APP_URL = "https://nur-qissa.uz"
-
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Avtomatik .env.local yoki .env faylidan muhit o'zgaruvchilarini yuklash
+def _load_env_files():
+    for fname in ['.env.local', '.env']:
+        fpath = os.path.join(BASE_DIR, fname)
+        if os.path.exists(fpath):
+            try:
+                with open(fpath, 'r', encoding='utf-8') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#') and '=' in line:
+                            k, v = line.split('=', 1)
+                            k = k.strip()
+                            v = v.strip().strip('"').strip("'")
+                            if k not in os.environ:
+                                os.environ[k] = v
+            except Exception:
+                pass
+
+_load_env_files()
+
+TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+if not TOKEN:
+    print("XATO: TELEGRAM_BOT_TOKEN muhit o'zgaruvchisi topilmadi (.env.local da ko'rsating)!", file=sys.stderr)
+    sys.exit(1)
+
+BASE_URL = f"https://api.telegram.org/bot{TOKEN}"
+ADMIN_CHAT_ID = int(os.environ.get('ADMIN_TELEGRAM_ID', 0))
+if not ADMIN_CHAT_ID:
+    print("OGOHLANTIRISH: ADMIN_TELEGRAM_ID belgilanmagan (.env.local da ko'rsating)!", file=sys.stderr)
+
+WEB_APP_URL = os.environ.get('NEXT_PUBLIC_SITE_URL', 'https://nur-qissa.uz')
 FEEDBACKS_FILE = os.path.join(BASE_DIR, 'data', 'feedbacks.json')
 user_states = {}
 
 def notify_owner(notification_text):
-    """Sends notification EXCLUSIVELY to the owner's personal Telegram ID (5636799086)."""
+    """Sends notification EXCLUSIVELY to the owner's personal Telegram ID (ADMIN_CHAT_ID)."""
     try:
         requests.post(f"{BASE_URL}/sendMessage", json={
             "chat_id": ADMIN_CHAT_ID,
@@ -50,7 +77,7 @@ def save_feedback(user_name, contact, message, fb_type="taklif"):
     with open(FEEDBACKS_FILE, 'w', encoding='utf-8') as f:
         json.dump(feedbacks, f, ensure_ascii=False, indent=2)
 
-    # Forward EXCLUSIVELY to the Owner (5636799086)
+    # Forward EXCLUSIVELY to the Owner (ADMIN_CHAT_ID)
     type_badge = "💡 <b>[YANGI TAKLIF]</b>" if fb_type == "taklif" else "⚠️ <b>[YANGI SHIKOYAT]</b>"
     admin_msg = (
         f"🔔 {type_badge} (NurQissa AI)\n\n"

@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { CLICK_PLANS, ClickPlan } from './click';
+import { supabaseAdmin } from './supabase';
 
 export interface Order {
   id: string;
@@ -26,13 +27,13 @@ declare global {
 const ordersStore = globalThis.__nurqissa_orders_store ?? new Map<string, Order>();
 globalThis.__nurqissa_orders_store = ordersStore;
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8841612635:AAGaKyz6iAES2CxmpCg2Sff-N3jQwQA7zc4';
+const ORDER_SECRET_SALT = process.env.ORDER_SECRET_KEY || process.env.TELEGRAM_BOT_TOKEN || 'nurqissa_secure_order_salt';
 
 /**
  * Generate cryptographic secret signature for order actions (prevents forged approvals)
  */
 export function generateOrderSecret(orderId: string): string {
-  return crypto.createHmac('sha256', BOT_TOKEN).update(orderId).digest('hex').slice(0, 16);
+  return crypto.createHmac('sha256', ORDER_SECRET_SALT).update(orderId).digest('hex').slice(0, 16);
 }
 
 export function verifyOrderSecret(orderId: string, signature: string): boolean {
@@ -77,10 +78,9 @@ export async function createOrder(params: {
 
   ordersStore.set(orderId, order);
 
-  // Multi-tier persistence: try primary orders table, then audit storage in feedbacks
+  // Securely persist to primary orders table via supabaseAdmin
   try {
-    const { supabase } = await import('@/lib/supabase');
-    await supabase.from('orders').insert([{
+    await supabaseAdmin.from('orders').upsert([{
       id: order.id,
       plan_key: order.planKey,
       plan_name: order.planName,
@@ -88,20 +88,13 @@ export async function createOrder(params: {
       status: order.status,
       user_name: order.userName,
       user_phone: order.userPhone,
+      provider: order.provider,
       created_at: order.created_at,
       updated_at: order.updated_at,
     }]);
-  } catch {}
-
-  try {
-    const { supabase } = await import('@/lib/supabase');
-    await supabase.from('feedbacks').insert([{
-      type: 'order',
-      contact: order.id,
-      name: order.status,
-      message: JSON.stringify(order),
-    }]);
-  } catch {}
+  } catch (err) {
+    console.warn('Orders persistence notice:', err);
+  }
 
   return order;
 }
@@ -111,10 +104,9 @@ export async function getOrder(orderId: string): Promise<Order | null> {
   const cached = ordersStore.get(orderId);
   if (cached) return cached;
 
-  // 1. Try primary Supabase 'orders' table
+  // 1. Try primary Supabase 'orders' table via supabaseAdmin
   try {
-    const { supabase } = await import('@/lib/supabase');
-    const { data } = await supabase.from('orders').select('*').eq('id', orderId).single();
+    const { data } = await supabaseAdmin.from('orders').select('*').eq('id', orderId).maybeSingle();
     if (data) {
       const order: Order = {
         id: data.id,
@@ -125,36 +117,21 @@ export async function getOrder(orderId: string): Promise<Order | null> {
         status: data.status,
         userName: data.user_name,
         userPhone: data.user_phone,
+        provider: data.provider || 'card',
+        receiptNote: data.receipt_note,
         clickTransId: data.click_trans_id,
+        clickPrepareId: data.click_prepare_id,
         created_at: data.created_at,
         updated_at: data.updated_at,
       };
       ordersStore.set(orderId, order);
       return order;
     }
-  } catch {}
+  } catch (err) {
+    console.warn('Fetch order notice:', err);
+  }
 
-  // 2. Try persistent audit log in 'feedbacks' table (reliable across serverless instances)
-  try {
-    const { supabase } = await import('@/lib/supabase');
-    const { data } = await supabase
-      .from('feedbacks')
-      .select('*')
-      .eq('type', 'order')
-      .eq('contact', orderId)
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    if (data && data.length > 0 && data[0].message) {
-      const parsed = JSON.parse(data[0].message);
-      if (parsed && parsed.id) {
-        ordersStore.set(orderId, parsed);
-        return parsed;
-      }
-    }
-  } catch {}
-
-  // 3. Deterministic self-healing fallback from orderId prefix
+  // 2. Deterministic self-healing fallback from orderId prefix
   if (orderId.startsWith('NQ-')) {
     const isPack3 = orderId.includes('29K');
     const isVip = orderId.includes('VIP');
@@ -193,24 +170,15 @@ export async function updateOrder(orderId: string, updates: Partial<Order>): Pro
   ordersStore.set(orderId, updated);
 
   try {
-    const { supabase } = await import('@/lib/supabase');
-    await supabase.from('orders').update({
+    await supabaseAdmin.from('orders').update({
       status: updated.status,
       click_trans_id: updated.clickTransId,
+      receipt_note: updated.receiptNote,
       updated_at: updated.updated_at,
     }).eq('id', orderId);
-  } catch {}
-
-  try {
-    const { supabase } = await import('@/lib/supabase');
-    await supabase.from('feedbacks').insert([{
-      type: 'order',
-      contact: orderId,
-      name: updated.status,
-      message: JSON.stringify(updated),
-    }]);
-  } catch {}
+  } catch (err) {
+    console.warn('Update order notice:', err);
+  }
 
   return updated;
 }
-

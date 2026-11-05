@@ -13,7 +13,7 @@ export default function StoryReaderPage() {
   const params = useParams();
   const router = useRouter();
   const storyId = params?.id as string;
-  const { stories, locale } = useAppStore();
+  const { stories, locale, addStoryToLibrary } = useAppStore();
 
   const [story, setStory] = useState<StoryBook | null>(null);
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ export default function StoryReaderPage() {
   useEffect(() => {
     if (!storyId) return;
 
-    // First check Zustand stories, then sample stories, then fallback to local storage
+    // 1. First check Zustand stories and sample stories
     const found = 
       stories.find((s) => s.id === storyId) || 
       SAMPLE_STORIES.find((s) => s.id === storyId);
@@ -33,34 +33,95 @@ export default function StoryReaderPage() {
         const docTitle = locale === 'uz' ? found.title_uz : (found.title_en || found.title_uz);
         document.title = `${docTitle} - NurQissa AI`;
       }
-    } else {
-      // Try reading from localStorage directly if refreshed
-      if (typeof window !== 'undefined') {
-        const stored = localStorage.getItem('nurqissa_store') || localStorage.getItem('nurqissa_stories');
-        if (stored) {
-          try {
-            const parsed = JSON.parse(stored);
-            const storyList = parsed.state?.stories || parsed;
-            if (Array.isArray(storyList)) {
-              const lsFound = storyList.find((s: StoryBook) => s && s.id === storyId);
-              if (lsFound) {
-                setStory(lsFound);
-                setLoading(false);
-                if (typeof document !== 'undefined') {
-                  const docTitle = locale === 'uz' ? lsFound.title_uz : (lsFound.title_en || lsFound.title_uz);
-                  document.title = `${docTitle} - NurQissa AI`;
-                }
-                return;
+      return;
+    }
+
+    // 2. Try reading from localStorage directly if refreshed
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('nurqissa_store') || localStorage.getItem('nurqissa_stories');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          const storyList = parsed.state?.stories || parsed;
+          if (Array.isArray(storyList)) {
+            const lsFound = storyList.find((s: StoryBook) => s && s.id === storyId);
+            if (lsFound) {
+              setStory(lsFound);
+              setLoading(false);
+              if (typeof document !== 'undefined') {
+                const docTitle = locale === 'uz' ? lsFound.title_uz : (lsFound.title_en || lsFound.title_uz);
+                document.title = `${docTitle} - NurQissa AI`;
               }
+              return;
             }
-          } catch (e) {
-            console.error(e);
           }
+        } catch (e) {
+          console.error(e);
         }
       }
-      setLoading(false);
     }
-  }, [storyId, stories, locale]);
+
+    // 3. Fallback to Supabase cloud database (for shared links or multi-device sync)
+    let isMounted = true;
+    async function fetchFromCloud() {
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { data } = await supabase
+          .from('stories')
+          .select('*')
+          .eq('id', storyId)
+          .maybeSingle();
+
+        if (data && isMounted) {
+          const cloudStory: StoryBook = {
+            id: data.id,
+            created_at: data.created_at,
+            title_uz: data.title_uz,
+            title_en: data.title_en || data.title_uz,
+            cover_image_url: data.cover_image_url,
+            theme_color: '#013E37',
+            child_profile: {
+              child_name: data.child_name || 'Farzand',
+              age: data.child_age || 6,
+              gender: 'boy',
+              daily_activity: '',
+              emotional_state: '',
+              parent_goal: (data.theme as any) || 'kindness',
+              favorite_animal: 'Qushcha',
+              favorite_color: 'Zumrad yashil',
+              story_setting: 'blessed_garden',
+            },
+            prologue_uz: data.title_uz,
+            prologue_en: data.title_en || data.title_uz,
+            pages: data.pages || [],
+            reflection: data.reflection || {},
+            quiz: data.quiz || [],
+          };
+
+          setStory(cloudStory);
+          addStoryToLibrary(cloudStory);
+          if (typeof document !== 'undefined') {
+            const docTitle = locale === 'uz' ? cloudStory.title_uz : cloudStory.title_en;
+            document.title = `${docTitle} - NurQissa AI`;
+          }
+          setLoading(false);
+          return;
+        }
+      } catch (cloudErr) {
+        console.warn('Cloud story fetch notice:', cloudErr);
+      }
+
+      if (isMounted) {
+        setLoading(false);
+      }
+    }
+
+    fetchFromCloud();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [storyId, stories, locale, addStoryToLibrary]);
 
   if (loading) {
     return (

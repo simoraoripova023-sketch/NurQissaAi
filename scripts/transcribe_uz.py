@@ -2,7 +2,15 @@ import os
 import json
 from openai import OpenAI
 
-api_key = os.environ.get('OPENAI_API_KEY', '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')
+api_key = os.environ.get('OPENAI_API_KEY', '')
+if not api_key:
+    env_local = os.path.join(os.path.dirname(__file__), '..', '.env.local')
+    if os.path.exists(env_local):
+        with open(env_local, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith('OPENAI_API_KEY='):
+                    api_key = line.split('=', 1)[1].strip()
+                    break
 client = OpenAI(api_key=api_key)
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

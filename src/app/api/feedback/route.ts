@@ -165,8 +165,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const { supabase } = await import('@/lib/supabase');
-    const { data } = await supabase.from('feedbacks').select('*').order('created_at', { ascending: false }).limit(20);
+    const { supabaseAdmin } = await import('@/lib/supabase');
+    const { data } = await supabaseAdmin.from('feedbacks').select('*').order('created_at', { ascending: false }).limit(20);
     if (data && data.length > 0) {
       return NextResponse.json({ feedbacks: data });
     }
