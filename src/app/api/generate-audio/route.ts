@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { synthesizeEdgeTts } from '@/lib/edgeTts';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export const runtime = 'nodejs';
 
@@ -29,10 +30,25 @@ const ELEVENLABS_VOICE_MAP: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    // Max 30 audio generations per minute per client
+    const rateCheck = checkRateLimit(`gen_audio:${ip}`, 30, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: "Audio so'rovlari me'yordan oshdi. Birozdan so'ng qayta urinib ko'ring." },
+        { status: 429 }
+      );
+    }
+
     const { text, voiceId = 'mother', locale = 'uz' } = await req.json();
 
     if (!text || typeof text !== 'string' || !text.trim()) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
+    }
+
+    // Safety limit: avoid unbounded TTS generation costs
+    if (text.length > 2500) {
+      return NextResponse.json({ error: 'Matn hajmi juda katta (maksimal 2500 belgi)' }, { status: 400 });
     }
 
     // Clean text from markdown formatting, quotes and special characters for natural speech

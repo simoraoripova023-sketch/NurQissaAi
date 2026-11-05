@@ -11,11 +11,15 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    // In production, block all unauthorized simulations
-    if (process.env.NODE_ENV === 'production' && req.headers.get('x-admin-secret') !== process.env.ADMIN_SECRET_KEY) {
-      return NextResponse.json({
-        error: "Simulyatsiya faqat rivojlantirish (dev) rejimida mavjud.",
-      }, { status: 403 });
+    // In production, strictly gate behind ADMIN_SECRET_KEY
+    if (process.env.NODE_ENV === 'production') {
+      const adminSecret = process.env.ADMIN_SECRET_KEY;
+      const sentSecret = req.headers.get('x-admin-secret');
+      if (!adminSecret || !sentSecret || sentSecret !== adminSecret) {
+        return NextResponse.json({
+          error: "Simulyatsiya faqat rivojlantirish (dev) rejimida yoki maxsus admin kaliti bilan mavjud.",
+        }, { status: 403 });
+      }
     }
 
     const body = await req.json();

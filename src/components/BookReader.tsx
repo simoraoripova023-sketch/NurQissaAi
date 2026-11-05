@@ -176,8 +176,7 @@ export default function BookReader({ story }: BookReaderProps) {
       const data = await res.json();
       if (data.success && data.imageUrl) {
         setCustomPageImages((prev) => ({ ...prev, [pageIdx]: data.imageUrl }));
-        page.image_url = data.imageUrl;
-      } else {
+              } else {
         console.warn('AI image regeneration notice:', data?.error);
       }
     } catch (err: any) {

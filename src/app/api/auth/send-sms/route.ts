@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateOTP, sendSMSVerification } from '@/lib/smsService';
 import { isUzbekPhoneValid } from '@/lib/phoneHelper';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,6 +22,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Telefon raqam 9 xonali bo'lishi shart (masalan: 90 123 45 67)" },
         { status: 400 }
+      );
+    }
+
+    // Rate limiting: max 3 SMS per phone per 10 minutes
+    const rateCheck = checkRateLimit(`send_sms:${nineDigits}`, 3, 10 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: `Juda ko'p urinish. Iltimos, ${rateCheck.resetInSeconds} soniyadan keyin qayta urinib ko'ring.`,
+        },
+        { status: 429 }
       );
     }
 

@@ -57,7 +57,7 @@ function CallbackContent() {
           loginUser({
             name: fullName,
             phone: emailOrPhone,
-            childName: 'Alijon',
+            childName: '',
           });
 
           if (isMounted) {
@@ -92,7 +92,7 @@ function CallbackContent() {
             loginUser({
               name: fullName,
               phone: user.email || user.phone || '',
-              childName: 'Alijon',
+              childName: '',
             });
 
             setStatus('success');

@@ -774,8 +774,8 @@ export default function AuthModal() {
               ))}
             </div>
 
-            {/* Quick Demo Helper Chip (Allows 1-click test fill) */}
-            {demoOtpCode && (
+            {/* Quick Demo Helper Chip (Allows 1-click test fill only in development mode) */}
+            {process.env.NODE_ENV !== 'production' && demoOtpCode && (
               <div className="p-2.5 rounded-2xl bg-amber-50 dark:bg-pine-900/60 border border-amber-300 dark:border-pine-700 flex items-center justify-between gap-2 text-xs">
                 <div className="flex items-center gap-1.5 text-pine-900 dark:text-butter-200">
                   <KeyRound className="w-4 h-4 text-amber-600 shrink-0" />

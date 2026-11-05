@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -28,13 +29,28 @@ Javob berish qoidalari:
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    // Rate limit: max 20 chat messages per minute per client
+    const rateCheck = checkRateLimit(`support_chat:${ip}`, 20, 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: "Xabarlar chegarasi oshdi. Iltimos, bir daqiqadan so'ng qayta urinib ko'ring." },
+        { status: 429 }
+      );
+    }
+
     const { messages, userMessage } = await req.json();
 
     if (!userMessage && (!messages || messages.length === 0)) {
       return NextResponse.json({ error: 'Xabar kiritilmadi' }, { status: 400 });
     }
 
-    const conversation = messages || [{ role: 'user', content: userMessage }];
+    const rawConversation = messages || [{ role: 'user', content: userMessage }];
+    // Bound conversation length to last 8 messages and enforce text limits
+    const conversation = rawConversation.slice(-8).map((m: any) => ({
+      role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: String(m.content || '').slice(0, 1500),
+    }));
 
     // 1. Try OpenAI GPT-4o-mini first
     if (OPENAI_API_KEY) {
