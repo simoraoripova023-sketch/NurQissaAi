@@ -677,20 +677,6 @@ export default function StoryWizard() {
                       })}
                     </div>
                   </div>
-
-                  {/* 4. Optional 1-line custom wish */}
-                  <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-pine-800">
-                    <label className="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center justify-between">
-                      <span>{locale === 'uz' ? "Ertakda nima haqida aytilsin? (Ixtiyoriy):" : "Special wish for the plot (Optional):"}</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={childProfile.daily_activity}
-                      onChange={(e) => updateChildProfile({ daily_activity: e.target.value })}
-                      placeholder={locale === 'uz' ? "Masalan: Buvijonisiga yordam bergani, o'yinchoq ulashgani..." : "e.g. Helping grandparents, sharing toys..."}
-                      className="w-full px-4 py-2.5 rounded-2xl border border-slate-300 dark:border-pine-700 bg-slate-50 dark:bg-pine-950 text-xs font-medium text-slate-900 dark:text-butter-100 placeholder:text-slate-400"
-                    />
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

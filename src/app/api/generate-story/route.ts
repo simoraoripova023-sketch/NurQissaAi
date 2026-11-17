@@ -223,6 +223,8 @@ For EVERY page, you MUST generate an "image_prompt" in ENGLISH following this ex
 Formula: [LOCKED CHARACTER ANCHOR] + [PRECISE SCENE ACTION & EXPRESSION] + [ENVIRONMENT & OBJECTS] + [LIGHTING & STORYBOOK ART STYLE]
 Example: "${masterAnchor} is standing happily in a sunlit blooming orchard holding a crafted wooden birdhouse with smiling father, sunny golden daylight, delightful 3D Disney Pixar style children's picturebook illustration, crisp clean details, vibrant cheerful colors, masterpiece"
 
+IMPORTANT: You MUST return exactly ${targetPageCount} page objects in the "pages" array (from page 1 to ${targetPageCount}), each with complete text_uz (50-70 words minimum).
+
 Output Valid JSON ONLY with this exact schema:
 {
   "title_uz": "...",
@@ -300,12 +302,14 @@ Output Valid JSON ONLY with this exact schema:
       }
     }
 
-    // 2. Try Google Gemini models
+    // 2. Try Google Gemini modern high-speed models
     const geminiKey = getGeminiApiKey();
     const modelsToTry = [
-      'gemini-1.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-pro'
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite',
+      'gemini-flash-latest',
+      'gemini-3.5-flash',
+      'gemini-3.8-flash',
     ];
 
     let resultText = '';
