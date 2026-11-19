@@ -11,6 +11,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import AudioComingSoonModal from "@/components/AudioComingSoonModal";
+import TelegramMiniAppManager from "@/components/TelegramMiniAppManager";
 
 export const metadata: Metadata = {
   title: "NurQissa AI - Farzandingiz Bosh Qahramon Bo'lgan Sehrli & Ibratli Ertaklar",
@@ -65,6 +66,7 @@ export default function RootLayout({
     <html lang="uz" className="scroll-smooth">
       <head>
         <meta name="google-site-verification" content="2DCVJSLKJUChp0trw_SSZbtgT773khiackvzFK8zo9Q" />
+        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
         <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
       </head>
       <body className="min-h-screen flex flex-col bg-[#FDFBF7] dark:bg-[#0B0E1B] text-[#1E1B4B] dark:text-slate-100 antialiased selection:bg-amber-200 transition-colors duration-300">
@@ -81,6 +83,7 @@ export default function RootLayout({
           <ServiceWorkerRegister />
           <PwaInstallPrompt />
           <AudioComingSoonModal />
+          <TelegramMiniAppManager />
         </ThemeProvider>
       </body>
     </html>

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
+import { useTelegram } from '@/lib/useTelegram';
 import { SAMPLE_STORIES } from '@/lib/sampleStories';
 import { StoryBook } from '@/lib/types';
 import BookReader from '@/components/BookReader';
@@ -14,9 +15,18 @@ export default function StoryReaderPage() {
   const router = useRouter();
   const storyId = params?.id as string;
   const { stories, locale, addStoryToLibrary } = useAppStore();
+  const { setupBackButton } = useTelegram();
 
   const [story, setStory] = useState<StoryBook | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Setup Telegram BackButton
+  useEffect(() => {
+    const cleanup = setupBackButton(() => {
+      router.push('/library');
+    });
+    return cleanup;
+  }, [setupBackButton, router]);
 
   useEffect(() => {
     if (!storyId) return;

@@ -12,6 +12,7 @@ import { useAppStore } from '@/lib/store';
 import { translations } from '@/lib/translations';
 import { MoralVirtue, StorySetting, Gender, ReadingTimeContext } from '@/lib/types';
 import confetti from 'canvas-confetti';
+import { useTelegram } from '@/lib/useTelegram';
 
 import { ILLUSTRATION_STYLES } from '@/lib/illustrationHelper';
 
@@ -35,6 +36,21 @@ export default function StoryWizard() {
   const [generationStep, setGenerationStep] = useState(0);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { setupBackButton, hapticImpact, hapticSuccess, hapticSelection } = useTelegram() as any;
+
+  // Telegram BackButton handler for wizard steps
+  useEffect(() => {
+    if (!setupBackButton) return;
+    const cleanup = setupBackButton(() => {
+      if (step > 1) {
+        setStep(step - 1);
+      } else {
+        router.push('/');
+      }
+    });
+    return cleanup;
+  }, [step, setupBackButton, router]);
 
   // Auto pre-fill child's name from currentUser account if available and not yet set
   useEffect(() => {
